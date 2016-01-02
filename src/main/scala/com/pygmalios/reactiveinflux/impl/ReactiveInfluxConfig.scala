@@ -1,12 +1,11 @@
 package com.pygmalios.reactiveinflux.impl
 
-import java.net.URI
-
+import akka.http.scaladsl.model.Uri
 import com.typesafe.config.{Config, ConfigFactory}
 
 private[impl] trait ReactiveInfluxConfig extends Serializable {
   def reactiveinflux: Config
-  def url: URI
+  def url: Uri
 }
 
 private class DefaultReactiveInfluxConfig(config: Option[Config] = None) extends ReactiveInfluxConfig {
@@ -16,7 +15,7 @@ private class DefaultReactiveInfluxConfig(config: Option[Config] = None) extends
   }
 
   val reactiveinflux = rootConfig.getConfig("reactiveinflux")
-  val url = new URI(reactiveinflux.getString("url"))
+  val url = Uri(reactiveinflux.getString("url"))
 }
 
 private[reactiveinflux] object ReactiveInfluxConfig {

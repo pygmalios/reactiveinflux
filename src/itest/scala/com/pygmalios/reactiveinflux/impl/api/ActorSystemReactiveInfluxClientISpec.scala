@@ -15,10 +15,22 @@ class ActorSystemReactiveInfluxClientISpec(_system: ActorSystem) extends TestKit
   }
 
   test("Send ping to test InfluxDB") {
-    // Prepare
-    val client = new ActorSystemReactiveInfluxClient(system, ITestConfig.reactiveInfluxConfig)
+    val testScope = new TestScope
+    import testScope._
 
     // Execute
     assert(client.ping().futureValue.influxDbVersion == "0.9.6.1")
+  }
+
+
+  test("Create test DB") {
+    val testScope = new TestScope
+    import testScope._
+
+    client.createDatabase("ActorSystemReactiveInfluxClientISpec").futureValue
+  }
+
+  private class TestScope {
+    val client = new ActorSystemReactiveInfluxClient(system, ITestConfig.reactiveInfluxConfig)
   }
 }

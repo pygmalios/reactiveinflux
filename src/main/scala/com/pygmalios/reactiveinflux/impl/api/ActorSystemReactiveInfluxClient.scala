@@ -6,8 +6,8 @@ import akka.http.scaladsl.model._
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux.api.ReactiveInfluxClient
 import com.pygmalios.reactiveinflux.api.response.PingResponse
-import com.pygmalios.reactiveinflux.impl.{ReactiveInfluxConfig, Logging}
 import com.pygmalios.reactiveinflux.impl.api.response.SimplePingResponse
+import com.pygmalios.reactiveinflux.impl.{Logging, ReactiveInfluxConfig}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -28,6 +28,13 @@ private[reactiveinflux] class ActorSystemReactiveInfluxClient(actorSystem: Actor
     http.singleRequest(HttpRequest(uri = config.url + "ping")).map { httpResponse =>
       log.debug(s"Ping HTTP response. [$httpResponse]")
       SimplePingResponse(httpResponse.getHeader(pingVersionHeader).map(_.value()).getOrElse(""))
+    }
+  }
+
+  override def createDatabase(name: String): Future[Unit] = {
+    val uri = config.url.withPath(Uri.Path("/query")).withQuery(Uri.Query("q" -> ("CREATE DATABASE " + name)))
+    http.singleRequest(HttpRequest(uri = uri)).map { httpResponse =>
+      log.debug(s"CreateDatabase HTTP response. [$httpResponse]")
     }
   }
 }

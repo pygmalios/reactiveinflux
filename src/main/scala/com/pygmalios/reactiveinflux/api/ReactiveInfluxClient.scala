@@ -21,6 +21,8 @@ trait ReactiveInfluxClient extends Closeable {
     * @return Request response.
     */
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResponse]
+
+  def createDatabase(name: String): Future[Unit]
 }
 
 object ReactiveInfluxClient {
