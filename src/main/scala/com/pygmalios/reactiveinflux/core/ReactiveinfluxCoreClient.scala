@@ -7,11 +7,11 @@ import com.pygmalios.reactiveinflux.impl.response.{JsonResponse, ReactiveinfluxJ
 import scala.concurrent.Future
 
 trait ReactiveinfluxRequest extends Serializable {
-  type Response <: Any
+  type TResponse <: Any
 
   def httpRequest: HttpRequest
 
-  def apply(httpResponse: HttpResponse): Response = try {
+  def apply(httpResponse: HttpResponse): TResponse = try {
     responseFactory(httpResponse).result
   }
   catch {
@@ -21,8 +21,13 @@ trait ReactiveinfluxRequest extends Serializable {
       throw new ReactiveinfluxException(s"Response processing failed! [${httpRequest.method.name} ${httpRequest.uri}]", ex)
   }
 
-  protected def responseFactory: (HttpResponse) => JsonResponse[Response]}
+  protected def responseFactory(httpResponse: HttpResponse): ReactiveinfluxResponse[TResponse]
+}
+
+trait ReactiveinfluxResponse[+T] {
+  def result: T
+}
 
 trait ReactiveinfluxCoreClient {
-  def execute[R <: ReactiveinfluxRequest](request: R): Future[request.Response]
+  def execute[R <: ReactiveinfluxRequest](request: R): Future[request.TResponse]
 }

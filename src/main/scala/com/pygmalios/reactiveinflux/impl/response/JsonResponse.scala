@@ -2,12 +2,13 @@ package com.pygmalios.reactiveinflux.impl.response
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse}
 import com.pygmalios.reactiveinflux.api.ReactiveinfluxException
+import com.pygmalios.reactiveinflux.core.ReactiveinfluxResponse
 import org.slf4j.LoggerFactory
 import spray.json.{JsArray, JsString, _}
 
 class ReactiveinfluxJsonResultException(val error: String) extends ReactiveinfluxException(error)
 
-abstract class JsonResponse[+T](httpResponse: HttpResponse) {
+abstract class JsonResponse[+T](httpResponse: HttpResponse) extends ReactiveinfluxResponse[T] {
   import JsonResponse._
 
   httpResponse.entity match {
@@ -26,8 +27,6 @@ abstract class JsonResponse[+T](httpResponse: HttpResponse) {
       }
     case other => throw new ReactiveinfluxException(s"Invalid response! [$other]")
   }
-
-  def result: T
 }
 
 private object JsonResponse {

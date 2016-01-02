@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.impl.query
+package com.pygmalios.reactiveinflux.impl.request.query
 
 import akka.http.scaladsl.model.Uri
 import com.pygmalios.reactiveinflux.core.ReactiveinfluxRequest
