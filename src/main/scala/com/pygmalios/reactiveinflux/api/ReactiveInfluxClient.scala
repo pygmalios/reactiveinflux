@@ -36,7 +36,7 @@ object ReactiveInfluxClient {
   def apply(name: String = defaultClientName,
             config: Option[Config] = None): ReactiveInfluxClient = {
     val reactiveInfluxConfig = ReactiveInfluxConfig(config)
-    val actorSystem = ActorSystem(name, reactiveInfluxConfig.akka)
+    val actorSystem = ActorSystem(name, reactiveInfluxConfig.reactiveinflux)
     new ActorSystemReactiveInfluxClient(actorSystem, reactiveInfluxConfig)
   }
 }
