@@ -6,7 +6,7 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux.api.ReactiveInfluxClient
 import com.pygmalios.reactiveinflux.core.{ReactiveinfluxCoreClient, ReactiveinfluxRequest}
 import com.pygmalios.reactiveinflux.impl.request.Ping
-import com.pygmalios.reactiveinflux.impl.request.query.CreateDatabase
+import com.pygmalios.reactiveinflux.impl.request.query.{CreateDatabase, DropDatabase}
 import com.pygmalios.reactiveinflux.impl.{Logging, ReactiveInfluxConfig}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,6 +25,7 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: Reactive
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new Ping(config.uri))
   override def createDatabase(name: String) = execute(new CreateDatabase(config.uri, name))
+  override def dropDatabase(name: String) = execute(new DropDatabase(config.uri, name))
 
   override def execute[R <: ReactiveinfluxRequest](request: R): Future[request.TResponse] = {
     val httpRequest = request.httpRequest

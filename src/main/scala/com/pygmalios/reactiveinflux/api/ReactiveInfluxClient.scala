@@ -14,15 +14,9 @@ import scala.concurrent.Future
   * Reactive client for InfluxDB.
   */
 trait ReactiveInfluxClient extends Closeable {
-  /**
-    * Creates GET `/ping` request.
-    *
-    * @param waitForLeaderSec Number of seconds to wait before returning a response.
-    * @return Request response.
-    */
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResponse]
-
   def createDatabase(name: String): Future[Unit]
+  def dropDatabase(name: String): Future[Unit]
 }
 
 object ReactiveInfluxClient {

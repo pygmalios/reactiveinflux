@@ -11,6 +11,9 @@ class ReactiveinfluxJsonResultException(val error: String) extends Reactiveinflu
 abstract class JsonResponse[+T](httpResponse: HttpResponse) extends ReactiveinfluxResponse[T] {
   import JsonResponse._
 
+  if (!httpResponse.status.isSuccess())
+    throw new ReactiveinfluxException(s"Not a successful response! [$httpResponse]")
+
   httpResponse.entity match {
     case HttpEntity.Strict(ContentTypes.`application/json`, byteString) =>
       val jsonBody = byteString.decodeString("UTF8").parseJson.asJsObject

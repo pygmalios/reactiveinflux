@@ -23,11 +23,17 @@ class ActorSystemReactiveInfluxClientISpec(_system: ActorSystem) extends TestKit
   }
 
 
-  test("Create test DB") {
+  test("Create and drop test DB") {
     val testScope = new TestScope
     import testScope._
 
-    client.createDatabase("ActorSystemReactiveInfluxClientISpec").futureValue
+    val dbName = "ActorSystemReactiveInfluxClientISpec"
+    try {
+      client.createDatabase(dbName).futureValue
+    }
+    finally {
+      client.dropDatabase(dbName).futureValue
+    }
   }
 
   private class TestScope {
