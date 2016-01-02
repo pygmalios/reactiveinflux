@@ -51,13 +51,16 @@ task itest(type: Test) {
 dependencies {
     def scalaVersion = "2.11"
     def akkaVersion = "2.4.1"
+    def akkaHttpVersion = "2.0.1"
 
     compile "org.scala-lang:scala-library:$scalaVersion.7"
     compile "com.typesafe.akka:akka-actor_$scalaVersion:$akkaVersion"
     compile "com.typesafe.akka:akka-slf4j_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-http-experimental_$scalaVersion:$akkaHttpVersion"
     compile "ch.qos.logback:logback-classic:1.1.3"
 
     testCompile "org.scalatest:scalatest_$scalaVersion:2.2.5"
     testCompile "org.mockito:mockito-all:1.10.19"
     testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:$akkaVersion"
+    testCompile "com.typesafe.akka:akka-http-testkit-experimental_$scalaVersion:$akkaHttpVersion"
 }

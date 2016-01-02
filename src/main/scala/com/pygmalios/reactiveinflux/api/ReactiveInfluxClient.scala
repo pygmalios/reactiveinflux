@@ -2,13 +2,24 @@ package com.pygmalios.reactiveinflux.api
 
 import java.io.Closeable
 
-import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInfluxClient
+import akka.actor.ActorSystem
+import com.pygmalios.reactiveinflux.api.response.PingResponse
+import com.pygmalios.reactiveinflux.impl.api.ActorSystemReactiveInfluxClient
 import com.typesafe.config.{Config, ConfigFactory}
+
+import scala.concurrent.Future
 
 /**
   * Reactive client for InfluxDB.
   */
 trait ReactiveInfluxClient extends Closeable {
+  /**
+    * Creates GET `/ping` request.
+    *
+    * @param waitForLeaderSec Number of seconds to wait before returning a response.
+    * @return Request response.
+    */
+  def ping(waitForLeaderSec: Option[Int] = None): Future[PingResponse]
 }
 
 object ReactiveInfluxClient {
@@ -27,6 +38,8 @@ object ReactiveInfluxClient {
       case Some(c) => c.withFallback(ConfigFactory.load)
       case _ => ConfigFactory.load
     }
-    new ActorSystemReactiveInfluxClient(name, rootConfig)
+
+    val actorSystem = ActorSystem(name, rootConfig)
+    new ActorSystemReactiveInfluxClient(actorSystem)
   }
 }
