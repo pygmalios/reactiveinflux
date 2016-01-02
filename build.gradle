@@ -1,0 +1,63 @@
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "com.github.maiflai:gradle-scalatest:0.10"
+    }
+}
+
+apply plugin: "scala"
+apply plugin: "com.github.maiflai.scalatest"
+
+group = group
+version = version
+
+targetCompatibility = "1.8"
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    itestCompile.extendsFrom testCompile
+    itestRuntime.extendsFrom testRuntime
+}
+
+sourceSets {
+    itest {
+        compileClasspath += main.output + test.output
+        runtimeClasspath += main.output + test.output
+
+        scala.srcDir file('src/itest/scala')
+    }
+
+    test {
+        resources.srcDir file('src/itest/resources')
+    }
+}
+
+task itest(type: Test) {
+    testClassesDir = sourceSets.itest.output.classesDir
+    classpath = sourceSets.itest.runtimeClasspath
+
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+dependencies {
+    def scalaVersion = "2.11"
+    def akkaVersion = "2.4.1"
+
+    compile "org.scala-lang:scala-library:$scalaVersion.7"
+    compile "com.typesafe.akka:akka-actor_$scalaVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-slf4j_$scalaVersion:$akkaVersion"
+    compile "ch.qos.logback:logback-classic:1.1.3"
+
+    testCompile "org.scalatest:scalatest_$scalaVersion:2.2.5"
+    testCompile "org.mockito:mockito-all:1.10.19"
+    testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:$akkaVersion"
+}

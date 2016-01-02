@@ -1,2 +1,2 @@
 # reactiveinflux
-Non-blocking, Reactive InfluxDB Driver for Scala
+Non-blocking, Reactive InfluxDB Driver for Scala.
