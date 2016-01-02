@@ -2,15 +2,15 @@ package com.pygmalios.reactiveinflux.impl.query
 
 import akka.http.scaladsl.model._
 import com.pygmalios.reactiveinflux.api.{ReactiveinfluxException, ReactiveinfluxResultError}
+import org.slf4j.LoggerFactory
 import spray.json.{JsArray, JsString, _}
 
-class CreateDatabase(baseUri: Uri, name: String) extends BaseQuery {
+class CreateDatabase(baseUri: Uri, name: String) extends BaseQuery(baseUri) {
+  import CreateDatabase._
+
   override type Response = Unit
 
-  val httpRequest: HttpRequest = {
-    val uri = baseUri.withPath(Uri.Path("/query")).withQuery(Uri.Query("q" -> ("CREATE DATABASE " + name)))
-    HttpRequest(uri = uri)
-  }
+  override val httpRequest = HttpRequest(uri = qUri(queryPattern.format(name)))
 
   override def apply(httpResponse: HttpResponse): Unit = {
     log.debug(s"CreateDatabase HTTP response. [$httpResponse]")
@@ -31,4 +31,9 @@ class CreateDatabase(baseUri: Uri, name: String) extends BaseQuery {
       case other => throw new ReactiveinfluxException(s"Invalid response! [$other]")
     }
   }
+}
+
+private object CreateDatabase {
+  val log = LoggerFactory.getLogger(classOf[CreateDatabase])
+  val queryPattern = "CREATE DATABASE %s"
 }
