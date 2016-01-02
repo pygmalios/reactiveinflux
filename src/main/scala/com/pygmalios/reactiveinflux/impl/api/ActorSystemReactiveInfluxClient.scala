@@ -6,12 +6,12 @@ import akka.http.scaladsl.model._
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux.api.ReactiveInfluxClient
 import com.pygmalios.reactiveinflux.api.response.PingResponse
-import com.pygmalios.reactiveinflux.impl.Logging
+import com.pygmalios.reactiveinflux.impl.{ReactiveInfluxConfig, Logging}
 import com.pygmalios.reactiveinflux.impl.api.response.SimplePingResponse
 
 import scala.concurrent.{ExecutionContext, Future}
 
-private[reactiveinflux] class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem)
+private[reactiveinflux] class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: ReactiveInfluxConfig)
   extends ReactiveInfluxClient with Logging {
   import ActorSystemReactiveInfluxClient._
 
@@ -25,7 +25,7 @@ private[reactiveinflux] class ActorSystemReactiveInfluxClient(actorSystem: Actor
   }
 
   override def ping(waitForLeaderSec: Option[Int]): Future[PingResponse] = {
-    http.singleRequest(HttpRequest(uri = "http://influxdb.test.pygmalios.svc.tutum.io:8086/ping")).map { httpResponse =>
+    http.singleRequest(HttpRequest(uri = config.url + "ping")).map { httpResponse =>
       log.debug(s"Ping HTTP response. [$httpResponse]")
       SimplePingResponse(httpResponse.getHeader(pingVersionHeader).map(_.value()).getOrElse(""))
     }

@@ -4,8 +4,9 @@ import java.io.Closeable
 
 import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.api.response.PingResponse
+import com.pygmalios.reactiveinflux.impl.ReactiveInfluxConfig
 import com.pygmalios.reactiveinflux.impl.api.ActorSystemReactiveInfluxClient
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 
 import scala.concurrent.Future
 
@@ -34,12 +35,8 @@ object ReactiveInfluxClient {
     */
   def apply(name: String = defaultClientName,
             config: Option[Config] = None): ReactiveInfluxClient = {
-    val rootConfig = config match {
-      case Some(c) => c.withFallback(ConfigFactory.load)
-      case _ => ConfigFactory.load
-    }
-
-    val actorSystem = ActorSystem(name, rootConfig)
-    new ActorSystemReactiveInfluxClient(actorSystem)
+    val reactiveInfluxConfig = ReactiveInfluxConfig(config)
+    val actorSystem = ActorSystem(name, reactiveInfluxConfig.akka)
+    new ActorSystemReactiveInfluxClient(actorSystem, reactiveInfluxConfig)
   }
 }
