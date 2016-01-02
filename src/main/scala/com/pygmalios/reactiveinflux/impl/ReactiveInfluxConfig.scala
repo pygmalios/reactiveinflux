@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 
 trait ReactiveInfluxConfig extends Serializable {
   def reactiveinflux: Config
-  def url: Uri
+  def uri: Uri
 }
 
 class DefaultReactiveInfluxConfig(config: Option[Config] = None) extends ReactiveInfluxConfig {
@@ -15,7 +15,7 @@ class DefaultReactiveInfluxConfig(config: Option[Config] = None) extends Reactiv
   }
 
   val reactiveinflux = rootConfig.getConfig("reactiveinflux")
-  val url = Uri(reactiveinflux.getString("url"))
+  val uri = Uri(reactiveinflux.getString("url"))
 }
 
 object ReactiveInfluxConfig {

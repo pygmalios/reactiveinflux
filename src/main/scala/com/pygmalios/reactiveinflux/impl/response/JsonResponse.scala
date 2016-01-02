@@ -22,7 +22,8 @@ abstract class JsonResponse[+T](httpResponse: HttpResponse) extends Reactiveinfl
               log.warn(s"Unknown error reason. [$other]")
               None
           }
-          throw new ReactiveinfluxJsonResultException(errorReasons.mkString(","))
+          if (errorReasons.nonEmpty)
+            throw new ReactiveinfluxJsonResultException(errorReasons.mkString(","))
         case other => throw new ReactiveinfluxException(s"Invalid JSON response! results field expected. [$other]")
       }
     case other => throw new ReactiveinfluxException(s"Invalid response! [$other]")

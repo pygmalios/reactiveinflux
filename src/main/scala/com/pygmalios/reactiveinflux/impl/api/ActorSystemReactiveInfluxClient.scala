@@ -23,14 +23,14 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: Reactive
     actorSystem.terminate()
   }
 
-  override def ping(waitForLeaderSec: Option[Int]) = execute(new Ping(config.url))
-  override def createDatabase(name: String) = execute(new CreateDatabase(config.url, name))
+  override def ping(waitForLeaderSec: Option[Int]) = execute(new Ping(config.uri))
+  override def createDatabase(name: String) = execute(new CreateDatabase(config.uri, name))
 
   override def execute[R <: ReactiveinfluxRequest](request: R): Future[request.TResponse] = {
     val httpRequest = request.httpRequest
-    log.debug(s"HTTP request. [${httpRequest.method.name} ${httpRequest.uri}]")
+    log.debug(s"${request.getClass.getSimpleName} HTTP ${httpRequest.method.name} ${httpRequest.uri}")
     http.singleRequest(httpRequest).map { httpResponse =>
-      log.debug(s"HTTP response. [$httpResponse]")
+      log.debug(s"Response: $httpResponse")
       request(httpResponse)
     }
   }
