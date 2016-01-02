@@ -4,10 +4,12 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import com.pygmalios.reactiveinflux.api.ReactiveInfluxClient
+import akka.util.ByteString
 import com.pygmalios.reactiveinflux.api.response.PingResponse
+import com.pygmalios.reactiveinflux.api.{ReactiveInfluxClient, ReactiveinfluxException, ReactiveinfluxResultError}
 import com.pygmalios.reactiveinflux.impl.api.response.SimplePingResponse
 import com.pygmalios.reactiveinflux.impl.{Logging, ReactiveInfluxConfig}
+import spray.json._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -33,8 +35,25 @@ private[reactiveinflux] class ActorSystemReactiveInfluxClient(actorSystem: Actor
 
   override def createDatabase(name: String): Future[Unit] = {
     val uri = config.url.withPath(Uri.Path("/query")).withQuery(Uri.Query("q" -> ("CREATE DATABASE " + name)))
-    http.singleRequest(HttpRequest(uri = uri)).map { httpResponse =>
+    val request = HttpRequest(uri = uri)
+    http.singleRequest(request).flatMap { httpResponse =>
       log.debug(s"CreateDatabase HTTP response. [$httpResponse]")
+      httpResponse.entity.dataBytes.runFold(ByteString.empty)(_ ++ _).map(_.decodeString("UTF8")).map { stringBody =>
+        val jsonBody = stringBody.parseJson.asJsObject
+        jsonBody.fields("results") match {
+          case JsArray(results) =>
+            val errorReasons = results.map(_.asJsObject).flatMap(_.fields.get("error")).flatMap {
+              case JsString(reason) => Some(reason)
+              case other =>
+                log.warn(s"Unknown error reason. [$other]")
+                None
+            }
+            throw new ReactiveinfluxResultError(errorReasons.mkString(","), request)
+
+          case other => throw new ReactiveinfluxException(s"Invalid JSON response! results field expected.")
+        }
+        log.debug(jsonBody.prettyPrint)
+      }
     }
   }
 }

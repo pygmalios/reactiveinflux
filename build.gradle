@@ -57,6 +57,7 @@ dependencies {
     compile "com.typesafe.akka:akka-actor_$scalaVersion:$akkaVersion"
     compile "com.typesafe.akka:akka-slf4j_$scalaVersion:$akkaVersion"
     compile "com.typesafe.akka:akka-http-experimental_$scalaVersion:$akkaHttpVersion"
+    compile "com.typesafe.akka:akka-http-spray-json-experimental_$scalaVersion:$akkaHttpVersion"
     compile "ch.qos.logback:logback-classic:1.1.3"
 
     testCompile "org.scalatest:scalatest_$scalaVersion:2.2.5"
