@@ -27,6 +27,8 @@ trait ReactiveInfluxClient extends Closeable {
 
 object ReactiveInfluxClient {
   private val defaultClientName = "ReactiveInfluxClient"
+  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig) =
+    new ActorSystemReactiveInfluxClient(actorSystem, config)
 
   /**
     * Create reactive Influx client. Normally there should be only one instance per application.
@@ -36,9 +38,10 @@ object ReactiveInfluxClient {
     * @return Reactive Influx client.
     */
   def apply(name: String = defaultClientName,
-            config: Option[Config] = None): ReactiveInfluxClient = {
+            config: Option[Config] = None,
+            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInfluxClient = defaultClientFactory): ReactiveInfluxClient = {
     val reactiveInfluxConfig = ReactiveInfluxConfig(config)
     val actorSystem = ActorSystem(name, reactiveInfluxConfig.reactiveinflux)
-    new ActorSystemReactiveInfluxClient(actorSystem, reactiveInfluxConfig)
+    clientFactory(actorSystem, reactiveInfluxConfig)
   }
 }

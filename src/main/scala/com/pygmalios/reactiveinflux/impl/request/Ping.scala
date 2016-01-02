@@ -6,9 +6,10 @@ import com.pygmalios.reactiveinflux.core.{ReactiveinfluxRequest, ReactiveinfluxR
 
 class Ping(baseUri: Uri) extends ReactiveinfluxRequest {
   override type TResponse = PingResponse
+
   override protected def responseFactory(httpResponse: HttpResponse): ReactiveinfluxResponse[PingResponse] =
     SimplePingResponse(httpResponse.getHeader(Ping.versionHeader).map(_.value()).getOrElse(""))
-  
+
   override val httpRequest = HttpRequest(uri = baseUri.withPath(Ping.path))
 }
 
