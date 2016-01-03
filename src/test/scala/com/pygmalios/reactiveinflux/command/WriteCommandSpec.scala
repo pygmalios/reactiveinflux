@@ -39,6 +39,10 @@ class WriteCommandSpec extends FlatSpec {
     assert(Micro.format(Instant.ofEpochSecond(0, 999)) == "0")
   }
 
+  it should "convert 1 microsecond to 1" in {
+    assert(Micro.format(Instant.ofEpochSecond(0, 1000)) == "1")
+  }
+
   it should "convert 1 millisecond to 1000" in {
     assert(Micro.format(Instant.ofEpochMilli(1)) == "1000")
   }
@@ -53,6 +57,40 @@ class WriteCommandSpec extends FlatSpec {
 
   it should "convert 1234567890 to 1234567890000000" in {
     assert(Micro.format(Instant.ofEpochSecond(1234567890)) == "1234567890000000")
+  }
+
+  behavior of "Milli"
+
+  it should "convert 1 nanosecond to 0" in {
+    assert(Milli.format(Instant.ofEpochSecond(0, 1)) == "0")
+  }
+
+  it should "convert 999 nanoseconds to 0" in {
+    assert(Milli.format(Instant.ofEpochSecond(0, 999)) == "0")
+  }
+
+  it should "convert 1 microsecond to 0" in {
+    assert(Milli.format(Instant.ofEpochSecond(0, 1000)) == "0")
+  }
+
+  it should "convert 999 microsecond to 0" in {
+    assert(Milli.format(Instant.ofEpochSecond(0, 999000)) == "0")
+  }
+
+  it should "convert 1 millisecond to 1" in {
+    assert(Milli.format(Instant.ofEpochMilli(1)) == "1")
+  }
+
+  it should "convert 1 second to 100" in {
+    assert(Milli.format(Instant.ofEpochSecond(1)) == "1000")
+  }
+
+  it should "convert 1 minute to 60000" in {
+    assert(Milli.format(Instant.ofEpochSecond(60)) == "60000")
+  }
+
+  it should "convert 1234567890 to 1234567890000" in {
+    assert(Milli.format(Instant.ofEpochSecond(1234567890)) == "1234567890000")
   }
 
   behavior of "method"
