@@ -4,14 +4,14 @@ import akka.http.scaladsl.model._
 import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 
-class CreateDatabase(baseUri: Uri, name: String, failIfExists: Boolean) extends BaseQueryCommand(baseUri) {
-  import CreateDatabase._
+class CreateDatabaseCommand(baseUri: Uri, dbName: String, failIfExists: Boolean) extends BaseQueryCommand(baseUri) {
+  import CreateDatabaseCommand._
   override type TResult = Unit
   override protected def responseFactory(httpResponse: HttpResponse) = new CreateDatabaseResponse(httpResponse, failIfExists)
-  override val httpRequest = HttpRequest(uri = qUri(queryPattern.format(name)))
+  override val httpRequest = HttpRequest(uri = qUri(queryPattern.format(dbName)))
 }
 
-object CreateDatabase {
+object CreateDatabaseCommand {
   val queryPattern = "CREATE DATABASE %s"
 }
 

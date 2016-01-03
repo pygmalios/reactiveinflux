@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.{CreateDatabase, DropDatabase, PingCommand}
+import com.pygmalios.reactiveinflux.command.{CreateDatabaseCommand, DropDatabaseCommand, PingCommand}
 import com.pygmalios.reactiveinflux.model.PointNoTime
 
 import scala.concurrent.{ExecutionContext, Future}
 
-private[reactiveinflux] class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveInfluxConfig)
+class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveInfluxConfig)
   extends ReactiveInflux with ReactiveInfluxCore with Logging {
 
   protected implicit def system: ActorSystem = actorSystem
@@ -35,16 +35,16 @@ private[reactiveinflux] class ActorSystemReactiveInflux(actorSystem: ActorSystem
   }
 }
 
-private[reactiveinflux] class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInflux) extends ReactiveInfluxDb {
+class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInflux) extends ReactiveInfluxDb {
   import client._
 
-  override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabase(config.uri, dbName, failIfExists))
-  override def drop(failIfNotExists: Boolean): Future[Unit] = execute(new DropDatabase(config.uri, dbName, failIfNotExists))
+  override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabaseCommand(config.uri, dbName, failIfExists))
+  override def drop(failIfNotExists: Boolean): Future[Unit] = execute(new DropDatabaseCommand(config.uri, dbName, failIfNotExists))
   override def write(point: PointNoTime): Future[Unit] = ???
   override def write(points: Iterable[PointNoTime]): Future[Unit] = ???
 }
 
-private[reactiveinflux] object ActorSystemReactiveInflux {
+object ActorSystemReactiveInflux {
   def apply(actorSystem: ActorSystem, config: ReactiveInfluxConfig) =
     new ActorSystemReactiveInflux(actorSystem, config)
 }
