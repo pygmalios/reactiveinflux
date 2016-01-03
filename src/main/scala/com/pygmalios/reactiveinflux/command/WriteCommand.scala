@@ -42,7 +42,7 @@ class WriteCommand(baseUri: Uri,
 
   private def query = {
     val qMap = Map(
-      queryDbQ -> Some(dbName),
+      dbQ -> Some(dbName),
       retentionPolicyQ -> retentionPolicy,
       usernameQ -> username,
       passwordQ -> password,
@@ -58,7 +58,7 @@ class WriteCommand(baseUri: Uri,
 
 object WriteCommand {
   val path = Uri.Path("/write")
-  val queryDbQ = "db"
+  val dbQ = "db"
   val retentionPolicyQ = "rp"
   val usernameQ = "u"
   val passwordQ = "p"
