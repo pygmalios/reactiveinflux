@@ -69,19 +69,23 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     import testScope._
 
     db.drop(failIfNotExists = false).futureValue
-    assertError(db.drop(failIfNotExists = true), classOf[DatabaseNotFound])
+    assertError(db.drop(failIfNotExists = true), classOf[DatabaseNotFound], "database not found: ActorSystemReactiveInfluxDbISpec")
   }
 
   private class TestScope {
     val client = new ActorSystemReactiveInfluxClient(system, ITestConfig.reactiveInfluxConfig)
     val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", client)
 
-    def assertError(f: => Future[_], error: Class[_ <: ReactiveinfluxError], message: Option[String] = None) = {
+    def assertError(f: => Future[_], error: Class[_ <: ReactiveinfluxError], message: String): Unit =
+      assertError(f, error, Some(message))
+    def assertError(f: => Future[_], error: Class[_ <: ReactiveinfluxError], message: Option[String] = None): Unit = {
       whenReady(f.failed) {
         case ex: ReactiveinfluxResultError =>
-          assert(ex.errors.map(_.getClass) == Set(error))
-          if (message.isDefined)
-            assert(ex.getMessage == message.get)
+          ex.errors.find(_.getClass == error) match {
+            case Some(e) if !message.contains(e.message) => fail(s"Expected error message [${message.get}] got [${e.message}]")
+            case None => fail(s"Expected error not found. [$ex]")
+            case _ =>
+          }
         case other => fail(s"Unexpected exception. [$other]")
       }
     }
