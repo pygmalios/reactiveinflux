@@ -1,47 +1,11 @@
 package com.pygmalios.reactiveinflux.command
 
-import java.time.Instant
-
 import akka.http.scaladsl.model._
 import akka.util.ByteString
 import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
+import com.pygmalios.reactiveinflux.model.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.model._
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
-
-sealed abstract class Precision(val q: String) {
-  def format(i: Instant): String
-  protected def nano(i: Instant, divideBy: Int, digits: Int): String = {
-    val t = i.getNano / divideBy
-    if (i.getEpochSecond > 0)
-      i.getEpochSecond.toString + t.formatted(s"%0${digits}d")
-    else
-      t.toString
-  }
-}
-case object Nano extends Precision("n") {
-  override def format(i: Instant): String = nano(i, 1, 9)
-}
-case object Micro extends Precision("u") {
-  override def format(i: Instant): String = nano(i, 1000, 6)
-}
-case object Milli extends Precision("ms") {
-  override def format(i: Instant): String = nano(i, 1000000, 3)
-}
-case object Second extends Precision("s") {
-  override def format(i: Instant): String = i.getEpochSecond.toString
-}
-case object Minute extends Precision("m") {
-  override def format(i: Instant): String = (i.getEpochSecond / 60).toString
-}
-case object Hour extends Precision("h") {
-  override def format(i: Instant): String = (i.getEpochSecond / 3600).toString
-}
-
-sealed abstract class Consistency(val q: String)
-case object One extends Consistency("one")
-case object Quorum extends Consistency("quorum")
-case object All extends Consistency("all")
-case object Any extends Consistency("any")
 
 class WriteCommand(baseUri: Uri,
                    dbName: String,
@@ -57,14 +21,15 @@ class WriteCommand(baseUri: Uri,
   protected val uriWithPath = baseUri.withPath(path)
   override protected def responseFactory(httpResponse: HttpResponse) = new WriteResponse(httpResponse)
   override val httpRequest = {
-    val pointLines = points.map(pointToLine)
-    val lines = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(pointLines.mkString("\n")))
+    val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(pointsToLine(points)))
     HttpRequest(
       method  = HttpMethods.POST,
       uri     = uriWithPath.withQuery(query),
-      entity  = lines
+      entity  = entity
     )
   }
+
+  private def prec: Precision = precision.getOrElse(Nano)
 
   private def query = {
     val qMap = Map(
@@ -72,7 +37,7 @@ class WriteCommand(baseUri: Uri,
       retentionPolicyQ -> retentionPolicy,
       usernameQ -> username,
       passwordQ -> password,
-      precisionQ -> precision.map(_.q),
+      precisionQ -> Some(prec.q),
       consistencyQ -> consistency.map(_.q)
     ).collect {
       case (k, Some(v)) => k -> v
@@ -81,39 +46,40 @@ class WriteCommand(baseUri: Uri,
     Uri.Query(qMap)
   }
 
-  private def pointToLine(point: PointNoTime): String = {
+  private def pointsToLine(points: Seq[PointNoTime]): String = {
     val sb = new StringBuilder
+    points.foreach { point =>
+      pointToLine(point, sb)
+      sb.append("\n")
+    }
+    sb.toString()
+  }
 
-    // Measurement
+  private def pointToLine(point: PointNoTime, sb: StringBuilder): Unit = {
     sb.append(point.measurement)
+    tagsToLine(point.tags, sb)
+    fieldsToLine(point.fields, sb)
+    timestampToLine(point, sb)
+  }
 
-    // Tags
-    point.tags.foreach { tag =>
+  private def tagsToLine(tags: Map[TagKey, TagValue], sb: StringBuilder): Unit = {
+    tags.foreach { tag =>
       sb.append(",")
       sb.append(tag._1)
       sb.append("=")
       sb.append(tag._2)
     }
+  }
 
-    // Fields
-    if (point.fields.nonEmpty) {
+  private def fieldsToLine(fields: Map[FieldKey, FieldValue], sb: StringBuilder): Unit = {
+    if (fields.nonEmpty) {
       sb.append(" ")
-      val fieldStrings = point.fields.map { field =>
+      val fieldStrings = fields.map { field =>
         field._1 + "=" + fieldValueToLine(field._2)
       }
 
       sb.append(fieldStrings.mkString(","))
     }
-
-    // Timestamp
-    val prec = precision.getOrElse(Nano)
-    point match {
-      case pointWithTime: Point =>
-        sb.append(" ")
-        sb.append(prec.format(pointWithTime.time))
-    }
-
-    sb.toString()
   }
 
   private def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
@@ -121,6 +87,15 @@ class WriteCommand(baseUri: Uri,
     case FloatFieldValue(v) => v.toString
     case LongFieldValue(v) => v.toString + "i"
     case BooleanFieldValue(v) => v.toString
+  }
+
+  private def timestampToLine(point: PointNoTime, sb: StringBuilder): Unit = {
+    point match {
+      case pointWithTime: Point =>
+        sb.append(" ")
+        sb.append(prec.format(pointWithTime.time))
+      case _ => // No timestamp provided
+    }
   }
 }
 
