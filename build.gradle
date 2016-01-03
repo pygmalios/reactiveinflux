@@ -13,7 +13,7 @@ apply plugin: "scala"
 apply plugin: "com.github.maiflai.scalatest"
 
 group = group
-version = version
+version = "${influxVersion}_${version}"
 
 targetCompatibility = "1.8"
 
@@ -49,7 +49,6 @@ task itest(type: Test) {
 }
 
 dependencies {
-    def scalaVersion = "2.11"
     def akkaVersion = "2.4.1"
     def akkaHttpVersion = "2.0.1"
 
