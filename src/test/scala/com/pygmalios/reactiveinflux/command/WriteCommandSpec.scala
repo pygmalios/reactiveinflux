@@ -1,9 +1,34 @@
 package com.pygmalios.reactiveinflux.command
 
+import java.time.Instant
+
 import akka.http.scaladsl.model.{HttpMethods, Uri}
+import com.pygmalios.reactiveinflux.model.PointNoTime
 import org.scalatest.FlatSpec
 
 class WriteCommandSpec extends FlatSpec {
+  behavior of "Nano"
+
+  it should "convert 1 nanosecond to 1" in {
+    assert(Nano.format(Instant.ofEpochSecond(0, 1)) == "1")
+  }
+
+  it should "convert 1 millisecond to 1000000" in {
+    assert(Nano.format(Instant.ofEpochMilli(1)) == "1000000")
+  }
+
+  it should "convert 1 second to 1000000000" in {
+    assert(Nano.format(Instant.ofEpochSecond(1)) == "1000000000")
+  }
+
+  it should "convert 1 minute to 60000000000" in {
+    assert(Nano.format(Instant.ofEpochSecond(60)) == "60000000000")
+  }
+
+  it should "convert 1234567890 to 1234567890000000000" in {
+    assert(Nano.format(Instant.ofEpochSecond(1234567890)) == "1234567890000000000")
+  }
+
   behavior of "method"
 
   it should "use POST method" in new TestScope {
@@ -35,12 +60,14 @@ class WriteCommandSpec extends FlatSpec {
   }
 
   it should "have precision query" in new TestScope {
-    assertQ(cmd(precision = Some(Minute)), WriteCommand.precisionQ, Minute.value)
+    assertQ(cmd(precision = Some(Minute)), WriteCommand.precisionQ, Minute.q)
   }
 
   it should "have consistency query" in new TestScope {
-    assertQ(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.value)
+    assertQ(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
   }
+
+  behavior of "entity"
 }
 
 private class TestScope {
@@ -48,6 +75,7 @@ private class TestScope {
   val baseUri = Uri("http://something/")
   def cmd(baseUri: Uri = baseUri,
           dbName: String = dbName,
+          points: Seq[PointNoTime] = Seq.empty,
           retentionPolicy: Option[String] = None,
           username: Option[String] = None,
           password: Option[String] = None,
@@ -56,6 +84,7 @@ private class TestScope {
     new WriteCommand(
       baseUri,
       dbName,
+      points,
       retentionPolicy,
       username,
       password,

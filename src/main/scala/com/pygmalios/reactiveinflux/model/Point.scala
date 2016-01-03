@@ -5,6 +5,15 @@ import java.time.Instant
 import com.pygmalios.reactiveinflux.model.Point.{FieldKey, TagValue, TagKey}
 
 /**
+  * Common attributes of every point.
+  */
+trait PointNoTime extends Serializable {
+  def measurement: String
+  def tags: Map[TagKey, TagValue]
+  def fields: Map[FieldKey, FieldValue]
+}
+
+/**
   * Point with nanosecond precision time.
   */
 trait Point extends PointNoTime {
@@ -15,15 +24,6 @@ object Point {
   type TagKey = String
   type TagValue = String
   type FieldKey = String
-}
-
-/**
-  * Common attributes of every point.
-  */
-trait PointNoTime extends Serializable {
-  def measurement: String
-  def tags: Map[TagKey, TagValue]
-  def fields: Map[FieldKey, FieldValue]
 }
 
 /**
