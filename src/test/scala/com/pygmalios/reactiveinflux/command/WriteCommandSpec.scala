@@ -153,6 +153,36 @@ class WriteCommandSpec extends FlatSpec {
     assert(Minute.format(Instant.ofEpochSecond(1234567890)) == "20576131")
   }
 
+  behavior of "Hour"
+
+  it should "convert 1 nanosecond to 0" in {
+    assert(Hour.format(Instant.ofEpochSecond(0, 1)) == "0")
+  }
+
+  it should "convert 1 microsecond to 0" in {
+    assert(Hour.format(Instant.ofEpochSecond(0, 1000)) == "0")
+  }
+
+  it should "convert 1 millisecond to 0" in {
+    assert(Hour.format(Instant.ofEpochMilli(1)) == "0")
+  }
+
+  it should "convert 1 second to 0" in {
+    assert(Hour.format(Instant.ofEpochSecond(1)) == "0")
+  }
+
+  it should "convert 1 minute to 0" in {
+    assert(Hour.format(Instant.ofEpochSecond(60)) == "0")
+  }
+
+  it should "convert 59 minutes to 0" in {
+    assert(Hour.format(Instant.ofEpochSecond(3540)) == "0")
+  }
+
+  it should "convert 1234567890 to 342935" in {
+    assert(Hour.format(Instant.ofEpochSecond(1234567890)) == "342935")
+  }
+
   behavior of "method"
 
   it should "use POST method" in new TestScope {
