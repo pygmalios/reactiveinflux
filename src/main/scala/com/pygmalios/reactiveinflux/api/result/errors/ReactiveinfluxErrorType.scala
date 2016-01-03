@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.api.response.errors
+package com.pygmalios.reactiveinflux.api.result.errors
 
 import scala.util.matching.Regex
 

@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux.api.sync
 
 import com.pygmalios.reactiveinflux.api.model.PointNoTime
-import com.pygmalios.reactiveinflux.api.response.PingResponse
+import com.pygmalios.reactiveinflux.api.result.PingResponse
 import com.pygmalios.reactiveinflux.api.sync.ReactiveInfluxSyncClient._
 import com.pygmalios.reactiveinflux.api.{ReactiveInfluxClient, ReactiveInfluxDb}
 

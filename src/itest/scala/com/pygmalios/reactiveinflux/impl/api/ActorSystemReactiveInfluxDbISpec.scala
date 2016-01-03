@@ -3,7 +3,7 @@ package com.pygmalios.reactiveinflux.impl.api
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import com.pygmalios.reactiveinflux.api.ReactiveinfluxResultError
-import com.pygmalios.reactiveinflux.api.response.errors.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveinfluxError}
+import com.pygmalios.reactiveinflux.api.result.errors.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveinfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import org.scalatest.concurrent.{AsyncAssertions, IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}

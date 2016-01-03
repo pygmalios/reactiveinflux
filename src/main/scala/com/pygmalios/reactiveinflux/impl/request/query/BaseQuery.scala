@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux.impl.request.query
 
 import akka.http.scaladsl.model.Uri
-import com.pygmalios.reactiveinflux.core.ReactiveinfluxRequest
+import com.pygmalios.reactiveinflux.api.ReactiveinfluxRequest
 
 abstract class BaseQuery(baseUri: Uri) extends ReactiveinfluxRequest {
   protected val queryUri = baseUri.withPath(BaseQuery.queryPath)

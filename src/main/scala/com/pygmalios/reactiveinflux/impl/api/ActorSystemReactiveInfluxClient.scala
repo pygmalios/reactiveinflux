@@ -4,15 +4,14 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux.api.model.PointNoTime
-import com.pygmalios.reactiveinflux.api.{ReactiveInfluxClient, ReactiveInfluxDb}
-import com.pygmalios.reactiveinflux.core.{ReactiveinfluxCoreClient, ReactiveinfluxRequest}
+import com.pygmalios.reactiveinflux.api.{ReactiveInfluxClient, ReactiveInfluxDb, ReactiveinfluxCoreClient, ReactiveinfluxRequest}
 import com.pygmalios.reactiveinflux.impl.request.Ping
 import com.pygmalios.reactiveinflux.impl.request.query.{CreateDatabase, DropDatabase}
 import com.pygmalios.reactiveinflux.impl.{Logging, ReactiveInfluxConfig}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, val config: ReactiveInfluxConfig)
+private[impl] class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, val config: ReactiveInfluxConfig)
   extends ReactiveInfluxClient with ReactiveinfluxCoreClient with Logging {
 
   protected implicit def system: ActorSystem = actorSystem
@@ -38,11 +37,16 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, val config: Reac
   }
 }
 
-class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInfluxClient) extends ReactiveInfluxDb {
+private[impl] class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInfluxClient) extends ReactiveInfluxDb {
   import client._
 
   override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabase(config.uri, dbName, failIfExists))
   override def drop(failIfNotExists: Boolean): Future[Unit] = execute(new DropDatabase(config.uri, dbName, failIfNotExists))
   override def write(point: PointNoTime): Future[Unit] = ???
   override def write(points: Iterable[PointNoTime]): Future[Unit] = ???
+}
+
+private[reactiveinflux] object ActorSystemReactiveInfluxClient {
+  def apply(actorSystem: ActorSystem, config: ReactiveInfluxConfig) =
+    new ActorSystemReactiveInfluxClient(actorSystem, config)
 }

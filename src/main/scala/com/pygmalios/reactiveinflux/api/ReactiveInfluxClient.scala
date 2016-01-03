@@ -4,7 +4,7 @@ import java.io.Closeable
 
 import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.api.model.PointNoTime
-import com.pygmalios.reactiveinflux.api.response.PingResponse
+import com.pygmalios.reactiveinflux.api.result.PingResponse
 import com.pygmalios.reactiveinflux.impl.ReactiveInfluxConfig
 import com.pygmalios.reactiveinflux.impl.api.ActorSystemReactiveInfluxClient
 import com.typesafe.config.Config
@@ -31,8 +31,8 @@ trait ReactiveInfluxDb {
 
 object ReactiveInfluxClient {
   private val defaultClientName = "ReactiveInfluxClient"
-  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig) =
-    new ActorSystemReactiveInfluxClient(actorSystem, config)
+  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInfluxClient =
+    ActorSystemReactiveInfluxClient(actorSystem, config)
 
   /**
     * Create reactive Influx client. Normally there should be only one instance per application.

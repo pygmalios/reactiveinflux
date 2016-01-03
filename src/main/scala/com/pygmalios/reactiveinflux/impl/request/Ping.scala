@@ -1,8 +1,8 @@
 package com.pygmalios.reactiveinflux.impl.request
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
-import com.pygmalios.reactiveinflux.api.response.PingResponse
-import com.pygmalios.reactiveinflux.core.{ReactiveinfluxRequest, ReactiveinfluxResponse}
+import com.pygmalios.reactiveinflux.api.result.PingResponse
+import com.pygmalios.reactiveinflux.api.{ReactiveinfluxRequest, ReactiveinfluxResponse}
 
 class Ping(baseUri: Uri) extends ReactiveinfluxRequest {
   override type TResponse = PingResponse

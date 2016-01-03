@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux.impl.request.query
 
 import akka.http.scaladsl.model._
-import com.pygmalios.reactiveinflux.api.response.errors.{DatabaseAlreadyExists, ReactiveinfluxError}
+import com.pygmalios.reactiveinflux.api.result.errors.{DatabaseAlreadyExists, ReactiveinfluxError}
 import com.pygmalios.reactiveinflux.impl.response.EmptyJsonResponse
 
 class CreateDatabase(baseUri: Uri, name: String, failIfExists: Boolean) extends BaseQuery(baseUri) {

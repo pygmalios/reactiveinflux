@@ -1,9 +1,8 @@
 package com.pygmalios.reactiveinflux.impl.response
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse}
-import com.pygmalios.reactiveinflux.api.ReactiveinfluxException
-import com.pygmalios.reactiveinflux.api.response.errors._
-import com.pygmalios.reactiveinflux.core.ReactiveinfluxResponse
+import com.pygmalios.reactiveinflux.api.{ReactiveinfluxResponse, ReactiveinfluxException}
+import com.pygmalios.reactiveinflux.api.result.errors._
 import org.slf4j.LoggerFactory
 import spray.json.{JsArray, JsString, _}
 

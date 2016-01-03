@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.api.response
+package com.pygmalios.reactiveinflux.api.result
 
 trait PingResponse extends Serializable {
   def influxDbVersion: String
