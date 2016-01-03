@@ -29,10 +29,10 @@ class ActorSystemReactiveInfluxClientISpec(_system: ActorSystem) extends TestKit
 
     val dbName = "ActorSystemReactiveInfluxClientISpec"
     try {
-      client.createDatabase(dbName).futureValue
+      client.getOrCreateDb(dbName).futureValue
     }
     finally {
-      client.dropDatabase(dbName).futureValue
+      client.dropDb(dbName).futureValue
     }
   }
 

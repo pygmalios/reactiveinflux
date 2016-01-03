@@ -24,8 +24,8 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: Reactive
   }
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new Ping(config.uri))
-  override def createDatabase(name: String) = execute(new CreateDatabase(config.uri, name))
-  override def dropDatabase(name: String) = execute(new DropDatabase(config.uri, name))
+  override def getOrCreateDb(name: String) = execute(new CreateDatabase(config.uri, name))
+  override def dropDb(name: String) = execute(new DropDatabase(config.uri, name))
 
   override def execute[R <: ReactiveinfluxRequest](request: R): Future[request.TResponse] = {
     val httpRequest = request.httpRequest

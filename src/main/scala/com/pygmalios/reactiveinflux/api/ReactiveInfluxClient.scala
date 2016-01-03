@@ -3,6 +3,7 @@ package com.pygmalios.reactiveinflux.api
 import java.io.Closeable
 
 import akka.actor.ActorSystem
+import com.pygmalios.reactiveinflux.api.model.PointNoTime
 import com.pygmalios.reactiveinflux.api.response.PingResponse
 import com.pygmalios.reactiveinflux.impl.ReactiveInfluxConfig
 import com.pygmalios.reactiveinflux.impl.api.ActorSystemReactiveInfluxClient
@@ -15,8 +16,17 @@ import scala.concurrent.Future
   */
 trait ReactiveInfluxClient extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResponse]
-  def createDatabase(name: String): Future[Unit]
-  def dropDatabase(name: String): Future[Unit]
+  def database(name: String): ReactiveInfluxDb
+}
+
+/**
+  * Reactive API for InfluxDB database.
+  */
+trait ReactiveInfluxDb {
+  def create(failIfExists: Boolean = false): Future[Unit]
+  def drop(): Future[Unit]
+  def write(point: PointNoTime): Future[Unit]
+  def write(points: Iterable[PointNoTime]): Future[Unit]
 }
 
 object ReactiveInfluxClient {
