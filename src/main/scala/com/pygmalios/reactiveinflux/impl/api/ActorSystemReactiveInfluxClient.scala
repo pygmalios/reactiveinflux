@@ -41,7 +41,7 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, val config: Reac
 class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInfluxClient) extends ReactiveInfluxDb {
   import client._
 
-  override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabase(config.uri, dbName))
+  override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabase(config.uri, dbName, failIfExists))
   override def drop(): Future[Unit] = execute(new DropDatabase(config.uri, dbName))
   override def write(point: PointNoTime): Future[Unit] = ???
   override def write(points: Iterable[PointNoTime]): Future[Unit] = ???
