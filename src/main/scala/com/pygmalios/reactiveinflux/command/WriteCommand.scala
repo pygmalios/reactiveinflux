@@ -28,13 +28,13 @@ case object Milli extends Precision("ms") {
   override def format(i: Instant): String = nano(i, 1000000, 3)
 }
 case object Second extends Precision("s") {
-  override def format(i: Instant): String = ???
+  override def format(i: Instant): String = i.getEpochSecond.toString
 }
 case object Minute extends Precision("m") {
-  override def format(i: Instant): String = ???
+  override def format(i: Instant): String = (i.getEpochSecond / 60).toString
 }
 case object Hour extends Precision("h") {
-  override def format(i: Instant): String = ???
+  override def format(i: Instant): String = (i.getEpochSecond / 3600).toString
 }
 
 sealed abstract class Consistency(val q: String)
