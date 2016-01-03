@@ -29,7 +29,7 @@ trait ReactiveInfluxDb {
 }
 
 object ReactiveInflux {
-  private val defaultClientName = "ReactiveInfluxClient"
+  private val defaultClientName = "ReactiveInflux"
   private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
     ActorSystemReactiveInflux(actorSystem, config)
 

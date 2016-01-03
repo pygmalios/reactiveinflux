@@ -5,6 +5,6 @@ import org.slf4j.LoggerFactory
 /**
   * Logging mix-in.
   */
-trait Logging {
+private[reactiveinflux] trait Logging {
   protected val log = LoggerFactory.getLogger(getClass)
 }

@@ -2,7 +2,7 @@ package com.example
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
 import com.pygmalios.reactiveinflux.command.BaseQueryCommand
-import com.pygmalios.reactiveinflux.impl.response.EmptyJsonResult
+import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxCore}
 import org.scalatest.FunSuite
@@ -30,8 +30,8 @@ class ExampleApplication extends FunSuite with ScalaFutures with IntegrationPati
 
 class CustomQueryCommand(baseUri: Uri) extends BaseQueryCommand(baseUri) {
   override type TResult = Unit
-  override protected def responseFactory(httpResponse: HttpResponse) = new CustomQueryCommandResult(httpResponse)
+  override protected def responseFactory(httpResponse: HttpResponse) = new CustomQueryCommandResponse(httpResponse)
   override val httpRequest = HttpRequest(uri = qUri("WHATEVER"))
 }
 
-class CustomQueryCommandResult(httpResponse: HttpResponse) extends EmptyJsonResult(httpResponse)
+class CustomQueryCommandResponse(httpResponse: HttpResponse) extends EmptyJsonResponse(httpResponse)

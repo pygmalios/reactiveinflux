@@ -35,7 +35,7 @@ private[reactiveinflux] class ActorSystemReactiveInflux(actorSystem: ActorSystem
   }
 }
 
-private[impl] class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInflux) extends ReactiveInfluxDb {
+private[reactiveinflux] class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInflux) extends ReactiveInfluxDb {
   import client._
 
   override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabase(config.uri, dbName, failIfExists))

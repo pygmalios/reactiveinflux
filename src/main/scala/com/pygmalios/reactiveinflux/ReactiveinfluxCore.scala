@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
-import com.pygmalios.reactiveinflux.impl.response.ReactiveInfluxJsonResultException
+import com.pygmalios.reactiveinflux.response.ReactiveInfluxJsonResultException
 
 import scala.concurrent.Future
 
