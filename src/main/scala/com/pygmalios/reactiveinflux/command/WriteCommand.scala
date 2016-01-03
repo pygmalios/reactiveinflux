@@ -14,13 +14,19 @@ sealed abstract class Precision(val q: String) {
 case object Nano extends Precision("n") {
   override def format(i: Instant): String = {
     if (i.getEpochSecond > 0)
-      i.getEpochSecond.toString + i.getNano.formatted("%09d")
+      i.getEpochSecond.toString + i.getNano.formatted(s"%09d")
     else
       i.getNano.toString
   }
 }
 case object Micro extends Precision("u") {
-  override def format(i: Instant): String = ???
+  override def format(i: Instant): String = {
+    val milli = i.getNano / 1000
+    if (i.getEpochSecond > 0)
+      i.getEpochSecond.toString + milli.formatted(s"%06d")
+    else
+      milli.toString
+  }
 }
 case object Milli extends Precision("ms") {
   override def format(i: Instant): String = ???

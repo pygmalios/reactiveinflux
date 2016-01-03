@@ -29,6 +29,32 @@ class WriteCommandSpec extends FlatSpec {
     assert(Nano.format(Instant.ofEpochSecond(1234567890)) == "1234567890000000000")
   }
 
+  behavior of "Micro"
+
+  it should "convert 1 nanosecond to 0" in {
+    assert(Micro.format(Instant.ofEpochSecond(0, 1)) == "0")
+  }
+
+  it should "convert 999 nanoseconds to 0" in {
+    assert(Micro.format(Instant.ofEpochSecond(0, 999)) == "0")
+  }
+
+  it should "convert 1 millisecond to 1000" in {
+    assert(Micro.format(Instant.ofEpochMilli(1)) == "1000")
+  }
+
+  it should "convert 1 second to 100000" in {
+    assert(Micro.format(Instant.ofEpochSecond(1)) == "1000000")
+  }
+
+  it should "convert 1 minute to 60000000" in {
+    assert(Micro.format(Instant.ofEpochSecond(60)) == "60000000")
+  }
+
+  it should "convert 1234567890 to 1234567890000000" in {
+    assert(Micro.format(Instant.ofEpochSecond(1234567890)) == "1234567890000000")
+  }
+
   behavior of "method"
 
   it should "use POST method" in new TestScope {
