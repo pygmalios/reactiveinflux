@@ -16,7 +16,7 @@ object CreateDatabase {
 }
 
 class CreateDatabaseResponse(httpResponse: HttpResponse, failIfExists: Boolean) extends EmptyJsonResponse(httpResponse) {
-  override protected def errorHandler: PartialFunction[String, Option[ReactiveinfluxError]] = {
-    case DatabaseAlreadyExists.message if !failIfExists => None
+  override protected def errorHandler: PartialFunction[ReactiveinfluxError, Option[ReactiveinfluxError]] = {
+    case DatabaseAlreadyExists(_) if !failIfExists => None
   }
 }

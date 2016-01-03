@@ -24,7 +24,7 @@ trait ReactiveInfluxClient extends Closeable {
   */
 trait ReactiveInfluxDb {
   def create(failIfExists: Boolean = false): Future[Unit]
-  def drop(): Future[Unit]
+  def drop(failIfNotExists: Boolean = false): Future[Unit]
   def write(point: PointNoTime): Future[Unit]
   def write(points: Iterable[PointNoTime]): Future[Unit]
 }

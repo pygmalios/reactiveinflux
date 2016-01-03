@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.impl.response
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpResponse}
 import com.pygmalios.reactiveinflux.api.ReactiveinfluxException
-import com.pygmalios.reactiveinflux.api.response.errors.{DatabaseAlreadyExists, OtherError, ReactiveinfluxError}
+import com.pygmalios.reactiveinflux.api.response.errors._
 import com.pygmalios.reactiveinflux.core.ReactiveinfluxResponse
 import org.slf4j.LoggerFactory
 import spray.json.{JsArray, JsString, _}
@@ -27,7 +27,7 @@ abstract class JsonResponse[+T](httpResponse: HttpResponse) extends Reactiveinfl
               None
           }
 
-          val errors = stringErrors.map(errorHandler.applyOrElse(_, DefaultErrorHandler.apply)).flatten.toSet
+          val errors = stringErrors.map(ReactiveinfluxError.apply).flatMap(errorHandler.applyOrElse(_, defaultErrorHandler)).toSet
           if (errors.nonEmpty)
             throw new ReactiveinfluxJsonResultException(errors)
         case other => throw new ReactiveinfluxException(s"Invalid JSON response! results field expected. [$other]")
@@ -35,19 +35,12 @@ abstract class JsonResponse[+T](httpResponse: HttpResponse) extends Reactiveinfl
     case other => throw new ReactiveinfluxException(s"Invalid response! [$other]")
   }
 
-  protected def errorHandler: PartialFunction[String, Option[ReactiveinfluxError]] = PartialFunction.empty
+  protected def errorHandler: PartialFunction[ReactiveinfluxError, Option[ReactiveinfluxError]] = PartialFunction.empty
 }
 
 private object JsonResponse {
   val log = LoggerFactory.getLogger(JsonResponse.getClass)
-}
-
-private object DefaultErrorHandler {
-  def apply(error: String): Option[ReactiveinfluxError] = {
-    val result = error match {
-      case DatabaseAlreadyExists.message => DatabaseAlreadyExists
-      case other => OtherError(other)
-    }
-    Some(result)
+  val defaultErrorHandler: PartialFunction[ReactiveinfluxError, Option[ReactiveinfluxError]] = {
+    case error => Some(error)
   }
 }

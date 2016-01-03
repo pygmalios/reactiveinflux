@@ -21,7 +21,7 @@ trait ReactiveInfluxSyncClient {
   */
 trait ReactiveInfluxSyncDb {
   def create(failIfExists: Boolean = false): Unit
-  def drop(): Unit
+  def drop(failIfNotExists: Boolean = false): Unit
   def write(point: PointNoTime): Unit
   def write(points: Iterable[PointNoTime]): Unit
 }
@@ -41,7 +41,7 @@ private final class WrappingReactiveInfluxSyncClient(reactiveInfluxClient: React
 
 private final class WrappingReactiveInfluxSyncDb(reactiveInfluxDb: ReactiveInfluxDb) extends ReactiveInfluxSyncDb {
   def create(failIfExists: Boolean) = await(reactiveInfluxDb.create(failIfExists))
-  def drop() = await(reactiveInfluxDb.drop())
+  def drop(failIfNotExists: Boolean = false) = await(reactiveInfluxDb.drop(failIfNotExists))
   def write(point: PointNoTime) = await(reactiveInfluxDb.write(point))
   def write(points: Iterable[PointNoTime]) = await(reactiveInfluxDb.write(points))
 }
