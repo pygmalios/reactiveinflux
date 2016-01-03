@@ -17,30 +17,40 @@ class WriteCommandSpec extends FlatSpec {
     assert(cmd().httpRequest.uri.path == Uri.Path("/write"))
   }
 
+  behavior of "prec"
+
+  it should "use provided precision" in new TestScope {
+    assert(cmd(precision = Some(Second)).prec == Second)
+  }
+
+  it should "use nanosecond as default precision" in new TestScope {
+    assert(cmd(precision = Some(Nano)).prec == Nano)
+  }
+
   behavior of "query"
 
   it should "have db query" in new TestScope {
-    assertQ(cmd(), WriteCommand.dbQ, dbName)
+    assertQuery(cmd(), WriteCommand.dbQ, dbName)
   }
 
   it should "have retentionPolicy query" in new TestScope {
-    assertQ(cmd(retentionPolicy = Some("a")), WriteCommand.retentionPolicyQ, "a")
+    assertQuery(cmd(retentionPolicy = Some("a")), WriteCommand.retentionPolicyQ, "a")
   }
 
   it should "have username query" in new TestScope {
-    assertQ(cmd(username = Some("a")), WriteCommand.usernameQ, "a")
+    assertQuery(cmd(username = Some("a")), WriteCommand.usernameQ, "a")
   }
 
   it should "have password query" in new TestScope {
-    assertQ(cmd(password = Some("a")), WriteCommand.passwordQ, "a")
+    assertQuery(cmd(password = Some("a")), WriteCommand.passwordQ, "a")
   }
 
   it should "have precision query" in new TestScope {
-    assertQ(cmd(precision = Some(Minute)), WriteCommand.precisionQ, Minute.q)
+    assertQuery(cmd(precision = Some(Minute)), WriteCommand.precisionQ, Minute.q)
   }
 
   it should "have consistency query" in new TestScope {
-    assertQ(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
+    assertQuery(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
   }
 
   behavior of "entity"
@@ -67,6 +77,6 @@ private class TestScope {
       precision,
       consistency)
 
-  def assertQ(cmd: WriteCommand, key: String, value: String) =
-    assert(cmd.httpRequest.uri.query().get(key).contains(value), cmd.httpRequest.uri)
+  def assertQuery(cmd: WriteCommand, key: String, value: String) =
+    assert(cmd.query.get(key).contains(value), cmd.httpRequest.uri)
 }

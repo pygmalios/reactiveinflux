@@ -29,9 +29,9 @@ class WriteCommand(baseUri: Uri,
     )
   }
 
-  private def prec: Precision = precision.getOrElse(Nano)
+  private[command] def prec: Precision = precision.getOrElse(Nano)
 
-  private def query = {
+  private[command] def query: Uri.Query = {
     val qMap = Map(
       dbQ -> Some(dbName),
       retentionPolicyQ -> retentionPolicy,
@@ -46,7 +46,7 @@ class WriteCommand(baseUri: Uri,
     Uri.Query(qMap)
   }
 
-  private def pointsToLine(points: Seq[PointNoTime]): String = {
+  private[command] def pointsToLine(points: Seq[PointNoTime]): String = {
     val sb = new StringBuilder
     points.foreach { point =>
       pointToLine(point, sb)
@@ -55,14 +55,14 @@ class WriteCommand(baseUri: Uri,
     sb.toString()
   }
 
-  private def pointToLine(point: PointNoTime, sb: StringBuilder): Unit = {
+  private[command] def pointToLine(point: PointNoTime, sb: StringBuilder): Unit = {
     sb.append(point.measurement)
     tagsToLine(point.tags, sb)
     fieldsToLine(point.fields, sb)
     timestampToLine(point, sb)
   }
 
-  private def tagsToLine(tags: Map[TagKey, TagValue], sb: StringBuilder): Unit = {
+  private[command] def tagsToLine(tags: Map[TagKey, TagValue], sb: StringBuilder): Unit = {
     tags.foreach { tag =>
       sb.append(",")
       sb.append(tag._1)
@@ -71,7 +71,7 @@ class WriteCommand(baseUri: Uri,
     }
   }
 
-  private def fieldsToLine(fields: Map[FieldKey, FieldValue], sb: StringBuilder): Unit = {
+  private[command] def fieldsToLine(fields: Map[FieldKey, FieldValue], sb: StringBuilder): Unit = {
     if (fields.nonEmpty) {
       sb.append(" ")
       val fieldStrings = fields.map { field =>
@@ -82,14 +82,14 @@ class WriteCommand(baseUri: Uri,
     }
   }
 
-  private def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
+  private[command] def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
     case StringFieldValue(v) => v
     case FloatFieldValue(v) => v.toString
     case LongFieldValue(v) => v.toString + "i"
     case BooleanFieldValue(v) => v.toString
   }
 
-  private def timestampToLine(point: PointNoTime, sb: StringBuilder): Unit = {
+  private[command] def timestampToLine(point: PointNoTime, sb: StringBuilder): Unit = {
     point match {
       case pointWithTime: Point =>
         sb.append(" ")
