@@ -22,20 +22,6 @@ class ActorSystemReactiveInfluxClientISpec(_system: ActorSystem) extends TestKit
     assert(client.ping().futureValue.influxDbVersion == "0.9.6.1")
   }
 
-
-  test("Create and drop test DB") {
-    val testScope = new TestScope
-    import testScope._
-
-    val dbName = "ActorSystemReactiveInfluxClientISpec"
-    try {
-      client.getOrCreateDb(dbName).futureValue
-    }
-    finally {
-      client.dropDb(dbName).futureValue
-    }
-  }
-
   private class TestScope {
     val client = new ActorSystemReactiveInfluxClient(system, ITestConfig.reactiveInfluxConfig)
   }

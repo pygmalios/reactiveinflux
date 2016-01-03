@@ -3,7 +3,8 @@ package com.pygmalios.reactiveinflux.impl.api
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import com.pygmalios.reactiveinflux.api.ReactiveInfluxClient
+import com.pygmalios.reactiveinflux.api.model.PointNoTime
+import com.pygmalios.reactiveinflux.api.{ReactiveInfluxClient, ReactiveInfluxDb}
 import com.pygmalios.reactiveinflux.core.{ReactiveinfluxCoreClient, ReactiveinfluxRequest}
 import com.pygmalios.reactiveinflux.impl.request.Ping
 import com.pygmalios.reactiveinflux.impl.request.query.{CreateDatabase, DropDatabase}
@@ -11,7 +12,7 @@ import com.pygmalios.reactiveinflux.impl.{Logging, ReactiveInfluxConfig}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: ReactiveInfluxConfig)
+class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, val config: ReactiveInfluxConfig)
   extends ReactiveInfluxClient with ReactiveinfluxCoreClient with Logging {
 
   protected implicit def system: ActorSystem = actorSystem
@@ -24,8 +25,8 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: Reactive
   }
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new Ping(config.uri))
-  override def getOrCreateDb(name: String) = execute(new CreateDatabase(config.uri, name))
-  override def dropDb(name: String) = execute(new DropDatabase(config.uri, name))
+
+  override def database(name: String): ReactiveInfluxDb = new ActorSystemReactiveInfluxDb(name, this)
 
   override def execute[R <: ReactiveinfluxRequest](request: R): Future[request.TResponse] = {
     val httpRequest = request.httpRequest
@@ -35,4 +36,13 @@ class ActorSystemReactiveInfluxClient(actorSystem: ActorSystem, config: Reactive
       request(httpResponse)
     }
   }
+}
+
+class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInfluxClient) extends ReactiveInfluxDb {
+  import client._
+
+  override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabase(config.uri, dbName))
+  override def drop(): Future[Unit] = execute(new DropDatabase(config.uri, dbName))
+  override def write(point: PointNoTime): Future[Unit] = ???
+  override def write(points: Iterable[PointNoTime]): Future[Unit] = ???
 }
