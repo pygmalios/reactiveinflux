@@ -21,7 +21,7 @@ class WriteCommand(baseUri: Uri,
   protected val uriWithPath = baseUri.withPath(path)
   override protected def responseFactory(httpResponse: HttpResponse) = new WriteResponse(httpResponse)
   override val httpRequest = {
-    val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(pointsToLine(points)))
+    val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(pointsToLine(points, prec)))
     HttpRequest(
       method  = HttpMethods.POST,
       uri     = uriWithPath.withQuery(query),
@@ -45,21 +45,31 @@ class WriteCommand(baseUri: Uri,
 
     Uri.Query(qMap)
   }
+}
 
-  private[command] def pointsToLine(points: Seq[PointNoTime]): String = {
+object WriteCommand {
+  val path = Uri.Path("/write")
+  val dbQ = "db"
+  val retentionPolicyQ = "rp"
+  val usernameQ = "u"
+  val passwordQ = "p"
+  val precisionQ = "precision"
+  val consistencyQ = "consistency"
+
+  private[command] def pointsToLine(points: Seq[PointNoTime], precision: Precision): String = {
     val sb = new StringBuilder
     points.foreach { point =>
-      pointToLine(point, sb)
+      pointToLine(point, precision, sb)
       sb.append("\n")
     }
     sb.toString()
   }
 
-  private[command] def pointToLine(point: PointNoTime, sb: StringBuilder): Unit = {
+  private[command] def pointToLine(point: PointNoTime, precision: Precision, sb: StringBuilder): Unit = {
     sb.append(point.measurement)
     tagsToLine(point.tags, sb)
     fieldsToLine(point.fields, sb)
-    timestampToLine(point, sb)
+    timestampToLine(point, precision, sb)
   }
 
   private[command] def tagsToLine(tags: Map[TagKey, TagValue], sb: StringBuilder): Unit = {
@@ -89,24 +99,14 @@ class WriteCommand(baseUri: Uri,
     case BooleanFieldValue(v) => v.toString
   }
 
-  private[command] def timestampToLine(point: PointNoTime, sb: StringBuilder): Unit = {
+  private[command] def timestampToLine(point: PointNoTime, precision: Precision, sb: StringBuilder): Unit = {
     point match {
       case pointWithTime: Point =>
         sb.append(" ")
-        sb.append(prec.format(pointWithTime.time))
+        sb.append(precision.format(pointWithTime.time))
       case _ => // No timestamp provided
     }
   }
-}
-
-object WriteCommand {
-  val path = Uri.Path("/write")
-  val dbQ = "db"
-  val retentionPolicyQ = "rp"
-  val usernameQ = "u"
-  val passwordQ = "p"
-  val precisionQ = "precision"
-  val consistencyQ = "consistency"
 }
 
 private[reactiveinflux] class WriteResponse(httpResponse: HttpResponse) extends EmptyJsonResponse(httpResponse)

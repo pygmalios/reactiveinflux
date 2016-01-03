@@ -24,6 +24,12 @@ object Point {
   type TagKey = String
   type TagValue = String
   type FieldKey = String
+
+  def apply(measurement: String, tags: Map[TagKey, TagValue], fields: Map[FieldKey, FieldValue]): PointNoTime =
+    SimplePointNoTime(measurement, tags, fields)
+
+  def apply(time: Instant, measurement: String, tags: Map[TagKey, TagValue], fields: Map[FieldKey, FieldValue]): Point =
+    SimplePoint(time, measurement, tags, fields)
 }
 
 /**
@@ -34,3 +40,12 @@ case class StringFieldValue(value: String) extends FieldValue
 case class FloatFieldValue(value: Double) extends FieldValue
 case class LongFieldValue(value: Long) extends FieldValue
 case class BooleanFieldValue(value: Boolean) extends FieldValue
+
+private[reactiveinflux] case class SimplePointNoTime(measurement: String,
+                                                     tags: Map[TagKey, TagValue],
+                                                     fields: Map[FieldKey, FieldValue]) extends PointNoTime
+
+private[reactiveinflux] case class SimplePoint(time: Instant,
+                                               measurement: String,
+                                               tags: Map[TagKey, TagValue],
+                                               fields: Map[FieldKey, FieldValue]) extends Point

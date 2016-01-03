@@ -1,7 +1,9 @@
 package com.pygmalios.reactiveinflux.command
 
+import java.time.{ZoneOffset, OffsetDateTime}
+
 import akka.http.scaladsl.model.{HttpMethods, Uri}
-import com.pygmalios.reactiveinflux.model.PointNoTime
+import com.pygmalios.reactiveinflux.model.{Point, PointNoTime}
 import org.scalatest.FlatSpec
 
 class WriteCommandSpec extends FlatSpec {
@@ -53,7 +55,20 @@ class WriteCommandSpec extends FlatSpec {
     assertQuery(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
   }
 
-  behavior of "entity"
+  behavior of "timestampToLine"
+
+  it should "append nothing if no time is provided" in new TestScope {
+    val sb = new StringBuilder
+    WriteCommand.timestampToLine(Point("a", Map.empty, Map.empty), Nano, sb)
+    assert(sb.isEmpty)
+  }
+
+  it should "append time" in new TestScope {
+    val time = OffsetDateTime.of(1983, 1, 10, 11, 42, 0, 0, ZoneOffset.UTC).toInstant
+    val sb = new StringBuilder
+    WriteCommand.timestampToLine(Point(time, "a", Map.empty, Map.empty), Milli, sb)
+    assert(sb.toString == " 411046920000")
+  }
 }
 
 private class TestScope {
