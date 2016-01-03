@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.impl.api
+package com.pygmalios.reactiveinflux.impl
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
@@ -23,6 +23,6 @@ class ActorSystemReactiveInfluxClientISpec(_system: ActorSystem) extends TestKit
   }
 
   private class TestScope {
-    val client = new ActorSystemReactiveInfluxClient(system, ITestConfig.reactiveInfluxConfig)
+    val client = new ActorSystemReactiveInflux(system, ITestConfig.reactiveInfluxConfig)
   }
 }

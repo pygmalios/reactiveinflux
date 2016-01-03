@@ -1,12 +1,11 @@
-package com.pygmalios.reactiveinflux.api
+package com.pygmalios.reactiveinflux
 
 import java.io.Closeable
 
 import akka.actor.ActorSystem
-import com.pygmalios.reactiveinflux.api.model.PointNoTime
-import com.pygmalios.reactiveinflux.api.result.PingResponse
-import com.pygmalios.reactiveinflux.impl.ReactiveInfluxConfig
-import com.pygmalios.reactiveinflux.impl.api.ActorSystemReactiveInfluxClient
+import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInflux
+import com.pygmalios.reactiveinflux.model.PointNoTime
+import com.pygmalios.reactiveinflux.result.PingResult
 import com.typesafe.config.Config
 
 import scala.concurrent.Future
@@ -14,8 +13,8 @@ import scala.concurrent.Future
 /**
   * Reactive client for InfluxDB.
   */
-trait ReactiveInfluxClient extends Closeable {
-  def ping(waitForLeaderSec: Option[Int] = None): Future[PingResponse]
+trait ReactiveInflux extends Closeable {
+  def ping(waitForLeaderSec: Option[Int] = None): Future[PingResult]
   def database(name: String): ReactiveInfluxDb
 }
 
@@ -29,10 +28,10 @@ trait ReactiveInfluxDb {
   def write(points: Iterable[PointNoTime]): Future[Unit]
 }
 
-object ReactiveInfluxClient {
+object ReactiveInflux {
   private val defaultClientName = "ReactiveInfluxClient"
-  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInfluxClient =
-    ActorSystemReactiveInfluxClient(actorSystem, config)
+  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
+    ActorSystemReactiveInflux(actorSystem, config)
 
   /**
     * Create reactive Influx client. Normally there should be only one instance per application.
@@ -43,7 +42,7 @@ object ReactiveInfluxClient {
     */
   def apply(name: String = defaultClientName,
             config: Option[Config] = None,
-            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInfluxClient = defaultClientFactory): ReactiveInfluxClient = {
+            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInflux = defaultClientFactory): ReactiveInflux = {
     val reactiveInfluxConfig = ReactiveInfluxConfig(config)
     val actorSystem = ActorSystem(name, reactiveInfluxConfig.reactiveinflux)
     clientFactory(actorSystem, reactiveInfluxConfig)

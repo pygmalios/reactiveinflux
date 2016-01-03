@@ -1,8 +1,8 @@
-package com.pygmalios.reactiveinflux.api.model
+package com.pygmalios.reactiveinflux.model
 
 import java.time.Instant
 
-import com.pygmalios.reactiveinflux.api.model.Point.{FieldKey, TagValue, TagKey}
+import com.pygmalios.reactiveinflux.model.Point.{FieldKey, TagValue, TagKey}
 
 /**
   * Point with nanosecond precision time.

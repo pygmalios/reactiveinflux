@@ -1,9 +1,9 @@
-package com.pygmalios.reactiveinflux.impl.api
+package com.pygmalios.reactiveinflux.impl
 
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
-import com.pygmalios.reactiveinflux.api.ReactiveinfluxResultError
-import com.pygmalios.reactiveinflux.api.result.errors.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveinfluxError}
+import com.pygmalios.reactiveinflux.ReactiveInfluxResultError
+import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import org.scalatest.concurrent.{AsyncAssertions, IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterAll, FunSuiteLike}
@@ -73,14 +73,14 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
   }
 
   private class TestScope {
-    val client = new ActorSystemReactiveInfluxClient(system, ITestConfig.reactiveInfluxConfig)
+    val client = new ActorSystemReactiveInflux(system, ITestConfig.reactiveInfluxConfig)
     val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", client)
 
-    def assertError(f: => Future[_], error: Class[_ <: ReactiveinfluxError], message: String): Unit =
+    def assertError(f: => Future[_], error: Class[_ <: ReactiveInfluxError], message: String): Unit =
       assertError(f, error, Some(message))
-    def assertError(f: => Future[_], error: Class[_ <: ReactiveinfluxError], message: Option[String] = None): Unit = {
+    def assertError(f: => Future[_], error: Class[_ <: ReactiveInfluxError], message: Option[String] = None): Unit = {
       whenReady(f.failed) {
-        case ex: ReactiveinfluxResultError =>
+        case ex: ReactiveInfluxResultError =>
           ex.errors.find(_.getClass == error) match {
             case Some(e) if !message.contains(e.message) => fail(s"Expected error message [${message.get}] got [${e.message}]")
             case None => fail(s"Expected error not found. [$ex]")

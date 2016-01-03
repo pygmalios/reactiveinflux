@@ -2,6 +2,6 @@ package com.pygmalios.reactiveinflux.impl.response
 
 import akka.http.scaladsl.model.HttpResponse
 
-class EmptyJsonResponse(httpResponse: HttpResponse) extends JsonResponse[Unit](httpResponse) {
+class EmptyJsonResult(httpResponse: HttpResponse) extends JsonResult[Unit](httpResponse) {
   val result = ()
 }

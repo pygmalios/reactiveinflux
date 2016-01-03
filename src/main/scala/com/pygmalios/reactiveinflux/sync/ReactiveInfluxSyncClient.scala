@@ -1,9 +1,9 @@
-package com.pygmalios.reactiveinflux.api.sync
+package com.pygmalios.reactiveinflux.sync
 
-import com.pygmalios.reactiveinflux.api.model.PointNoTime
-import com.pygmalios.reactiveinflux.api.result.PingResponse
-import com.pygmalios.reactiveinflux.api.sync.ReactiveInfluxSyncClient._
-import com.pygmalios.reactiveinflux.api.{ReactiveInfluxClient, ReactiveInfluxDb}
+import com.pygmalios.reactiveinflux.model.PointNoTime
+import com.pygmalios.reactiveinflux.result.PingResult
+import com.pygmalios.reactiveinflux.sync.ReactiveInfluxSyncClient._
+import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxDb}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -12,7 +12,7 @@ import scala.concurrent.{Await, Future}
   * Synchronous blocking client for InfluxDB.
   */
 trait ReactiveInfluxSyncClient {
-  def ping(waitForLeaderSec: Option[Int] = None): PingResponse
+  def ping(waitForLeaderSec: Option[Int] = None): PingResult
   def database(name: String): ReactiveInfluxSyncDb
 }
 
@@ -30,11 +30,11 @@ object ReactiveInfluxSyncClient {
   val awaitAtMost = 30.seconds
   def await[T](f: => Future[T]): T = Await.result(f, awaitAtMost)
 
-  def apply(reactiveInfluxClient: ReactiveInfluxClient): ReactiveInfluxSyncClient =
+  def apply(reactiveInfluxClient: ReactiveInflux): ReactiveInfluxSyncClient =
     new WrappingReactiveInfluxSyncClient(reactiveInfluxClient)
 }
 
-private final class WrappingReactiveInfluxSyncClient(reactiveInfluxClient: ReactiveInfluxClient) extends ReactiveInfluxSyncClient {
+private final class WrappingReactiveInfluxSyncClient(reactiveInfluxClient: ReactiveInflux) extends ReactiveInfluxSyncClient {
   def ping(waitForLeaderSec: Option[Int]) = await(reactiveInfluxClient.ping(waitForLeaderSec))
   def database(name: String) = new WrappingReactiveInfluxSyncDb(reactiveInfluxClient.database(name))
 }
