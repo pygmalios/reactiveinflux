@@ -41,6 +41,23 @@ class WriteLinesSpec extends FlatSpec {
     assert(wl.fieldValueToLine(BooleanFieldValue(false)) == "false")
   }
 
+  behavior of "fieldsToLine"
+
+  it should "append nothing if no fields are provided" in new TestScope {
+    wl.fieldsToLine(Map.empty, sb)
+    assert(sb.isEmpty)
+  }
+
+  it should "append single long field" in new TestScope {
+    wl.fieldsToLine(Map("a" -> LongFieldValue(666)), sb)
+    assert(sb.toString == " a=666i")
+  }
+
+  it should "append double and boolean fields" in new TestScope {
+    wl.fieldsToLine(Map("l" -> DoubleFieldValue(0.1), "b" -> BooleanFieldValue(false)), sb)
+    assert(sb.toString == " l=0.1,b=false")
+  }
+
   private class TestScope {
     val sb = new StringBuilder
     val wl = new WriteLines(Seq.empty, Nano)
