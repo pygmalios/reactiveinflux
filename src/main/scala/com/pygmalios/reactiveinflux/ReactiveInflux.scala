@@ -4,7 +4,7 @@ import java.io.Closeable
 
 import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInflux
-import com.pygmalios.reactiveinflux.model.PointNoTime
+import com.pygmalios.reactiveinflux.model.{WriteParameters, PointNoTime}
 import com.pygmalios.reactiveinflux.result.PingResult
 import com.typesafe.config.Config
 
@@ -15,7 +15,7 @@ import scala.concurrent.Future
   */
 trait ReactiveInflux extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResult]
-  def database(name: String): ReactiveInfluxDb
+  def database(dbName: String, dbUsername: Option[String] = None, dbPassword: Option[String] = None): ReactiveInfluxDb
 }
 
 /**
@@ -25,7 +25,8 @@ trait ReactiveInfluxDb {
   def create(failIfExists: Boolean = false): Future[Unit]
   def drop(failIfNotExists: Boolean = false): Future[Unit]
   def write(point: PointNoTime): Future[Unit]
-  def write(points: Iterable[PointNoTime]): Future[Unit]
+  def write(point: PointNoTime, params: WriteParameters): Future[Unit]
+  def write(points: Iterable[PointNoTime], params: WriteParameters = WriteParameters()): Future[Unit]
 }
 
 object ReactiveInflux {

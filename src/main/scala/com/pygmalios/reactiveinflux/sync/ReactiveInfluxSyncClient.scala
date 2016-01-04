@@ -1,6 +1,6 @@
 package com.pygmalios.reactiveinflux.sync
 
-import com.pygmalios.reactiveinflux.model.PointNoTime
+import com.pygmalios.reactiveinflux.model.{WriteParameters, PointNoTime}
 import com.pygmalios.reactiveinflux.result.PingResult
 import com.pygmalios.reactiveinflux.sync.ReactiveInfluxSyncClient._
 import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxDb}
@@ -23,7 +23,8 @@ trait ReactiveInfluxSyncDb {
   def create(failIfExists: Boolean = false): Unit
   def drop(failIfNotExists: Boolean = false): Unit
   def write(point: PointNoTime): Unit
-  def write(points: Iterable[PointNoTime]): Unit
+  def write(point: PointNoTime, params: WriteParameters): Unit
+  def write(points: Iterable[PointNoTime], params: WriteParameters = WriteParameters()): Unit
 }
 
 object ReactiveInfluxSyncClient {
@@ -35,13 +36,14 @@ object ReactiveInfluxSyncClient {
 }
 
 private final class WrappingReactiveInfluxSyncClient(reactiveInfluxClient: ReactiveInflux) extends ReactiveInfluxSyncClient {
-  def ping(waitForLeaderSec: Option[Int]) = await(reactiveInfluxClient.ping(waitForLeaderSec))
-  def database(name: String) = new WrappingReactiveInfluxSyncDb(reactiveInfluxClient.database(name))
+  override def ping(waitForLeaderSec: Option[Int]) = await(reactiveInfluxClient.ping(waitForLeaderSec))
+  override def database(name: String) = new WrappingReactiveInfluxSyncDb(reactiveInfluxClient.database(name))
 }
 
 private final class WrappingReactiveInfluxSyncDb(reactiveInfluxDb: ReactiveInfluxDb) extends ReactiveInfluxSyncDb {
-  def create(failIfExists: Boolean) = await(reactiveInfluxDb.create(failIfExists))
-  def drop(failIfNotExists: Boolean = false) = await(reactiveInfluxDb.drop(failIfNotExists))
-  def write(point: PointNoTime) = await(reactiveInfluxDb.write(point))
-  def write(points: Iterable[PointNoTime]) = await(reactiveInfluxDb.write(points))
+  override def create(failIfExists: Boolean) = await(reactiveInfluxDb.create(failIfExists))
+  override def drop(failIfNotExists: Boolean = false) = await(reactiveInfluxDb.drop(failIfNotExists))
+  override def write(point: PointNoTime) = write(point, WriteParameters())
+  override def write(point: PointNoTime, params: WriteParameters) = write(Seq(point), params)
+  override def write(points: Iterable[PointNoTime], params: WriteParameters) = await(reactiveInfluxDb.write(points, params))
 }

@@ -1,10 +1,7 @@
 package com.pygmalios.reactiveinflux.command
 
-import java.time.{ZoneOffset, OffsetDateTime}
-
-import akka.http.scaladsl.model.{HttpEntity, ContentTypes, HttpMethods, Uri}
-import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.pygmalios.reactiveinflux.model.{PointSpec, Point, PointNoTime}
+import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, Uri}
+import com.pygmalios.reactiveinflux.model.{PointNoTime, PointSpec, WriteParameters}
 import org.scalatest.FlatSpec
 
 class WriteCommandSpec extends FlatSpec {
@@ -86,12 +83,10 @@ private class TestScope {
     new WriteCommand(
       baseUri,
       dbName,
-      points,
-      retentionPolicy,
       username,
       password,
-      precision,
-      consistency)
+      points,
+      WriteParameters(retentionPolicy,precision,consistency))
 
   def assertQuery(cmd: WriteCommand, key: String, value: String) =
     assert(cmd.query.get(key).contains(value), cmd.httpRequest.uri)

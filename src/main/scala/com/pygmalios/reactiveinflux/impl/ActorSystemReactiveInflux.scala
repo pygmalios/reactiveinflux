@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.{WriteCommand, CreateDatabaseCommand, DropDatabaseCommand, PingCommand}
-import com.pygmalios.reactiveinflux.model.PointNoTime
+import com.pygmalios.reactiveinflux.command.{CreateDatabaseCommand, DropDatabaseCommand, PingCommand, WriteCommand}
+import com.pygmalios.reactiveinflux.model.{PointNoTime, WriteParameters}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -23,7 +23,8 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new PingCommand(config.uri))
 
-  override def database(name: String): ReactiveInfluxDb = new ActorSystemReactiveInfluxDb(name, this)
+  override def database(name: String, username: Option[String], password: Option[String]): ReactiveInfluxDb =
+    new ActorSystemReactiveInfluxDb(name, username, password, this)
 
   override def execute[R <: ReactiveInfluxCommand](request: R): Future[request.TResult] = {
     val httpRequest = request.httpRequest
@@ -35,22 +36,25 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
   }
 }
 
-class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInflux) extends ReactiveInfluxDb {
-  import client._
-
-  override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabaseCommand(config.uri, dbName, failIfExists))
-  override def drop(failIfNotExists: Boolean): Future[Unit] = execute(new DropDatabaseCommand(config.uri, dbName, failIfNotExists))
-  override def write(point: PointNoTime): Future[Unit] = write(Seq(point))
-  override def write(points: Iterable[PointNoTime]): Future[Unit] = execute(new WriteCommand(
-    baseUri         = config.uri,
-    dbName          = dbName,
-    points          = points,
-    retentionPolicy = None,
-    username        = None,
-    password        = None,
-    precision       = None,
-    consistency     = None
-  ))
+class ActorSystemReactiveInfluxDb(dbName: String,
+                                  dbUsername: Option[String],
+                                  dbPassword: Option[String],
+                                  core: ReactiveInfluxCore) extends ReactiveInfluxDb {
+  override def create(failIfExists: Boolean): Future[Unit] =
+    core.execute(new CreateDatabaseCommand(core.config.uri, dbName, failIfExists))
+  override def drop(failIfNotExists: Boolean): Future[Unit] =
+    core.execute(new DropDatabaseCommand(core.config.uri, dbName, failIfNotExists))
+  override def write(point: PointNoTime): Future[Unit] = write(point, WriteParameters())
+  override def write(point: PointNoTime, params: WriteParameters): Future[Unit] = write(Seq(point))
+  override def write(points: Iterable[PointNoTime], params: WriteParameters): Future[Unit] =
+    core.execute(new WriteCommand(
+      baseUri     = core.config.uri,
+      dbName      = dbName,
+      dbUsername  = dbUsername,
+      dbPassword  = dbPassword,
+      points      = points,
+      params      = params
+    ))
 }
 
 object ActorSystemReactiveInflux {

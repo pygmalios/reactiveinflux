@@ -80,7 +80,7 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
 
   private class TestScope {
     val client = new ActorSystemReactiveInflux(system, ITestConfig.reactiveInfluxConfig)
-    val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", client)
+    val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", None, None, client)
 
     def withDb(action: (ActorSystemReactiveInfluxDb) => Any): Unit = {
       val result = db.create().map { _ =>

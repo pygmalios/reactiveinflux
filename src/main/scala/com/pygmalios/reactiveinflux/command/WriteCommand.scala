@@ -7,14 +7,12 @@ import com.pygmalios.reactiveinflux.model.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.model._
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 
-class WriteCommand(baseUri: Uri,
-                   dbName: String,
-                   points: Iterable[PointNoTime],
-                   retentionPolicy: Option[String],
-                   username: Option[String],
-                   password: Option[String],
-                   precision: Option[Precision],
-                   consistency: Option[Consistency]) extends ReactiveInfluxCommand {
+class WriteCommand(val baseUri: Uri,
+                   val dbName: String,
+                   val dbUsername: Option[String],
+                   val dbPassword: Option[String],
+                   val points: Iterable[PointNoTime],
+                   val params: WriteParameters) extends ReactiveInfluxCommand {
   import WriteCommand._
 
   override type TResult = Unit
@@ -30,22 +28,40 @@ class WriteCommand(baseUri: Uri,
     )
   }
 
-  private[command] def prec: Precision = precision.getOrElse(Nano)
+
+
+  private[command] def prec: Precision = params.precision.getOrElse(Nano)
 
   private[command] def query: Uri.Query = {
     val qMap = Map(
       dbQ -> Some(dbName),
-      retentionPolicyQ -> retentionPolicy,
-      usernameQ -> username,
-      passwordQ -> password,
+      retentionPolicyQ -> params.retentionPolicy,
+      usernameQ -> dbUsername,
+      passwordQ -> dbPassword,
       precisionQ -> Some(prec.q),
-      consistencyQ -> consistency.map(_.q)
+      consistencyQ -> params.consistency.map(_.q)
     ).collect {
       case (k, Some(v)) => k -> v
     }
 
     Uri.Query(qMap)
   }
+
+  def canEqual(other: Any): Boolean = other.isInstanceOf[WriteCommand]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: WriteCommand =>
+      (that canEqual this) &&
+        httpRequest == that.httpRequest
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    val state = Seq(httpRequest)
+    state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
+  }
+
+  override def toString = s"WriteCommand(uriWithPath=$uriWithPath, httpRequest=$httpRequest, baseUri=$baseUri, dbName=$dbName, dbUsername=$dbUsername, dbPassword=$dbPassword, points=$points, params=$params)"
 }
 
 object WriteCommand {

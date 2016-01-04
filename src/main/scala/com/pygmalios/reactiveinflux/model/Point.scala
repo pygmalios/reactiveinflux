@@ -14,7 +14,7 @@ trait PointNoTime extends Serializable {
 }
 
 /**
-  * Point with nanosecond precision time.
+  * Point with time.
   */
 trait Point extends PointNoTime {
   def time: Instant
