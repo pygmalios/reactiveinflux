@@ -71,7 +71,7 @@ class ActorSystemReactiveInfluxDb(dbName: String,
 
     results.head
   }
-  override def query(qs: Iterable[Query], params: QueryParameters): Future[Seq[QueryResult]] = ???
+  override def query(qs: Seq[Query], params: QueryParameters): Future[Seq[QueryResult]] = ???
 }
 
 object ActorSystemReactiveInflux {

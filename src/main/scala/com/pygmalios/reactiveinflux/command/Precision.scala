@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.command
 
 import java.time.Instant
 
-sealed abstract class Precision(val q: String) {
+sealed abstract class Precision(val q: String) extends Serializable {
   def format(i: Instant): String
   protected def nano(i: Instant, divideBy: Int, digits: Int): String = {
     val t = i.getNano / divideBy

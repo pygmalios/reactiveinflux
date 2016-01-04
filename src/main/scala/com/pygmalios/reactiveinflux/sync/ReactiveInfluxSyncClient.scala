@@ -31,7 +31,7 @@ trait ReactiveInfluxSyncDb {
 
   def query(q: Query): QueryResult
   def query(q: Query, params: QueryParameters): QueryResult
-  def query(qs: Iterable[Query], params: QueryParameters = QueryParameters()): Seq[QueryResult]
+  def query(qs: Seq[Query], params: QueryParameters = QueryParameters()): Seq[QueryResult]
 }
 
 object ReactiveInfluxSyncClient {
@@ -57,5 +57,5 @@ private final class WrappingReactiveInfluxSyncDb(reactiveInfluxDb: ReactiveInflu
 
   override def query(q: Query) = query(q, QueryParameters())
   override def query(q: Query, params: QueryParameters) = await(reactiveInfluxDb.query(q, params))
-  override def query(qs: Iterable[Query], params: QueryParameters) = await(reactiveInfluxDb.query(qs, params))
+  override def query(qs: Seq[Query], params: QueryParameters) = await(reactiveInfluxDb.query(qs, params))
 }

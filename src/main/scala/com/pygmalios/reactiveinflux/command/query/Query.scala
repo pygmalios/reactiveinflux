@@ -3,7 +3,7 @@ package com.pygmalios.reactiveinflux.command.query
 /**
   * Query in InfluxQL.
   */
-trait Query {
+trait Query extends Serializable {
   def influxQl: String
 }
 

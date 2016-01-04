@@ -3,7 +3,10 @@ package com.pygmalios.reactiveinflux.command.query
 import com.pygmalios.reactiveinflux.command.Precision
 import com.pygmalios.reactiveinflux.model.OptionalParameters
 
-trait QueryParameters extends OptionalParameters
+trait QueryParameters extends OptionalParameters {
+  def epoch: Option[Precision]
+  def chunkSize: Option[Int]
+}
 
 object QueryParameters {
   val epochQ = "epoch"

@@ -33,7 +33,7 @@ trait ReactiveInfluxDb {
 
   def query(q: Query): Future[QueryResult]
   def query(q: Query, params: QueryParameters): Future[QueryResult]
-  def query(qs: Iterable[Query], params: QueryParameters = QueryParameters()): Future[Seq[QueryResult]]
+  def query(qs: Seq[Query], params: QueryParameters = QueryParameters()): Future[Seq[QueryResult]]
 }
 
 object ReactiveInflux {

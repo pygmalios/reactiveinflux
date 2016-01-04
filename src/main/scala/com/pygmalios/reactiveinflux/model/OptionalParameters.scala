@@ -1,6 +1,6 @@
 package com.pygmalios.reactiveinflux.model
 
-trait OptionalParameters {
+trait OptionalParameters extends Serializable {
   def params: Map[String, String]
 }
 
