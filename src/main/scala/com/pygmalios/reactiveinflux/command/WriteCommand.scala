@@ -84,7 +84,7 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
   }
 
   private[command] def pointToLine(point: PointNoTime, precision: Precision, sb: StringBuilder): Unit = {
-    sb.append(point.measurement)
+    sb.append(point.measurement.escaped)
     tagsToLine(point.tags, sb)
     fieldsToLine(point.fields, sb)
     timestampToLine(point, precision, sb)
@@ -93,9 +93,9 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
   private[command] def tagsToLine(tags: Map[TagKey, TagValue], sb: StringBuilder): Unit = {
     tags.foreach { tag =>
       sb.append(",")
-      sb.append(tag._1)
+      sb.append(tag._1.escaped)
       sb.append("=")
-      sb.append(tag._2)
+      sb.append(tag._2.escaped)
     }
   }
 
@@ -103,7 +103,7 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
     if (fields.nonEmpty) {
       sb.append(" ")
       val fieldStrings = fields.map { field =>
-        field._1 + "=" + fieldValueToLine(field._2)
+        field._1.escaped + "=" + fieldValueToLine(field._2)
       }
 
       sb.append(fieldStrings.mkString(","))
@@ -111,7 +111,7 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
   }
 
   private[command] def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
-    case StringFieldValue(v) => "\"" + v.replace("\"", "\\\"") + "\""
+    case StringFieldValue(v) =>  "\"" + v.replace("\"", "\\\"") + "\""
     case DoubleFieldValue(v) => v.toString
     case LongFieldValue(v) => v.toString + "i"
     case BooleanFieldValue(v) => v.toString

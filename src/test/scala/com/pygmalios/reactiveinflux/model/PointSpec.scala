@@ -1,6 +1,8 @@
 package com.pygmalios.reactiveinflux.model
 
-import java.time.{ZoneOffset, OffsetDateTime}
+import java.time.{OffsetDateTime, ZoneOffset}
+
+import com.pygmalios.reactiveinflux._
 
 object PointSpec {
   val time1 = OffsetDateTime.of(1983, 1, 10, 11, 42, 0, 0, ZoneOffset.UTC).toInstant
