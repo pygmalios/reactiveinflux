@@ -2,8 +2,9 @@ package com.pygmalios.reactiveinflux.impl
 
 import akka.http.scaladsl.model.Uri
 import com.pygmalios.reactiveinflux.ReactiveInfluxCore
-import com.pygmalios.reactiveinflux.command.{All, Minute, WriteCommand}
-import com.pygmalios.reactiveinflux.model.{WriteParameters, PointSpec}
+import com.pygmalios.reactiveinflux.command.Minute
+import com.pygmalios.reactiveinflux.command.write.{WriteParameters, All, WriteCommand}
+import com.pygmalios.reactiveinflux.model.PointSpec
 import org.scalatest.FlatSpec
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._

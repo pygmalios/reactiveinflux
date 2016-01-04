@@ -1,7 +1,8 @@
 package com.pygmalios.reactiveinflux.command
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, Uri}
-import com.pygmalios.reactiveinflux.model.{PointNoTime, PointSpec, WriteParameters}
+import com.pygmalios.reactiveinflux.command.write._
+import com.pygmalios.reactiveinflux.model.{PointNoTime, PointSpec}
 import org.scalatest.FlatSpec
 
 class WriteCommandSpec extends FlatSpec {
@@ -34,7 +35,7 @@ class WriteCommandSpec extends FlatSpec {
   }
 
   it should "have retentionPolicy query" in new TestScope {
-    assertQuery(cmd(retentionPolicy = Some("a")), WriteCommand.retentionPolicyQ, "a")
+    assertQuery(cmd(retentionPolicy = Some("a")), WriteParameters.retentionPolicyQ, "a")
   }
 
   it should "have username query" in new TestScope {
@@ -46,11 +47,11 @@ class WriteCommandSpec extends FlatSpec {
   }
 
   it should "have precision query" in new TestScope {
-    assertQuery(cmd(precision = Some(Minute)), WriteCommand.precisionQ, Minute.q)
+    assertQuery(cmd(precision = Some(Minute)), WriteParameters.precisionQ, Minute.q)
   }
 
   it should "have consistency query" in new TestScope {
-    assertQuery(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
+    assertQuery(cmd(consistency = Some(Quorum)), WriteParameters.consistencyQ, Quorum.q)
   }
 
   behavior of "entity"

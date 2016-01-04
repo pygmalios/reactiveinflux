@@ -3,11 +3,12 @@ package com.pygmalios.reactiveinflux
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import com.pygmalios.reactiveinflux.response.ReactiveInfluxJsonResultException
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait ReactiveInfluxCore {
   def config: ReactiveInfluxConfig
   def execute[R <: ReactiveInfluxCommand](command: R): Future[command.TResult]
+  def executionContext: ExecutionContext
 }
 
 trait ReactiveInfluxCommand extends Serializable {

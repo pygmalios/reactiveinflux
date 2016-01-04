@@ -1,8 +1,9 @@
-package com.pygmalios.reactiveinflux.command
+package com.pygmalios.reactiveinflux.command.write
 
 import akka.http.scaladsl.model._
 import akka.util.ByteString
 import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
+import com.pygmalios.reactiveinflux.command.{Nano, Precision}
 import com.pygmalios.reactiveinflux.model.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.model._
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
@@ -31,18 +32,13 @@ class WriteCommand(val baseUri: Uri,
   private[command] def prec: Precision = params.precision.getOrElse(Nano)
 
   private[command] def query: Uri.Query = {
-    val qMap = Map(
+    val qMap = OptionalParameters(
       dbQ -> Some(dbName),
-      retentionPolicyQ -> params.retentionPolicy,
       usernameQ -> dbUsername,
-      passwordQ -> dbPassword,
-      precisionQ -> Some(prec.q),
-      consistencyQ -> params.consistency.map(_.q)
-    ).collect {
-      case (k, Some(v)) => k -> v
-    }
+      passwordQ -> dbPassword
+    )
 
-    Uri.Query(qMap)
+    Uri.Query(qMap ++ params.params)
   }
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[WriteCommand]
@@ -65,11 +61,8 @@ class WriteCommand(val baseUri: Uri,
 object WriteCommand {
   val path = Uri.Path("/write")
   val dbQ = "db"
-  val retentionPolicyQ = "rp"
   val usernameQ = "u"
   val passwordQ = "p"
-  val precisionQ = "precision"
-  val consistencyQ = "consistency"
 }
 
 private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precision: Precision) {

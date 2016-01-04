@@ -3,6 +3,7 @@ package com.pygmalios.reactiveinflux.command
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import com.pygmalios.reactiveinflux._
+import com.pygmalios.reactiveinflux.command.write.WriteLines
 import com.pygmalios.reactiveinflux.model._
 import org.scalatest.FlatSpec
 

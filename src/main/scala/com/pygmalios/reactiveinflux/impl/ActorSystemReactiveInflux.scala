@@ -4,8 +4,10 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.{CreateDatabaseCommand, DropDatabaseCommand, PingCommand, WriteCommand}
-import com.pygmalios.reactiveinflux.model.{PointNoTime, WriteParameters}
+import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
+import com.pygmalios.reactiveinflux.command.write.{WriteCommand, WriteParameters}
+import com.pygmalios.reactiveinflux.command.{CreateDatabaseCommand, DropDatabaseCommand, PingCommand}
+import com.pygmalios.reactiveinflux.model.PointNoTime
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -13,7 +15,7 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
   extends ReactiveInflux with ReactiveInfluxCore with Logging {
 
   protected implicit def system: ActorSystem = actorSystem
-  protected implicit def executionContext: ExecutionContext = actorSystem.dispatcher
+  implicit def executionContext: ExecutionContext = actorSystem.dispatcher
   protected implicit val materializer: ActorMaterializer = ActorMaterializer(Some(ActorMaterializerSettings(actorSystem)))
   protected val http = Http(actorSystem)
 
@@ -40,10 +42,13 @@ class ActorSystemReactiveInfluxDb(dbName: String,
                                   dbUsername: Option[String],
                                   dbPassword: Option[String],
                                   core: ReactiveInfluxCore) extends ReactiveInfluxDb {
+  private implicit def executionContext: ExecutionContext = core.executionContext
+
   override def create(failIfExists: Boolean): Future[Unit] =
     core.execute(new CreateDatabaseCommand(core.config.uri, dbName, failIfExists))
   override def drop(failIfNotExists: Boolean): Future[Unit] =
     core.execute(new DropDatabaseCommand(core.config.uri, dbName, failIfNotExists))
+
   override def write(point: PointNoTime): Future[Unit] = write(point, WriteParameters())
   override def write(point: PointNoTime, params: WriteParameters): Future[Unit] = write(Seq(point))
   override def write(points: Iterable[PointNoTime], params: WriteParameters): Future[Unit] =
@@ -55,6 +60,18 @@ class ActorSystemReactiveInfluxDb(dbName: String,
       points      = points,
       params      = params
     ))
+
+  override def query(q: Query): Future[QueryResult] = query(q, QueryParameters())
+  override def query(q: Query, params: QueryParameters): Future[QueryResult] = query(Seq(q), params).map { results =>
+    if (results.isEmpty)
+      throw new ReactiveInfluxException("No results returned!")
+
+    if (results.size > 1)
+      throw new ReactiveInfluxException(s"Too many results returned! [${results.size}]")
+
+    results.head
+  }
+  override def query(qs: Iterable[Query], params: QueryParameters): Future[Seq[QueryResult]] = ???
 }
 
 object ActorSystemReactiveInflux {

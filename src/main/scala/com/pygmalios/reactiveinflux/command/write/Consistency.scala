@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.command
+package com.pygmalios.reactiveinflux.command.write
 
 sealed abstract class Consistency(val q: String)
 case object One extends Consistency("one")

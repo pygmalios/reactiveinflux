@@ -3,8 +3,10 @@ package com.pygmalios.reactiveinflux
 import java.io.Closeable
 
 import akka.actor.ActorSystem
+import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
+import com.pygmalios.reactiveinflux.command.write.WriteParameters
 import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInflux
-import com.pygmalios.reactiveinflux.model.{WriteParameters, PointNoTime}
+import com.pygmalios.reactiveinflux.model.PointNoTime
 import com.pygmalios.reactiveinflux.result.PingResult
 import com.typesafe.config.Config
 
@@ -24,9 +26,14 @@ trait ReactiveInflux extends Closeable {
 trait ReactiveInfluxDb {
   def create(failIfExists: Boolean = false): Future[Unit]
   def drop(failIfNotExists: Boolean = false): Future[Unit]
+
   def write(point: PointNoTime): Future[Unit]
   def write(point: PointNoTime, params: WriteParameters): Future[Unit]
   def write(points: Iterable[PointNoTime], params: WriteParameters = WriteParameters()): Future[Unit]
+
+  def query(q: Query): Future[QueryResult]
+  def query(q: Query, params: QueryParameters): Future[QueryResult]
+  def query(qs: Iterable[Query], params: QueryParameters = QueryParameters()): Future[Seq[QueryResult]]
 }
 
 object ReactiveInflux {
