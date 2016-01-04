@@ -58,6 +58,23 @@ class WriteLinesSpec extends FlatSpec {
     assert(sb.toString == " l=0.1,b=false")
   }
 
+  behavior of "tagsToLine"
+
+  it should "append nothing if no tags are provided" in new TestScope {
+    wl.tagsToLine(Map.empty, sb)
+    assert(sb.isEmpty)
+  }
+
+  it should "append a single tag" in new TestScope {
+    wl.tagsToLine(Map("a" -> "1"), sb)
+    assert(sb.toString == ",a=1")
+  }
+
+  it should "append two tags" in new TestScope {
+    wl.tagsToLine(Map("a" -> "1", "b" -> "2"), sb)
+    assert(sb.toString == ",a=1,b=2")
+  }
+
   private class TestScope {
     val sb = new StringBuilder
     val wl = new WriteLines(Seq.empty, Nano)
