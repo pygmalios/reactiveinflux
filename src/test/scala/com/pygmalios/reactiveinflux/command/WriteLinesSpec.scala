@@ -21,7 +21,11 @@ class WriteLinesSpec extends FlatSpec {
   behavior of "fieldValueToLine"
 
   it should "convert string value as is" in new TestScope {
-    assert(wl.fieldValueToLine(StringFieldValue("a")) == "a")
+    assert(wl.fieldValueToLine(StringFieldValue("a")) == "\"a\"")
+  }
+
+  it should "escape quotes in strings" in new TestScope {
+    assert(wl.fieldValueToLine(StringFieldValue("""x"y"""")) == """"x\"y\""""")
   }
 
   it should "convert double value as is" in new TestScope {
@@ -86,7 +90,7 @@ class WriteLinesSpec extends FlatSpec {
 
   it should "append two points separated by newline" in {
     val wl = new WriteLines(Seq(PointSpec.point1, PointSpec.point2), Nano)
-    assert(wl.toString() == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1.0 411046920000000003")
+    assert(wl.toString() == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1.0,fk3=\"abcXYZ\" 411046920000000003")
   }
 
   private class TestScope {

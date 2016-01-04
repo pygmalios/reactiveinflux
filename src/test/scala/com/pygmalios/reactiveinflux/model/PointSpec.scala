@@ -7,6 +7,10 @@ object PointSpec {
   val point1 = Point(time1, "m1", Map.empty, Map("fk" -> LongFieldValue(-1)))
 
   val time2 = time1.plusNanos(3)
-  val point2 = Point(time2, "m2", Map("tk1" -> "tv1", "tk2" -> "tv2"), Map("fk" -> BooleanFieldValue(true),
-    "fk2" -> DoubleFieldValue(1)))
+  val point2 = Point(time2, "m2", Map("tk1" -> "tv1", "tk2" -> "tv2"),
+    Map(
+      "fk" -> BooleanFieldValue(true),
+      "fk2" -> DoubleFieldValue(1),
+      "fk3" -> StringFieldValue("abcXYZ")
+    ))
 }

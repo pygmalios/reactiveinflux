@@ -82,8 +82,8 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     val client = new ActorSystemReactiveInflux(system, ITestConfig.reactiveInfluxConfig)
     val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", None, None, client)
 
-    def withDb(action: (ActorSystemReactiveInfluxDb) => Any): Unit = {
-      val result = db.create().map { _ =>
+    def withDb(action: (ActorSystemReactiveInfluxDb) => Future[Any]): Unit = {
+      val result = db.create().flatMap { _ =>
         action(db)
       }.map { _ =>
         db.drop()

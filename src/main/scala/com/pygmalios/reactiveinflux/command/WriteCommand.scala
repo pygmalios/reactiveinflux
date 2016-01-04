@@ -28,8 +28,6 @@ class WriteCommand(val baseUri: Uri,
     )
   }
 
-
-
   private[command] def prec: Precision = params.precision.getOrElse(Nano)
 
   private[command] def query: Uri.Query = {
@@ -113,7 +111,7 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
   }
 
   private[command] def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
-    case StringFieldValue(v) => v
+    case StringFieldValue(v) => "\"" + v.replace("\"", "\\\"") + "\""
     case DoubleFieldValue(v) => v.toString
     case LongFieldValue(v) => v.toString + "i"
     case BooleanFieldValue(v) => v.toString
