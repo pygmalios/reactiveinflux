@@ -2,8 +2,9 @@ package com.pygmalios.reactiveinflux.command
 
 import java.time.{ZoneOffset, OffsetDateTime}
 
-import akka.http.scaladsl.model.{HttpMethods, Uri}
-import com.pygmalios.reactiveinflux.model.{Point, PointNoTime}
+import akka.http.scaladsl.model.{HttpEntity, ContentTypes, HttpMethods, Uri}
+import akka.http.scaladsl.testkit.ScalatestRouteTest
+import com.pygmalios.reactiveinflux.model.{PointSpec, Point, PointNoTime}
 import org.scalatest.FlatSpec
 
 class WriteCommandSpec extends FlatSpec {
@@ -53,6 +54,21 @@ class WriteCommandSpec extends FlatSpec {
 
   it should "have consistency query" in new TestScope {
     assertQuery(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
+  }
+
+  behavior of "entity"
+
+  it should "contain binary content" in new TestScope {
+    val entity = cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity
+    assert(entity.getContentType() == ContentTypes.`application/octet-stream`)
+  }
+
+  it should "contain point lines" in new TestScope {
+    cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity match {
+      case HttpEntity.Strict(_, byteString) =>
+          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1.0 411046920000000003")
+      case _ => fail("Invalit entity!")
+    }
   }
 }
 

@@ -14,7 +14,6 @@ class WriteLinesSpec extends FlatSpec {
   }
 
   it should "append time" in new TestScope {
-    val time = OffsetDateTime.of(1983, 1, 10, 11, 42, 0, 0, ZoneOffset.UTC).toInstant
     wl.timestampToLine(Point(time, "a", Map.empty, Map.empty), Milli, sb)
     assert(sb.toString == " 411046920000")
   }
@@ -75,7 +74,23 @@ class WriteLinesSpec extends FlatSpec {
     assert(sb.toString == ",a=1,b=2")
   }
 
+  behavior of "pointToLine"
+
+  it should "append measurement, tags, fields and timestamp" in new TestScope {
+    val point = Point(time, "m", Map("tk" -> "tv"), Map("fk" -> LongFieldValue(-1)))
+    wl.pointToLine(point, Second, sb)
+    assert(sb.toString() == "m,tk=tv fk=-1i 411046920")
+  }
+
+  behavior of "toString"
+
+  it should "append two points separated by newline" in {
+    val wl = new WriteLines(Seq(PointSpec.point1, PointSpec.point2), Nano)
+    assert(wl.toString() == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1.0 411046920000000003")
+  }
+
   private class TestScope {
+    val time = OffsetDateTime.of(1983, 1, 10, 11, 42, 0, 0, ZoneOffset.UTC).toInstant
     val sb = new StringBuilder
     val wl = new WriteLines(Seq.empty, Nano)
   }

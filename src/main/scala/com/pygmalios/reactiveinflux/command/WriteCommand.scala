@@ -62,8 +62,9 @@ private[reactiveinflux] class WriteLines(points: Seq[PointNoTime], precision: Pr
   override def toString: String = {
     val sb = new StringBuilder
     points.foreach { point =>
+      if (sb.nonEmpty)
+        sb.append("\n")
       pointToLine(point, precision, sb)
-      sb.append("\n")
     }
     sb.toString()
   }
