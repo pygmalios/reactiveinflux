@@ -54,21 +54,6 @@ class WriteCommandSpec extends FlatSpec {
   it should "have consistency query" in new TestScope {
     assertQuery(cmd(consistency = Some(Quorum)), WriteCommand.consistencyQ, Quorum.q)
   }
-
-  behavior of "timestampToLine"
-
-  it should "append nothing if no time is provided" in new TestScope {
-    val sb = new StringBuilder
-    WriteCommand.timestampToLine(Point("a", Map.empty, Map.empty), Nano, sb)
-    assert(sb.isEmpty)
-  }
-
-  it should "append time" in new TestScope {
-    val time = OffsetDateTime.of(1983, 1, 10, 11, 42, 0, 0, ZoneOffset.UTC).toInstant
-    val sb = new StringBuilder
-    WriteCommand.timestampToLine(Point(time, "a", Map.empty, Map.empty), Milli, sb)
-    assert(sb.toString == " 411046920000")
-  }
 }
 
 private class TestScope {

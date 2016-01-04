@@ -37,7 +37,7 @@ object Point {
   */
 sealed trait FieldValue extends Serializable
 case class StringFieldValue(value: String) extends FieldValue
-case class FloatFieldValue(value: Double) extends FieldValue
+case class DoubleFieldValue(value: Double) extends FieldValue
 case class LongFieldValue(value: Long) extends FieldValue
 case class BooleanFieldValue(value: Boolean) extends FieldValue
 

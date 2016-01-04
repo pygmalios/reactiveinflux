@@ -21,7 +21,8 @@ class WriteCommand(baseUri: Uri,
   protected val uriWithPath = baseUri.withPath(path)
   override protected def responseFactory(httpResponse: HttpResponse) = new WriteResponse(httpResponse)
   override val httpRequest = {
-    val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(pointsToLine(points, prec)))
+    val lines = new WriteLines(points, prec).toString
+    val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(lines))
     HttpRequest(
       method  = HttpMethods.POST,
       uri     = uriWithPath.withQuery(query),
@@ -55,8 +56,10 @@ object WriteCommand {
   val passwordQ = "p"
   val precisionQ = "precision"
   val consistencyQ = "consistency"
+}
 
-  private[command] def pointsToLine(points: Seq[PointNoTime], precision: Precision): String = {
+private[reactiveinflux] class WriteLines(points: Seq[PointNoTime], precision: Precision) {
+  override def toString: String = {
     val sb = new StringBuilder
     points.foreach { point =>
       pointToLine(point, precision, sb)
@@ -94,7 +97,7 @@ object WriteCommand {
 
   private[command] def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
     case StringFieldValue(v) => v
-    case FloatFieldValue(v) => v.toString
+    case DoubleFieldValue(v) => v.toString
     case LongFieldValue(v) => v.toString + "i"
     case BooleanFieldValue(v) => v.toString
   }
