@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.{CreateDatabaseCommand, DropDatabaseCommand, PingCommand}
+import com.pygmalios.reactiveinflux.command.{WriteCommand, CreateDatabaseCommand, DropDatabaseCommand, PingCommand}
 import com.pygmalios.reactiveinflux.model.PointNoTime
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -40,8 +40,17 @@ class ActorSystemReactiveInfluxDb(dbName: String, client: ActorSystemReactiveInf
 
   override def create(failIfExists: Boolean): Future[Unit] = execute(new CreateDatabaseCommand(config.uri, dbName, failIfExists))
   override def drop(failIfNotExists: Boolean): Future[Unit] = execute(new DropDatabaseCommand(config.uri, dbName, failIfNotExists))
-  override def write(point: PointNoTime): Future[Unit] = ???
-  override def write(points: Iterable[PointNoTime]): Future[Unit] = ???
+  override def write(point: PointNoTime): Future[Unit] = write(Seq(point))
+  override def write(points: Iterable[PointNoTime]): Future[Unit] = execute(new WriteCommand(
+    baseUri         = config.uri,
+    dbName          = dbName,
+    points          = points,
+    retentionPolicy = None,
+    username        = None,
+    password        = None,
+    precision       = None,
+    consistency     = None
+  ))
 }
 
 object ActorSystemReactiveInflux {

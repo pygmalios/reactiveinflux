@@ -23,7 +23,7 @@ trait ReactiveInfluxCommand extends Serializable {
       case ex: ReactiveInfluxJsonResultException =>
         throw new ReactiveInfluxResultError(ex.errors, httpRequest)
       case ex: Exception =>
-        throw new ReactiveInfluxException(s"Response processing failed! [${httpRequest.method.name} ${httpRequest.uri}]", ex)
+        throw new ReactiveInfluxException(s"Response processing failed!\n  [$httpResponse]\n  [${httpRequest.method.name}]\n  [${httpRequest.uri}]", ex)
     }
   }
 

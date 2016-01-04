@@ -9,7 +9,7 @@ import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 
 class WriteCommand(baseUri: Uri,
                    dbName: String,
-                   points: Seq[PointNoTime],
+                   points: Iterable[PointNoTime],
                    retentionPolicy: Option[String],
                    username: Option[String],
                    password: Option[String],
@@ -58,7 +58,7 @@ object WriteCommand {
   val consistencyQ = "consistency"
 }
 
-private[reactiveinflux] class WriteLines(points: Seq[PointNoTime], precision: Precision) {
+private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precision: Precision) {
   override def toString: String = {
     val sb = new StringBuilder
     points.foreach { point =>

@@ -31,7 +31,8 @@ abstract class JsonResponse[+T](httpResponse: HttpResponse) extends ReactiveInfl
             throw new ReactiveInfluxJsonResultException(errors)
         case other => throw new ReactiveInfluxException(s"Invalid JSON response! results field expected. [$other]")
       }
-    case other => throw new ReactiveInfluxException(s"Invalid response! [$other]")
+    case HttpEntity.Strict(ContentTypes.NoContentType, _) => // Empty response should be OK
+    case other => throw new ReactiveInfluxException(s"Invalid response entity! [$other]")
   }
 
   protected def errorHandler: PartialFunction[ReactiveInfluxError, Option[ReactiveInfluxError]] = PartialFunction.empty
