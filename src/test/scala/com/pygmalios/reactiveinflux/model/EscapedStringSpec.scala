@@ -17,8 +17,8 @@ class EscapedStringSpec extends FlatSpec {
     assert(new EscapedString("=").escaped == "=")
   }
 
-  it should "escape string" in {
-    assert(new EscapedString("a.b.c,1 Fg8=\\a").escaped == "a.b.c\\,1\\ Fg8=\\a")
+  it should "return escaped string in toString" in {
+    assert(new EscapedString("a.b.c,1 Fg8=\\a").toString == "a.b.c\\,1\\ Fg8=\\a")
   }
 
   behavior of "EscapedStringWithEquals"
@@ -27,7 +27,7 @@ class EscapedStringSpec extends FlatSpec {
     assert(new EscapedStringWithEquals("=").escaped == "\\=")
   }
 
-  it should "escape string" in {
-    assert(new EscapedStringWithEquals("a.b.c,1 Fg8=\\a").escaped == "a.b.c\\,1\\ Fg8\\=\\a")
+  it should "return escaped string in toString" in {
+    assert(new EscapedStringWithEquals("a.b.c,1 Fg8=\\a").toString == "a.b.c\\,1\\ Fg8\\=\\a")
   }
 }
