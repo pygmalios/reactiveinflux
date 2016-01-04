@@ -1,7 +1,7 @@
 package com.example
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
-import com.pygmalios.reactiveinflux.command.BaseQueryCommand
+import com.pygmalios.reactiveinflux.command.query.BaseQueryCommand
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxCore}

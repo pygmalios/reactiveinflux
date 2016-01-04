@@ -31,6 +31,6 @@ trait ReactiveInfluxCommand extends Serializable {
   protected def responseFactory(httpResponse: HttpResponse): ReactiveInfluxResult[TResult]
 }
 
-trait ReactiveInfluxResult[+T] {
+trait ReactiveInfluxResult[+T] extends Serializable {
   def result: T
 }

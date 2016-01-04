@@ -1,9 +1,9 @@
-package com.pygmalios.reactiveinflux.command
+package com.pygmalios.reactiveinflux.command.write
 
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.write.WriteLines
+import com.pygmalios.reactiveinflux.command.{Milli, Nano, Second}
 import com.pygmalios.reactiveinflux.model._
 import org.scalatest.FlatSpec
 

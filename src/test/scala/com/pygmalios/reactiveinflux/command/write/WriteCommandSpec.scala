@@ -1,7 +1,8 @@
-package com.pygmalios.reactiveinflux.command
+package com.pygmalios.reactiveinflux.command.write
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, Uri}
-import com.pygmalios.reactiveinflux.command.write._
+import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import com.pygmalios.reactiveinflux.command.{Precision, Minute, Nano, Second}
 import com.pygmalios.reactiveinflux.model.{PointNoTime, PointSpec}
 import org.scalatest.FlatSpec
 
@@ -74,11 +75,11 @@ private class TestScope {
   val dbName = "test"
   val baseUri = Uri("http://something/")
   def cmd(baseUri: Uri = baseUri,
-          dbName: String = dbName,
+          dbName: DbName = dbName,
           points: Seq[PointNoTime] = Seq.empty,
           retentionPolicy: Option[String] = None,
-          username: Option[String] = None,
-          password: Option[String] = None,
+          username: Option[DbUsername] = None,
+          password: Option[DbPassword] = None,
           precision: Option[Precision] = None,
           consistency: Option[Consistency] = None) =
     new WriteCommand(

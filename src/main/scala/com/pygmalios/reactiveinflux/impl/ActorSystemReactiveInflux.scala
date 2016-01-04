@@ -3,10 +3,11 @@ package com.pygmalios.reactiveinflux.impl
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
+import com.pygmalios.reactiveinflux.ReactiveInflux.{DbPassword, DbUsername, DbName}
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
+import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.{WriteCommand, WriteParameters}
-import com.pygmalios.reactiveinflux.command.{CreateDatabaseCommand, DropDatabaseCommand, PingCommand}
+import com.pygmalios.reactiveinflux.command.PingCommand
 import com.pygmalios.reactiveinflux.model.PointNoTime
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -25,7 +26,7 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new PingCommand(config.uri))
 
-  override def database(name: String, username: Option[String], password: Option[String]): ReactiveInfluxDb =
+  override def database(name: DbName, username: Option[DbUsername], password: Option[DbPassword]): ReactiveInfluxDb =
     new ActorSystemReactiveInfluxDb(name, username, password, this)
 
   override def execute[R <: ReactiveInfluxCommand](request: R): Future[request.TResult] = {
@@ -38,9 +39,9 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
   }
 }
 
-class ActorSystemReactiveInfluxDb(dbName: String,
-                                  dbUsername: Option[String],
-                                  dbPassword: Option[String],
+class ActorSystemReactiveInfluxDb(dbName: DbName,
+                                  dbUsername: Option[DbUsername],
+                                  dbPassword: Option[DbPassword],
                                   core: ReactiveInfluxCore) extends ReactiveInfluxDb {
   private implicit def executionContext: ExecutionContext = core.executionContext
 
@@ -71,7 +72,12 @@ class ActorSystemReactiveInfluxDb(dbName: String,
 
     results.head
   }
-  override def query(qs: Seq[Query], params: QueryParameters): Future[Seq[QueryResult]] = ???
+  override def query(qs: Seq[Query], params: QueryParameters): Future[Seq[QueryResult]] =
+    core.execute(new QueryCommand(
+      baseUri = core.config.uri,
+      qs      = qs,
+      params  = params
+    ))
 }
 
 object ActorSystemReactiveInflux {

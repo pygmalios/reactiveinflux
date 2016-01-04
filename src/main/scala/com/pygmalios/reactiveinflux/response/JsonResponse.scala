@@ -11,30 +11,36 @@ class ReactiveInfluxJsonResultException(val errors: Set[ReactiveInfluxError]) ex
 abstract class JsonResponse[+T](httpResponse: HttpResponse) extends ReactiveInfluxResult[T] {
   import JsonResponse._
 
-  httpResponse.entity match {
-    case HttpEntity.Strict(ContentTypes.`application/json`, byteString) =>
-      val jsonBody = byteString.decodeString("UTF8").parseJson.asJsObject
-      if (httpResponse.status.isSuccess()) {
-        jsonBody.fields("results") match {
-          case JsArray(results) =>
-            val stringErrors = results.map(_.asJsObject).flatMap(_.fields.get("error")).flatMap {
-              case JsString(reason) => Some(reason)
-              case other =>
-                log.warn(s"Unknown error reason. [$other]")
-                None
-            }
-            processErrors(stringErrors)
-          case other => throw new ReactiveInfluxException(s"Invalid JSON response! results field expected. [$other]")
+  protected lazy val results: JsArray = {
+    httpResponse.entity match {
+      case HttpEntity.Strict(ContentTypes.`application/json`, byteString) =>
+        val jsonBody = byteString.decodeString("UTF8").parseJson.asJsObject
+        if (httpResponse.status.isSuccess()) {
+          jsonBody.fields("results") match {
+            case rs: JsArray =>
+              val stringErrors = rs.elements.map(_.asJsObject).flatMap(_.fields.get("error")).flatMap {
+                case JsString(reason) => Some(reason)
+                case other =>
+                  log.warn(s"Unknown error reason. [$other]")
+                  None
+              }
+              processErrors(stringErrors)
+              rs
+
+            case other => throw new ReactiveInfluxException(s"Invalid JSON response! results field expected. [$other]")
+          }
         }
-      }
-      else {
-        jsonBody.fields.get("error") match {
-          case Some(JsString(reason)) => processErrors(Seq(reason))
-          case _ => throw new ReactiveInfluxException(s"Not a successful response! [$httpResponse]")
+        else {
+          jsonBody.fields.get("error") match {
+            case Some(JsString(reason)) =>
+              processErrors(Seq(reason))
+              JsArray()
+            case _ => throw new ReactiveInfluxException(s"Not a successful response! [$httpResponse]")
+          }
         }
-      }
-    case HttpEntity.Strict(ContentTypes.NoContentType, _) => // Empty response should be OK
-    case other => throw new ReactiveInfluxException(s"Invalid response entity! [$other]")
+      case HttpEntity.Strict(ContentTypes.NoContentType, _) => JsArray() // Empty response should be OK
+      case other => throw new ReactiveInfluxException(s"Invalid response entity! [$other]")
+    }
   }
 
   protected def errorHandler: PartialFunction[ReactiveInfluxError, Option[ReactiveInfluxError]] = PartialFunction.empty

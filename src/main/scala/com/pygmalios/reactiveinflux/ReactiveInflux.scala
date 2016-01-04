@@ -3,6 +3,7 @@ package com.pygmalios.reactiveinflux
 import java.io.Closeable
 
 import akka.actor.ActorSystem
+import com.pygmalios.reactiveinflux.ReactiveInflux.{DbPassword, DbUsername, DbName}
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.WriteParameters
 import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInflux
@@ -17,7 +18,7 @@ import scala.concurrent.Future
   */
 trait ReactiveInflux extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResult]
-  def database(dbName: String, dbUsername: Option[String] = None, dbPassword: Option[String] = None): ReactiveInfluxDb
+  def database(dbName: DbName, dbUsername: Option[DbUsername] = None, dbPassword: Option[DbPassword] = None): ReactiveInfluxDb
 }
 
 /**
@@ -37,6 +38,10 @@ trait ReactiveInfluxDb {
 }
 
 object ReactiveInflux {
+  type DbName = String
+  type DbUsername = String
+  type DbPassword = String
+
   private val defaultClientName = "ReactiveInflux"
   private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
     ActorSystemReactiveInflux(actorSystem, config)
