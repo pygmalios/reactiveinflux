@@ -3,6 +3,7 @@ package com.pygmalios.reactiveinflux.impl
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import com.pygmalios.reactiveinflux.ReactiveInfluxResultError
+import com.pygmalios.reactiveinflux.command.query.{BigDecimalValue, Query}
 import com.pygmalios.reactiveinflux.command.write.PointSpec
 import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
@@ -75,6 +76,22 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
   it should "write two points" in new TestScope {
     withDb { db =>
       db.write(Seq(PointSpec.point1, PointSpec.point2))
+    }
+  }
+
+  behavior of "query"
+
+  it should "get a single point" in new TestScope {
+    withDb { db =>
+      db.write(PointSpec.point1).flatMap { _ =>
+        db.query(Query("SELECT * FROM " + PointSpec.point1.measurement)).map { queryResult =>
+          val series = queryResult.result.single
+          assert(series.name == PointSpec.point1.measurement.unescaped)
+          val row = series.single
+          assert(row.time == PointSpec.point1.time)
+          assert(series(row, "fk") == BigDecimalValue(-1))
+        }
+      }
     }
   }
 

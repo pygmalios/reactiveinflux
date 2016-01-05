@@ -3,7 +3,6 @@ package com.pygmalios.reactiveinflux.command.query
 import java.time.Instant
 
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
-import com.pygmalios.reactiveinflux.command.write.Precision
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
 
 trait QueryParameters extends OptionalParameters {
@@ -45,6 +44,7 @@ case object HourEpoch extends Epoch("h") {
 }
 
 object QueryParameters {
+  val dbQ = "db"
   val epochQ = "epoch"
   val chunkSizeQ = "chunk_size"
 

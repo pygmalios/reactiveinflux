@@ -3,11 +3,11 @@ package com.pygmalios.reactiveinflux.impl
 import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
-import com.pygmalios.reactiveinflux.ReactiveInflux.{DbPassword, DbUsername, DbName}
+import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
 import com.pygmalios.reactiveinflux._
+import com.pygmalios.reactiveinflux.command.PingCommand
 import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteCommand, WriteParameters}
-import com.pygmalios.reactiveinflux.command.PingCommand
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -74,6 +74,7 @@ class ActorSystemReactiveInfluxDb(dbName: DbName,
   override def query(qs: Seq[Query], params: QueryParameters): Future[Seq[QueryResult]] =
     core.execute(new QueryCommand(
       baseUri = core.config.uri,
+      dbName  = dbName,
       qs      = qs,
       params  = params
     ))

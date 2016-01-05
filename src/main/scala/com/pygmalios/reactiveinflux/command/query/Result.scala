@@ -4,7 +4,6 @@ import java.time.Instant
 
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.command.query.Series.{ColumnName, SeriesName}
-import spray.json.JsString
 
 trait QueryResult extends Serializable {
   def q: Query
@@ -37,6 +36,15 @@ trait Series extends Serializable {
   def name: SeriesName
   def columns: Seq[ColumnName]
   def values: Seq[Row]
+  def single: Row = {
+    if (values.isEmpty)
+      throw new ReactiveInfluxException("No values!")
+
+    if (values.size > 1)
+      throw new ReactiveInfluxException(s"More values! [${values.size}]")
+
+    values.head
+  }
   def isEmpty: Boolean = values.isEmpty
   def apply(row: Row, columnName: ColumnName): Value = row.items(columns.indexOf(columnName))
 }

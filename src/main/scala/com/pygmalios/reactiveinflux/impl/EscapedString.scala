@@ -1,24 +1,24 @@
 package com.pygmalios.reactiveinflux.impl
 
-class EscapedString(value: String) extends BaseEscapedString(value)
-class EscapedStringWithEquals(value: String) extends BaseEscapedString(value) {
+class EscapedString(unescaped: String) extends BaseEscapedString(unescaped)
+class EscapedStringWithEquals(unescaped: String) extends BaseEscapedString(unescaped) {
   override val escaped = super.escaped.replace("=", "\\=")
 }
 
-abstract class BaseEscapedString(val value: String) extends Serializable {
-  def escaped: String = value.replace(" ", "\\ ").replace(",", "\\,")
+abstract class BaseEscapedString(val unescaped: String) extends Serializable {
+  def escaped: String = unescaped.replace(" ", "\\ ").replace(",", "\\,")
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[EscapedString]
 
   override def equals(other: Any): Boolean = other match {
     case that: EscapedString =>
       (that canEqual this) &&
-        value == that.value
+        unescaped == that.unescaped
     case _ => false
   }
 
   override def hashCode(): Int = {
-    val state = Seq(value)
+    val state = Seq(unescaped)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 

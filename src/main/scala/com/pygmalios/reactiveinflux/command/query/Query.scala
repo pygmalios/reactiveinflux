@@ -7,6 +7,10 @@ trait Query extends Serializable {
   def influxQl: String
 }
 
-case class RawQuery(influxQl: String) extends Query {
+object Query {
+  def apply(influxQl: String): Query = RawQuery(influxQl)
+}
+
+private[reactiveinflux] case class RawQuery(influxQl: String) extends Query {
   override def toString = influxQl
 }

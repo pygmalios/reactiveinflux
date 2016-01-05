@@ -1,17 +1,27 @@
 package com.pygmalios.reactiveinflux.command.query
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
+import com.pygmalios.reactiveinflux.ReactiveInflux._
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
+import com.pygmalios.reactiveinflux.impl.OptionalParameters
 import com.pygmalios.reactiveinflux.response.JsonResponse
 import spray.json._
 
-class QueryCommand(baseUri: Uri, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
+class QueryCommand(baseUri: Uri, dbName: DbName, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
   override type TResult = Seq[QueryResult]
   override protected def responseFactory(httpResponse: HttpResponse) = {
     val timeFormat: TimeFormat = params.epoch.getOrElse(Rfc3339)
     new QueryCommandResult(httpResponse, qs, timeFormat)
   }
-  override val httpRequest = HttpRequest(uri = qUri(qs.map(_.influxQl).mkString(";")))
+  override val httpRequest = {
+    val q = qs.map(_.influxQl).mkString(";")
+    HttpRequest(uri = qUri(q))
+  }
+  override def otherParams = OptionalParameters(
+    QueryParameters.dbQ -> Some(dbName),
+    QueryParameters.epochQ -> params.epoch.map(_.q),
+    QueryParameters.chunkSizeQ -> params.chunkSize.map(_.toString)
+  )
 }
 
 private[reactiveinflux] class QueryCommandResult(httpResponse: HttpResponse, qs: Seq[Query], timeFormat: TimeFormat)
