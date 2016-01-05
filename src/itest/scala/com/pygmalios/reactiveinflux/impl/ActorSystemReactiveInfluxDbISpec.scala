@@ -3,7 +3,7 @@ package com.pygmalios.reactiveinflux.impl
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import com.pygmalios.reactiveinflux.ReactiveInfluxResultError
-import com.pygmalios.reactiveinflux.command.query.{BigDecimalValue, Query}
+import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.PointSpec
 import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
@@ -81,16 +81,29 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
 
   behavior of "query"
 
-  it should "get a single point" in new TestScope {
+  it should "get a single point with various time formats" in new QueryTestScope {
     withDb { db =>
       db.write(PointSpec.point1).flatMap { _ =>
-        db.query(Query("SELECT * FROM " + PointSpec.point1.measurement)).map { queryResult =>
-          val series = queryResult.result.single
-          assert(series.name == PointSpec.point1.measurement.unescaped)
-          val row = series.single
-          assert(row.time == PointSpec.point1.time)
-          assert(series(row, "fk") == BigDecimalValue(-1))
-        }
+        for {
+          _ <- testEpoch(None)
+          _ <- testEpoch(Some(NanoEpoch))
+          _ <- testEpoch(Some(MicroEpoch))
+          _ <- testEpoch(Some(MilliEpoch))
+          _ <- testEpoch(Some(SecondEpoch))
+          _ <- testEpoch(Some(MinuteEpoch))
+        } yield ()
+      }
+    }
+  }
+
+  private class QueryTestScope extends TestScope {
+    def testEpoch(epoch: Option[Epoch]): Future[Unit] = {
+      db.query(Query("SELECT * FROM " + PointSpec.point1.measurement), QueryParameters(epoch = epoch)).map { queryResult =>
+        val series = queryResult.result.single
+        assert(series.name == PointSpec.point1.measurement.unescaped)
+        val row = series.single
+        assert(row.time == PointSpec.point1.time)
+        assert(series(row, "fk") == BigDecimalValue(-1))
       }
     }
   }
@@ -99,7 +112,7 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     val client = new ActorSystemReactiveInflux(system, ITestConfig.reactiveInfluxConfig)
     val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", None, None, client)
 
-    def withDb(action: (ActorSystemReactiveInfluxDb) => Future[Any]): Unit = {
+    def withDb(action: (ActorSystemReactiveInfluxDb) => Future[Any]): Future[Unit] = {
       val result = db.create().flatMap { _ =>
         action(db)
       }.map { _ =>
