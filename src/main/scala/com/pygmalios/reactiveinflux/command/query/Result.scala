@@ -4,6 +4,7 @@ import java.time.Instant
 
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.command.query.Series.{ColumnName, SeriesName}
+import spray.json.JsString
 
 trait QueryResult extends Serializable {
   def q: Query
@@ -72,9 +73,9 @@ trait TimeFormat {
 }
 
 private[reactiveinflux] object Rfc3339 extends TimeFormat {
-  override def apply(value: Value): Instant = {
-    // TODO: ...
-    ???
+  override def apply(value: Value): Instant = value match {
+    case StringValue(s) => Instant.parse(s)
+    case other => throw new ReactiveInfluxException(s"RFC3339 time must be a string! [$other]")
   }
 }
 
