@@ -1,8 +1,8 @@
 package com.pygmalios.reactiveinflux.sync
 
+import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
-import com.pygmalios.reactiveinflux.result.PingResult
 import com.pygmalios.reactiveinflux.sync.ReactiveInfluxSyncClient._
 import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxDb}
 

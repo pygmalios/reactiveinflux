@@ -3,11 +3,11 @@ package com.pygmalios.reactiveinflux
 import java.io.Closeable
 
 import akka.actor.ActorSystem
-import com.pygmalios.reactiveinflux.ReactiveInflux.{DbPassword, DbUsername, DbName}
+import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
 import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInflux
-import com.pygmalios.reactiveinflux.result.PingResult
 import com.typesafe.config.Config
 
 import scala.concurrent.Future

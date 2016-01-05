@@ -1,7 +1,6 @@
 package com.pygmalios.reactiveinflux.command
 
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
-import com.pygmalios.reactiveinflux.result.{SimplePingResult, PingResult}
 import com.pygmalios.reactiveinflux.{ReactiveInfluxCommand, ReactiveInfluxResult}
 
 class PingCommand(baseUri: Uri) extends ReactiveInfluxCommand {
@@ -16,4 +15,12 @@ class PingCommand(baseUri: Uri) extends ReactiveInfluxCommand {
 object PingCommand {
   val path = Uri.Path("/ping")
   val versionHeader = "X-Influxdb-Version"
+}
+
+trait PingResult extends Serializable {
+  def influxDbVersion: String
+}
+
+private[reactiveinflux] case class SimplePingResult(influxDbVersion: String) extends PingResult with ReactiveInfluxResult[PingResult] {
+  override def result: PingResult = this
 }
