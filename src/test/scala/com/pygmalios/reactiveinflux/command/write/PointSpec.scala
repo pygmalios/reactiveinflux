@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.model
+package com.pygmalios.reactiveinflux.command.write
 
 import java.time.{OffsetDateTime, ZoneOffset}
 
@@ -12,7 +12,7 @@ object PointSpec {
   val point2 = Point(time2, "m2", Map("tk1" -> "tv1", "tk2" -> "tv2"),
     Map(
       "fk" -> BooleanFieldValue(true),
-      "fk2" -> DoubleFieldValue(1),
+      "fk2" -> BigDecimalFieldValue(1),
       "fk3" -> StringFieldValue("abcXYZ")
     ))
 }

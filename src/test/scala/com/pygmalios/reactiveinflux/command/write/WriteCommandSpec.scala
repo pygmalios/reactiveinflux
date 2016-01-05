@@ -2,8 +2,6 @@ package com.pygmalios.reactiveinflux.command.write
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, Uri}
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
-import com.pygmalios.reactiveinflux.command.{Precision, Minute, Nano, Second}
-import com.pygmalios.reactiveinflux.model.{PointNoTime, PointSpec}
 import org.scalatest.FlatSpec
 
 class WriteCommandSpec extends FlatSpec {
@@ -65,7 +63,7 @@ class WriteCommandSpec extends FlatSpec {
   it should "contain point lines" in new TestScope {
     cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity match {
       case HttpEntity.Strict(_, byteString) =>
-          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1.0,fk3=\"abcXYZ\" 411046920000000003")
+          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920000000003")
       case _ => fail("Invalit entity!")
     }
   }

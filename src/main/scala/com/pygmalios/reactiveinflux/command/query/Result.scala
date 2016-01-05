@@ -37,37 +37,48 @@ trait Series extends Serializable {
   def columns: Seq[ColumnName]
   def values: Seq[Row]
   def isEmpty: Boolean = values.isEmpty
-  private[reactiveinflux] def createRow(items: Seq[Value]): Row
+  def apply(row: Row, columnName: ColumnName): Value = row.items(columns.indexOf(columnName))
 }
 
 object Series {
+  val timeColumnName: ColumnName = "time"
+
   type SeriesName = String
   type ColumnName = String
 
-  def apply(name: SeriesName, columns: Seq[ColumnName], values: Seq[Row]): Series =
-    SimpleSeries(name, columns, values)
+  def apply(name: SeriesName, columns: Seq[ColumnName], values: Seq[Seq[Value]], timeFormat: TimeFormat): Series = {
+    val timeColumnIndex = columns.indexOf(timeColumnName)
+    SimpleSeries(name, columns, values.map(Row.apply(_, timeColumnIndex, timeFormat)))
+  }
 }
 
-trait Row extends Serializable {
+trait Row {
+  def time: Instant
   def items: Seq[Value]
-  def apply(columnName: ColumnName): Value
+}
+
+object Row {
+  def apply(items: Seq[Value], timeColumnIndex: Int, timeFormat: TimeFormat): Row =
+    SimpleRow(timeFormat(items(timeColumnIndex)), items)
 }
 
 sealed trait Value extends Serializable
-case class TimeValue(value: Instant) extends Value
 case class StringValue(value: String) extends Value
-case class DoubleValue(value: Double) extends Value
-case class LongValue(value: Long) extends Value
+case class BigDecimalValue(value: BigDecimal) extends Value
 case class BooleanValue(value: Boolean) extends Value
 
-private[reactiveinflux] case class SimpleQueryResult(q: Query, result: Result) extends QueryResult
+trait TimeFormat {
+  def apply(value: Value): Instant
+}
 
-private[reactiveinflux] case class SimpleResult(series: Seq[Series]) extends Result
-
-private[reactiveinflux] case class SimpleSeries(name: SeriesName, columns: Seq[ColumnName], values: Seq[Row]) extends Series {
-  override private[reactiveinflux] def createRow(items: Seq[Value]): Row = SimpleRow(items)
-
-  case class SimpleRow(items: Seq[Value]) extends Row {
-    override def apply(columnName: ColumnName): Value = items(columns.indexOf(columnName))
+private[reactiveinflux] object Rfc3339 extends TimeFormat {
+  override def apply(value: Value): Instant = {
+    // TODO: ...
+    ???
   }
 }
+
+private[reactiveinflux] case class SimpleQueryResult(q: Query, result: Result) extends QueryResult
+private[reactiveinflux] case class SimpleResult(series: Seq[Series]) extends Result
+private[reactiveinflux] case class SimpleSeries(name: SeriesName, columns: Seq[ColumnName], values: Seq[Row]) extends Series
+private[reactiveinflux] case class SimpleRow(time: Instant, items: Seq[Value]) extends Row

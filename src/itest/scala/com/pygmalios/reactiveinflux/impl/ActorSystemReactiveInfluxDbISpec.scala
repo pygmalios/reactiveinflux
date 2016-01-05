@@ -3,9 +3,9 @@ package com.pygmalios.reactiveinflux.impl
 import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import com.pygmalios.reactiveinflux.ReactiveInfluxResultError
+import com.pygmalios.reactiveinflux.command.write.PointSpec
 import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
-import com.pygmalios.reactiveinflux.model.PointSpec
 import org.scalatest.concurrent.{AsyncAssertions, IntegrationPatience, ScalaFutures}
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike}
 

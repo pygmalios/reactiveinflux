@@ -1,6 +1,7 @@
 package com.pygmalios
 
-import com.pygmalios.reactiveinflux.model.{BooleanFieldValue, EscapedString, EscapedStringWithEquals, FieldValue}
+import com.pygmalios.reactiveinflux.command.write.FieldValue
+import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
 package object reactiveinflux {
   implicit def stringToEscapedString(value: String): EscapedString = new EscapedString(value)

@@ -1,8 +1,7 @@
-package com.pygmalios.reactiveinflux.command
+package com.pygmalios.reactiveinflux.command.write
 
 import java.time.Instant
 
-import com.pygmalios.reactiveinflux.command.write._
 import org.scalatest.FlatSpec
 
 class PrecisionSpec extends FlatSpec {

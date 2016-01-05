@@ -11,7 +11,7 @@ class ReactiveInfluxJsonResultException(val errors: Set[ReactiveInfluxError]) ex
 abstract class JsonResponse[+T](httpResponse: HttpResponse) extends ReactiveInfluxResult[T] {
   import JsonResponse._
 
-  protected lazy val results: JsArray = {
+  protected val results: JsArray = {
     httpResponse.entity match {
       case HttpEntity.Strict(ContentTypes.`application/json`, byteString) =>
         val jsonBody = byteString.decodeString("UTF8").parseJson.asJsObject

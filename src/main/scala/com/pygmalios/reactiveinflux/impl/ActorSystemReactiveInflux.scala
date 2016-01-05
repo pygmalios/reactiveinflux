@@ -6,9 +6,8 @@ import akka.stream.{ActorMaterializer, ActorMaterializerSettings}
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbPassword, DbUsername, DbName}
 import com.pygmalios.reactiveinflux._
 import com.pygmalios.reactiveinflux.command.query._
-import com.pygmalios.reactiveinflux.command.write.{WriteCommand, WriteParameters}
+import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteCommand, WriteParameters}
 import com.pygmalios.reactiveinflux.command.PingCommand
-import com.pygmalios.reactiveinflux.model.PointNoTime
 
 import scala.concurrent.{ExecutionContext, Future}
 

@@ -2,11 +2,10 @@ package com.pygmalios.reactiveinflux.command.write
 
 import akka.http.scaladsl.model._
 import akka.util.ByteString
-import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbUsername, DbPassword}
+import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
 import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
-import com.pygmalios.reactiveinflux.command.{Nano, Precision}
-import com.pygmalios.reactiveinflux.model.Point.{FieldKey, TagKey, TagValue}
-import com.pygmalios.reactiveinflux.model._
+import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
+import com.pygmalios.reactiveinflux.impl.OptionalParameters
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 
 class WriteCommand(val baseUri: Uri,
@@ -106,7 +105,7 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
 
   private[command] def fieldValueToLine(fieldValue: FieldValue): String = fieldValue match {
     case StringFieldValue(v) =>  "\"" + v.replace("\"", "\\\"") + "\""
-    case DoubleFieldValue(v) => v.toString
+    case BigDecimalFieldValue(v) => v.toString
     case LongFieldValue(v) => v.toString + "i"
     case BooleanFieldValue(v) => v.toString
   }

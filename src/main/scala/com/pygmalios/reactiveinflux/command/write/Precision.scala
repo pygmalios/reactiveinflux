@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.command
+package com.pygmalios.reactiveinflux.command.write
 
 import java.time.Instant
 

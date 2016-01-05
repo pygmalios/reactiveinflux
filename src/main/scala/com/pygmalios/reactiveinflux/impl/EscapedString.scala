@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.model
+package com.pygmalios.reactiveinflux.impl
 
 class EscapedString(value: String) extends BaseEscapedString(value)
 class EscapedStringWithEquals(value: String) extends BaseEscapedString(value) {

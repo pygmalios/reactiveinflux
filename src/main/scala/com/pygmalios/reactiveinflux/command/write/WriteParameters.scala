@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import com.pygmalios.reactiveinflux.command.Precision
-import com.pygmalios.reactiveinflux.model.OptionalParameters
+import com.pygmalios.reactiveinflux.command.write.Precision
+import com.pygmalios.reactiveinflux.impl.OptionalParameters
 
 trait WriteParameters extends OptionalParameters {
   def retentionPolicy: Option[String]

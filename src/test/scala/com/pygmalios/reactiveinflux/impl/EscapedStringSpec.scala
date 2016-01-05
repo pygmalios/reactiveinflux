@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.model
+package com.pygmalios.reactiveinflux.impl
 
 import org.scalatest.FlatSpec
 

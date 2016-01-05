@@ -1,8 +1,9 @@
-package com.pygmalios.reactiveinflux.model
+package com.pygmalios.reactiveinflux.command.write
 
 import java.time.Instant
 
-import com.pygmalios.reactiveinflux.model.Point.{FieldKey, Measurement, TagKey, TagValue}
+import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, Measurement, TagKey, TagValue}
+import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
 /**
   * Common attributes of every point.
@@ -38,7 +39,7 @@ object Point {
   */
 sealed trait FieldValue extends Serializable
 case class StringFieldValue(value: String) extends FieldValue
-case class DoubleFieldValue(value: Double) extends FieldValue
+case class BigDecimalFieldValue(value: BigDecimal) extends FieldValue
 case class LongFieldValue(value: Long) extends FieldValue
 case class BooleanFieldValue(value: Boolean) extends FieldValue
 

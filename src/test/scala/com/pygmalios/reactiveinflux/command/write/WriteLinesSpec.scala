@@ -3,8 +3,6 @@ package com.pygmalios.reactiveinflux.command.write
 import java.time.{OffsetDateTime, ZoneOffset}
 
 import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.command.{Milli, Nano, Second}
-import com.pygmalios.reactiveinflux.model._
 import org.scalatest.FlatSpec
 
 class WriteLinesSpec extends FlatSpec {
@@ -31,7 +29,7 @@ class WriteLinesSpec extends FlatSpec {
   }
 
   it should "convert double value as is" in new TestScope {
-    assert(wl.fieldValueToLine(DoubleFieldValue(-13.5879215d)) == "-13.5879215")
+    assert(wl.fieldValueToLine(BigDecimalFieldValue(-13.5879215d)) == "-13.5879215")
   }
 
   it should "convert long value with i appended" in new TestScope {
@@ -59,7 +57,7 @@ class WriteLinesSpec extends FlatSpec {
   }
 
   it should "append double and boolean fields" in new TestScope {
-    wl.fieldsToLine(Map("l" -> DoubleFieldValue(0.1), "b" -> BooleanFieldValue(false)), sb)
+    wl.fieldsToLine(Map("l" -> BigDecimalFieldValue(0.1), "b" -> BooleanFieldValue(false)), sb)
     assert(sb.toString == " l=0.1,b=false")
   }
 
@@ -92,7 +90,7 @@ class WriteLinesSpec extends FlatSpec {
 
   it should "append two points separated by newline" in {
     val wl = new WriteLines(Seq(PointSpec.point1, PointSpec.point2), Nano)
-    assert(wl.toString() == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1.0,fk3=\"abcXYZ\" 411046920000000003")
+    assert(wl.toString() == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920000000003")
   }
 
   private class TestScope {
