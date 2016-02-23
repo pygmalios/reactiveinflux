@@ -14,7 +14,7 @@ apply plugin: "com.github.maiflai.scalatest"
 apply plugin: "maven"
 
 group = group
-version = "${influxVersion}_${version}"
+version = "${influxVersion}.${version}"
 
 targetCompatibility = "1.7"
 
