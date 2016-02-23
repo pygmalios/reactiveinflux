@@ -20,7 +20,7 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
   protected val http = Http(actorSystem)
 
   override def close(): Unit = {
-    actorSystem.terminate()
+    actorSystem.shutdown()
   }
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new PingCommand(config.uri))

@@ -1,6 +1,5 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import com.pygmalios.reactiveinflux.command.write.Precision
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
 
 trait WriteParameters extends OptionalParameters {

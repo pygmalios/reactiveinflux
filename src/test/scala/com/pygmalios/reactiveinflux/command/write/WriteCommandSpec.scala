@@ -89,5 +89,5 @@ private class TestScope {
       WriteParameters(retentionPolicy,precision,consistency))
 
   def assertQuery(cmd: WriteCommand, key: String, value: String) =
-    assert(cmd.query.get(key).contains(value), cmd.httpRequest.uri)
+    assert(cmd.query.get(key) == Some(value), cmd.httpRequest.uri)
 }

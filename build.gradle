@@ -11,11 +11,12 @@ buildscript {
 
 apply plugin: "scala"
 apply plugin: "com.github.maiflai.scalatest"
+apply plugin: "maven"
 
 group = group
 version = "${influxVersion}_${version}"
 
-targetCompatibility = "1.8"
+targetCompatibility = "1.7"
 
 repositories {
     mavenCentral()
@@ -49,10 +50,10 @@ task itest(type: Test) {
 }
 
 dependencies {
-    def akkaVersion = "2.4.1"
+    def akkaVersion = "2.3.4"
     def akkaHttpVersion = "2.0.1"
 
-    compile "org.scala-lang:scala-library:$scalaVersion.7"
+    compile "org.scala-lang:scala-library:$scalaVersion.6"
     compile "com.typesafe.akka:akka-actor_$scalaVersion:$akkaVersion"
     compile "com.typesafe.akka:akka-slf4j_$scalaVersion:$akkaVersion"
     compile "com.typesafe.akka:akka-http-experimental_$scalaVersion:$akkaHttpVersion"

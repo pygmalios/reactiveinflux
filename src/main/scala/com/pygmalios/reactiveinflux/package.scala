@@ -1,6 +1,6 @@
 package com.pygmalios
 
-import com.pygmalios.reactiveinflux.command.write.FieldValue
+import com.pygmalios.reactiveinflux.command.write.{BigDecimalFieldValue, FieldValue}
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
 package object reactiveinflux {
@@ -10,4 +10,8 @@ package object reactiveinflux {
     (field._1, field._2)
   implicit def tagToEscapedStringWithEquals(tag: (String, String)): (EscapedStringWithEquals, EscapedStringWithEquals) =
     (tag._1, tag._2)
+  implicit def bigDecimalFieldToBigDecimalFieldValue(field: (String, BigDecimal)): (EscapedStringWithEquals,BigDecimalFieldValue) =
+    (new EscapedStringWithEquals(field._1), BigDecimalFieldValue(field._2))
+  implicit def intFieldToBigDecimalFieldValue(field: (String, Int)): (EscapedStringWithEquals,BigDecimalFieldValue) =
+    (new EscapedStringWithEquals(field._1), BigDecimalFieldValue(BigDecimal(field._2)))
 }
