@@ -12,6 +12,7 @@ buildscript {
 apply plugin: "scala"
 apply plugin: "com.github.maiflai.scalatest"
 apply plugin: "maven"
+apply plugin: "java"
 
 group = group
 version = "${influxVersion}.${version}"
