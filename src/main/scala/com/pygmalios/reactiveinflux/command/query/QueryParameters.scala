@@ -1,9 +1,8 @@
 package com.pygmalios.reactiveinflux.command.query
 
-import java.time.Instant
-
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
+import org.joda.time.Instant
 
 trait QueryParameters extends OptionalParameters {
   def epoch: Option[Epoch]
@@ -11,36 +10,29 @@ trait QueryParameters extends OptionalParameters {
 }
 
 sealed abstract class Epoch(val q: String) extends TimeFormat with Serializable {
-  protected def small(value: Value, c: Long): Instant = toInstant(value, c) { l =>
-    Instant.ofEpochSecond(l / c, l % c)
-  }
-
-  protected def big(value: Value, c: Long): Instant = toInstant(value, c) { l =>
-    Instant.ofEpochSecond(l * c)
-  }
-
-  private def toInstant(value: Value, c: Long)(f: (Long) => Instant): Instant = value match {
-    case BigDecimalValue(n) => f(n.toLong)
+  protected def toInstant(value: Value, c: Int): Instant = value match {
+    case BigDecimalValue(n) => new Instant(n.toLong * c)
     case other => throw new ReactiveInfluxException(s"Not a number! [$other]")
   }
 }
-case object NanoEpoch extends Epoch("ns") {
-  def apply(value: Value): Instant = super.small(value, 1000000000)
-}
-case object MicroEpoch extends Epoch("u") {
-  def apply(value: Value): Instant = super.small(value, 1000000)
-}
+// TODO: Java 7 supports up to milli only
+//case object NanoEpoch extends Epoch("ns") {
+//  def apply(value: Value): Instant = super.small(value, 1000000000)
+//}
+//case object MicroEpoch extends Epoch("u") {
+//  def apply(value: Value): Instant = super.small(value, 1000000)
+//}
 case object MilliEpoch extends Epoch("ms") {
-  def apply(value: Value): Instant = super.small(value, 1000)
+  def apply(value: Value): Instant = super.toInstant(value, 1)
 }
 case object SecondEpoch extends Epoch("s") {
-  def apply(value: Value): Instant = super.small(value, 1)
+  def apply(value: Value): Instant = super.toInstant(value, 1000)
 }
 case object MinuteEpoch extends Epoch("m") {
-  def apply(value: Value): Instant = super.big(value, 60)
+  def apply(value: Value): Instant = super.toInstant(value, 60000)
 }
 case object HourEpoch extends Epoch("h") {
-  def apply(value: Value): Instant = super.big(value, 3600)
+  def apply(value: Value): Instant = super.toInstant(value, 3600000)
 }
 
 object QueryParameters {

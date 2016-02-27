@@ -1,9 +1,12 @@
 package com.pygmalios.reactiveinflux.command.query
 
+import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
+import org.scalatest.junit.JUnitRunner
 import spray.json._
 import JsonResultProtocol._
 
+@RunWith(classOf[JUnitRunner])
 class JsonResultProtocolSpec extends FlatSpec {
   import JsonResultProtocolSpec._
 

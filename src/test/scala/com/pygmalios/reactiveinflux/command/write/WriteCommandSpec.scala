@@ -2,8 +2,11 @@ package com.pygmalios.reactiveinflux.command.write
 
 import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, Uri}
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class WriteCommandSpec extends FlatSpec {
   behavior of "method"
 
@@ -23,8 +26,8 @@ class WriteCommandSpec extends FlatSpec {
     assert(cmd(precision = Some(Second)).prec == Second)
   }
 
-  it should "use nanosecond as default precision" in new TestScope {
-    assert(cmd(precision = Some(Nano)).prec == Nano)
+  it should "use millisecond as default precision" in new TestScope {
+    assert(cmd(precision = Some(Milli)).prec == Milli)
   }
 
   behavior of "query"
@@ -63,7 +66,7 @@ class WriteCommandSpec extends FlatSpec {
   it should "contain point lines" in new TestScope {
     cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity match {
       case HttpEntity.Strict(_, byteString) =>
-          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920000000003")
+          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046920000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920003")
       case _ => fail("Invalit entity!")
     }
   }

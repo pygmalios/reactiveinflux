@@ -1,9 +1,8 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import java.time.Instant
-
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, Measurement, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
+import org.joda.time.Instant
 
 /**
   * Common attributes of every point.

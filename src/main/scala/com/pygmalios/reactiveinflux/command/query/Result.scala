@@ -1,9 +1,8 @@
 package com.pygmalios.reactiveinflux.command.query
 
-import java.time.Instant
-
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.command.query.Series.{ColumnName, SeriesName}
+import org.joda.time.Instant
 
 trait QueryResult extends Serializable {
   def q: Query

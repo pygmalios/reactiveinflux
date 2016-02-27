@@ -1,7 +1,10 @@
 package com.pygmalios.reactiveinflux.impl
 
+import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class EscapedStringSpec extends FlatSpec {
   behavior of "EscapedString"
 

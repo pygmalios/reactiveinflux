@@ -1,15 +1,17 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import java.time.{OffsetDateTime, ZoneOffset}
-
 import com.pygmalios.reactiveinflux._
+import org.joda.time.{DateTimeZone, DateTime}
+import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
+import org.scalatest.junit.JUnitRunner
 
+@RunWith(classOf[JUnitRunner])
 class WriteLinesSpec extends FlatSpec {
   behavior of "timestampToLine"
 
   it should "append nothing if no time is provided" in new TestScope {
-    wl.timestampToLine(Point("a", Map.empty, Map.empty), Nano, sb)
+    wl.timestampToLine(Point("a", Map.empty, Map.empty), Milli, sb)
     assert(sb.isEmpty)
   }
 
@@ -89,13 +91,13 @@ class WriteLinesSpec extends FlatSpec {
   behavior of "toString"
 
   it should "append two points separated by newline" in {
-    val wl = new WriteLines(Seq(PointSpec.point1, PointSpec.point2), Nano)
-    assert(wl.toString() == "m1 fk=-1i 411046920000000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920000000003")
+    val wl = new WriteLines(Seq(PointSpec.point1, PointSpec.point2), Milli)
+    assert(wl.toString() == "m1 fk=-1i 411046920000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920003")
   }
 
   private class TestScope {
-    val time = OffsetDateTime.of(1983, 1, 10, 11, 42, 0, 0, ZoneOffset.UTC).toInstant
+    val time = new DateTime(1983, 1, 10, 11, 42, 0, 0, DateTimeZone.UTC).toInstant
     val sb = new StringBuilder
-    val wl = new WriteLines(Seq.empty, Nano)
+    val wl = new WriteLines(Seq.empty, Milli)
   }
 }

@@ -4,9 +4,12 @@ import akka.http.scaladsl.model.Uri
 import com.pygmalios.reactiveinflux.ReactiveInfluxCore
 import com.pygmalios.reactiveinflux.command.write._
 import org.scalatest.FlatSpec
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
+import org.junit.runner.RunWith
 
+@RunWith(classOf[JUnitRunner])
 class ActorSystemReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
   behavior of "write of single point"
 

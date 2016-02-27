@@ -1,32 +1,26 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import java.time.Instant
+import org.joda.time.Instant
 
 sealed abstract class Precision(val q: String) extends Serializable {
   def format(i: Instant): String
-  protected def nano(i: Instant, divideBy: Int, digits: Int): String = {
-    val t = i.getNano / divideBy
-    if (i.getEpochSecond > 0)
-      i.getEpochSecond.toString + t.formatted(s"%0${digits}d")
-    else
-      t.toString
-  }
 }
-case object Nano extends Precision("n") {
-  override def format(i: Instant): String = nano(i, 1, 9)
-}
-case object Micro extends Precision("u") {
-  override def format(i: Instant): String = nano(i, 1000, 6)
-}
+// TODO: Java 7 supports up to milli only
+//case object Nano extends Precision("n") {
+//  override def format(i: Instant): String = nano(i, 1, 9)
+//}
+//case object Micro extends Precision("u") {
+//  override def format(i: Instant): String = nano(i, 1000, 6)
+//}
 case object Milli extends Precision("ms") {
-  override def format(i: Instant): String = nano(i, 1000000, 3)
+  override def format(i: Instant): String = i.getMillis.toString
 }
 case object Second extends Precision("s") {
-  override def format(i: Instant): String = i.getEpochSecond.toString
+  override def format(i: Instant): String = (i.getMillis / 1000).toString
 }
 case object Minute extends Precision("m") {
-  override def format(i: Instant): String = (i.getEpochSecond / 60).toString
+  override def format(i: Instant): String = (i.getMillis / 60000).toString
 }
 case object Hour extends Precision("h") {
-  override def format(i: Instant): String = (i.getEpochSecond / 3600).toString
+  override def format(i: Instant): String = (i.getMillis / 3600000).toString
 }
