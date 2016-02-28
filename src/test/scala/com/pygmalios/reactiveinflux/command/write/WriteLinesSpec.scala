@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux.command.write
 
 import com.pygmalios.reactiveinflux._
-import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.{DateTime, DateTimeZone}
 import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
@@ -92,11 +92,11 @@ class WriteLinesSpec extends FlatSpec {
 
   it should "append two points separated by newline" in {
     val wl = new WriteLines(Seq(PointSpec.point1, PointSpec.point2), Milli)
-    assert(wl.toString() == "m1 fk=-1i 411046920000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920003")
+    assert(wl.toString() == "m1 fk=-1i 411046927013\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016")
   }
 
   private class TestScope {
-    val time = new DateTime(1983, 1, 10, 11, 42, 0, 0, DateTimeZone.UTC).toInstant
+    val time = new DateTime(1983, 1, 10, 11, 42, 0, 0, DateTimeZone.UTC)
     val sb = new StringBuilder
     val wl = new WriteLines(Seq.empty, Milli)
   }

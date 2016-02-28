@@ -66,7 +66,7 @@ class WriteCommandSpec extends FlatSpec {
   it should "contain point lines" in new TestScope {
     cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity match {
       case HttpEntity.Strict(_, byteString) =>
-          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046920000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046920003")
+          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046927013\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016")
       case _ => fail("Invalit entity!")
     }
   }

@@ -7,11 +7,14 @@ import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.PointSpec
 import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
+import org.junit.runner.RunWith
 import org.scalatest.concurrent.{AsyncAssertions, IntegrationPatience, ScalaFutures}
+import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike}
 
 import scala.concurrent.Future
 
+@RunWith(classOf[JUnitRunner])
 class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
   with FlatSpecLike with BeforeAndAfterAll with ScalaFutures with IntegrationPatience with AsyncAssertions {
   def this() = this(ActorSystem("ActorSystemReactiveInfluxDbISpec", ITestConfig.reactiveInfluxConfig.reactiveinflux))
@@ -81,30 +84,38 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
 
   behavior of "query"
 
-  it should "get a single point with various time formats" in new QueryTestScope {
-    withDb { db =>
-      db.write(PointSpec.point1).flatMap { _ =>
-        for {
-          _ <- testEpoch(None)
-// TODO: Java 7 supports up to milli only
-//          _ <- testEpoch(Some(NanoEpoch))
-//          _ <- testEpoch(Some(MicroEpoch))
-          _ <- testEpoch(Some(MilliEpoch))
-          _ <- testEpoch(Some(SecondEpoch))
-          _ <- testEpoch(Some(MinuteEpoch))
-        } yield ()
-      }
-    }
+  it should "get a single point with no provided time format" in new QueryTestScope {
+    writeAndTestEpoch(None)
+  }
+
+  it should "get a single point with millisecond time format" in new QueryTestScope {
+    writeAndTestEpoch(Some(MilliEpoch))
+  }
+
+  it should "get a single point with second time format" in new QueryTestScope {
+    writeAndTestEpoch(Some(SecondEpoch))
+  }
+
+  it should "get a single point with minute time format" in new QueryTestScope {
+    writeAndTestEpoch(Some(MinuteEpoch))
   }
 
   private class QueryTestScope extends TestScope {
+    def writeAndTestEpoch(epoch: Option[Epoch]): Future[Unit] = {
+      withDb { db =>
+        db.write(PointSpec.point1).flatMap { _ =>
+          testEpoch(epoch)
+        }
+      }
+    }
+
     def testEpoch(epoch: Option[Epoch]): Future[Unit] = {
       db.query(Query("SELECT * FROM " + PointSpec.point1.measurement), QueryParameters(epoch = epoch)).map { queryResult =>
         val series = queryResult.result.single
-        assert(series.name == PointSpec.point1.measurement.unescaped)
+        assert(series.name == PointSpec.point1.measurement.unescaped, epoch)
         val row = series.single
-        assert(row.time == PointSpec.point1.time)
-        assert(series(row, "fk") == BigDecimalValue(-1))
+        assert(row.time == PointSpec.point1.time, epoch)
+        assert(series(row, "fk") == BigDecimalValue(-1), epoch)
       }
     }
   }

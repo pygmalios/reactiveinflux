@@ -2,6 +2,7 @@ package com.pygmalios.reactiveinflux.command.query
 
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.command.query.Series.{ColumnName, SeriesName}
+import com.pygmalios.reactiveinflux.command.write.PointTime
 import org.joda.time.Instant
 
 trait QueryResult extends Serializable {
@@ -61,7 +62,7 @@ object Series {
 }
 
 trait Row {
-  def time: Instant
+  def time: PointTime
   def items: Seq[Value]
 }
 
@@ -76,11 +77,11 @@ case class BigDecimalValue(value: BigDecimal) extends Value
 case class BooleanValue(value: Boolean) extends Value
 
 trait TimeFormat {
-  def apply(value: Value): Instant
+  def apply(value: Value): PointTime
 }
 
 private[reactiveinflux] object Rfc3339 extends TimeFormat {
-  override def apply(value: Value): Instant = value match {
+  override def apply(value: Value): PointTime = value match {
     case StringValue(s) => Instant.parse(s)
     case other => throw new ReactiveInfluxException(s"RFC3339 time must be a string! [$other]")
   }
@@ -89,4 +90,4 @@ private[reactiveinflux] object Rfc3339 extends TimeFormat {
 private[reactiveinflux] case class SimpleQueryResult(q: Query, result: Result) extends QueryResult
 private[reactiveinflux] case class SimpleResult(series: Seq[Series]) extends Result
 private[reactiveinflux] case class SimpleSeries(name: SeriesName, columns: Seq[ColumnName], values: Seq[Row]) extends Series
-private[reactiveinflux] case class SimpleRow(time: Instant, items: Seq[Value]) extends Row
+private[reactiveinflux] case class SimpleRow(time: PointTime, items: Seq[Value]) extends Row

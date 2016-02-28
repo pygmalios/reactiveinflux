@@ -4,7 +4,8 @@ import com.pygmalios.reactiveinflux._
 import org.joda.time.{DateTime, DateTimeZone, Duration}
 
 object PointSpec {
-  val time1 = new DateTime(1983, 1, 10, 11, 42, 0, 0, DateTimeZone.UTC).toInstant
+  val dateTime1 = new DateTime(1983, 1, 10, 11, 42, 7, 13, DateTimeZone.UTC)
+  val time1 = PointTime(dateTime1)
   val point1 = Point(time1, "m1", Map.empty, Map("fk" -> LongFieldValue(-1)))
 
   val time2 = time1.plus(Duration.millis(3))

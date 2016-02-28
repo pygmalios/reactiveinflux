@@ -1,5 +1,6 @@
 package com.pygmalios.reactiveinflux.command.write
 
+import akka.http.scaladsl.model.DateTime
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, Measurement, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 import org.joda.time.Instant
@@ -17,7 +18,10 @@ trait PointNoTime extends Serializable {
   * Point with time.
   */
 trait Point extends PointNoTime {
-  def time: Instant
+  /**
+    * Time with nanosecond precision.
+    */
+  def time: PointTime
 }
 
 object Point {
@@ -29,7 +33,7 @@ object Point {
   def apply(measurement: Measurement, tags: Map[TagKey, TagValue], fields: Map[FieldKey, FieldValue]): PointNoTime =
     SimplePointNoTime(measurement, tags, fields)
 
-  def apply(time: Instant, measurement: Measurement, tags: Map[TagKey, TagValue], fields: Map[FieldKey, FieldValue]): Point =
+  def apply(time: PointTime, measurement: Measurement, tags: Map[TagKey, TagValue], fields: Map[FieldKey, FieldValue]): Point =
     SimplePoint(time, measurement, tags, fields)
 }
 
@@ -46,7 +50,7 @@ private[reactiveinflux] case class SimplePointNoTime(measurement: Measurement,
                                                      tags: Map[TagKey, TagValue],
                                                      fields: Map[FieldKey, FieldValue]) extends PointNoTime
 
-private[reactiveinflux] case class SimplePoint(time: Instant,
+private[reactiveinflux] case class SimplePoint(time: PointTime,
                                                measurement: Measurement,
                                                tags: Map[TagKey, TagValue],
                                                fields: Map[FieldKey, FieldValue]) extends Point
