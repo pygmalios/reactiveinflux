@@ -29,7 +29,7 @@ class WriteCommand(val baseUri: Uri,
     )
   }
 
-  private[command] def prec: Precision = params.precision.getOrElse(Milli)
+  private[command] def prec: Precision = params.precision.getOrElse(Nano)
 
   private[command] def query: Uri.Query = {
     val qMap = OptionalParameters(

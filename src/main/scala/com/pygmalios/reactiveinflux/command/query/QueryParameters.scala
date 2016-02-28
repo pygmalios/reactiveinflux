@@ -16,13 +16,16 @@ sealed abstract class Epoch(val q: String) extends TimeFormat with Serializable 
   }
 }
 case object NanoEpoch extends Epoch("ns") {
-  def apply(value: Value): PointTime = super.toPointTime(value, ns => PointTime.ofEpochSecond(ns / 1000000000, ns % 1000000000))
+  def apply(value: Value): PointTime =
+    super.toPointTime(value, ns => PointTime.ofEpochSecond(ns / 1000000000, (ns % 1000000000).toInt))
 }
 case object MicroEpoch extends Epoch("u") {
-  def apply(value: Value): PointTime = super.toPointTime(value, u => PointTime.ofEpochSecond(u / 1000000, u % 1000000))
+  def apply(value: Value): PointTime =
+    super.toPointTime(value, u => PointTime.ofEpochSecond(u / 1000000, (u % 1000000).toInt * 1000))
 }
 case object MilliEpoch extends Epoch("ms") {
-  def apply(value: Value): PointTime = super.toPointTime(value, ms => PointTime.ofEpochSecond(ms / 1000, ms % 1000))
+  def apply(value: Value): PointTime =
+    super.toPointTime(value, ms => PointTime.ofEpochSecond(ms / 1000, (ms % 1000).toInt * 1000000))
 }
 case object SecondEpoch extends Epoch("s") {
   def apply(value: Value): PointTime = super.toPointTime(value, s => PointTime.ofEpochSecond(s, 0))

@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import com.pygmalios.reactiveinflux.ReactiveInfluxResultError
 import com.pygmalios.reactiveinflux.command.query._
-import com.pygmalios.reactiveinflux.command.write.PointSpec
-import com.pygmalios.reactiveinflux.error.{DatabaseAlreadyExists, DatabaseNotFound, ReactiveInfluxError}
+import com.pygmalios.reactiveinflux.command.write.{PointSpec, Precision, WriteParameters}
+import com.pygmalios.reactiveinflux.error.{DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import org.junit.runner.RunWith
 import org.scalatest.concurrent.{AsyncAssertions, IntegrationPatience, ScalaFutures}
@@ -36,20 +36,10 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     }
   }
 
-  it should "fail if DB already exists" in new TestScope {
-    try {
-      db.create(failIfExists = true).futureValue
-      assertError(db.create(failIfExists = true), classOf[DatabaseAlreadyExists], "database already exists")
-    }
-    finally {
-      db.drop().futureValue
-    }
-  }
-
   it should "not fail if DB already exists" in new TestScope {
     try {
-      db.create(failIfExists = true).futureValue
-      db.create(failIfExists = false).futureValue
+      db.create().futureValue
+      db.create().futureValue
     }
     finally {
       db.drop().futureValue
@@ -88,6 +78,14 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     writeAndTestEpoch(None)
   }
 
+  it should "get a single point with nanosecond time format" in new QueryTestScope {
+    writeAndTestEpoch(Some(NanoEpoch))
+  }
+
+  it should "get a single point with microsecond time format" in new QueryTestScope {
+    writeAndTestEpoch(Some(MicroEpoch))
+  }
+
   it should "get a single point with millisecond time format" in new QueryTestScope {
     writeAndTestEpoch(Some(MilliEpoch))
   }
@@ -101,21 +99,25 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
   }
 
   private class QueryTestScope extends TestScope {
-    def writeAndTestEpoch(epoch: Option[Epoch]): Future[Unit] = {
+    def writeAndTestEpoch(epoch: Option[Epoch]): Any = {
       withDb { db =>
-        db.write(PointSpec.point1).flatMap { _ =>
-          testEpoch(epoch)
+        val writeParameters = WriteParameters(precision = epoch.map(Precision(_)))
+        db.write(PointSpec.point1, writeParameters).flatMap { _ =>
+          testEpoch(epoch, writeParameters)
         }
       }
     }
 
-    def testEpoch(epoch: Option[Epoch]): Future[Unit] = {
+    def testEpoch(epoch: Option[Epoch], writeParameters: WriteParameters): Future[Unit] = {
       db.query(Query("SELECT * FROM " + PointSpec.point1.measurement), QueryParameters(epoch = epoch)).map { queryResult =>
         val series = queryResult.result.single
-        assert(series.name == PointSpec.point1.measurement.unescaped, epoch)
+        assert(series.name == PointSpec.point1.measurement.unescaped)
+
         val row = series.single
-        assert(row.time == PointSpec.point1.time, epoch)
-        assert(series(row, "fk") == BigDecimalValue(-1), epoch)
+
+        val expextedTime = writeParameters.precision.map(_.round(PointSpec.point1.time)).getOrElse(PointSpec.point1.time)
+        assert(row.time == expextedTime, epoch)
+        assert(series(row, "fk") == BigDecimalValue(-1))
       }
     }
   }
@@ -124,11 +126,11 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     val client = new ActorSystemReactiveInflux(system, ITestConfig.reactiveInfluxConfig)
     val db = new ActorSystemReactiveInfluxDb("ActorSystemReactiveInfluxDbISpec", None, None, client)
 
-    def withDb(action: (ActorSystemReactiveInfluxDb) => Future[Any]): Future[Unit] = {
+    def withDb(action: (ActorSystemReactiveInfluxDb) => Future[Any]): Any = {
       val result = db.create().flatMap { _ =>
         action(db)
-      }.map { _ =>
-        db.drop()
+      }.andThen {
+        case _ => db.drop()
       }
       result.futureValue
     }

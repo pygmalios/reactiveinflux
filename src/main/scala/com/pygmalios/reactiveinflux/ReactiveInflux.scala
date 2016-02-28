@@ -24,7 +24,7 @@ trait ReactiveInflux extends Closeable {
   * Reactive API for InfluxDB database.
   */
 trait ReactiveInfluxDb {
-  def create(failIfExists: Boolean = false): Future[Unit]
+  def create(): Future[Unit]
   def drop(failIfNotExists: Boolean = false): Future[Unit]
 
   def write(point: PointNoTime): Future[Unit]

@@ -21,7 +21,7 @@ trait ReactiveInfluxSyncClient {
   * Synchronous blocking API for InfluxDB database.
   */
 trait ReactiveInfluxSyncDb {
-  def create(failIfExists: Boolean = false): Unit
+  def create(): Unit
   def drop(failIfNotExists: Boolean = false): Unit
 
   def write(point: PointNoTime): Unit
@@ -47,7 +47,7 @@ private final class WrappingReactiveInfluxSyncClient(reactiveInflux: ReactiveInf
 }
 
 private final class WrappingReactiveInfluxSyncDb(reactiveInfluxDb: ReactiveInfluxDb) extends ReactiveInfluxSyncDb {
-  override def create(failIfExists: Boolean) = await(reactiveInfluxDb.create(failIfExists))
+  override def create() = await(reactiveInfluxDb.create())
   override def drop(failIfNotExists: Boolean = false) = await(reactiveInfluxDb.drop(failIfNotExists))
 
   override def write(point: PointNoTime) = write(point, WriteParameters())

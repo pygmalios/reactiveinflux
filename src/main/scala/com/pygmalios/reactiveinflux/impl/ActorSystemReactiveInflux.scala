@@ -44,13 +44,13 @@ class ActorSystemReactiveInfluxDb(dbName: DbName,
                                   core: ReactiveInfluxCore) extends ReactiveInfluxDb {
   private implicit def executionContext: ExecutionContext = core.executionContext
 
-  override def create(failIfExists: Boolean): Future[Unit] =
-    core.execute(new CreateDatabaseCommand(core.config.uri, dbName, failIfExists))
+  override def create(): Future[Unit] =
+    core.execute(new CreateDatabaseCommand(core.config.uri, dbName))
   override def drop(failIfNotExists: Boolean): Future[Unit] =
     core.execute(new DropDatabaseCommand(core.config.uri, dbName, failIfNotExists))
 
   override def write(point: PointNoTime): Future[Unit] = write(point, WriteParameters())
-  override def write(point: PointNoTime, params: WriteParameters): Future[Unit] = write(Seq(point))
+  override def write(point: PointNoTime, params: WriteParameters): Future[Unit] = write(Seq(point), params)
   override def write(points: Iterable[PointNoTime], params: WriteParameters): Future[Unit] =
     core.execute(new WriteCommand(
       baseUri     = core.config.uri,

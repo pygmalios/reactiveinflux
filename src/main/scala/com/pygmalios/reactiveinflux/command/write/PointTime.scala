@@ -2,32 +2,28 @@ package com.pygmalios.reactiveinflux.command.write
 
 import java.util.Date
 
-import org.joda.time.{Instant, DateTime, DateTimeZone}
+import org.joda.time.{DateTime, DateTimeZone, Instant}
 
 /**
   * Epoch time with nanosecond precision.
   */
 trait PointTime {
   /**
-    * Java 7 Date type is shitty and supports millisecond precision only. We can change this to Instant to support
-    * nanosecond precision once we switch to Java 8.
-    *
-    * @return Epoch time in seconds.
+    * The number of seconds from the epoch of 1970-01-01T00:00:00Z.
     */
   def seconds: Long
 
   /**
-    * Nanosecond fraction of second to extend Java 7 Date precision. Legal value is between 0 and 999999999.
-    *
-    * @return Nanosecond fraction of seconds.
+    * The number of nanoseconds, later along the time-line, from the seconds field.
+    * This is always positive, and never exceeds 999,999,999.
     */
-  def nanos: Long
+  def nanos: Int
 }
 
 object PointTime {
-  def ofEpochMilli(epochMilli: Long): PointTime = ofEpochSecond(epochMilli / 1000, (epochMilli % 1000) * 1000000)
+  def ofEpochMilli(epochMilli: Long): PointTime = ofEpochSecond(epochMilli / 1000, (epochMilli % 1000).toInt * 1000000)
   def ofEpochSecond(epochSecond: Long): PointTime = ofEpochMilli(epochSecond * 1000)
-  def ofEpochSecond(epochSecond: Long, nanoAdjustment: Long): PointTime =
+  def ofEpochSecond(epochSecond: Long, nanoAdjustment: Int): PointTime =
     SimplePointTime(epochSecond, nanoAdjustment)
 
   implicit def apply(dateTime: DateTime): PointTime = ofEpochMilli(dateTime.withZone(DateTimeZone.UTC).getMillis)
@@ -37,4 +33,4 @@ object PointTime {
     new DateTime(pointTime.seconds*1000 + (pointTime.nanos/1000000), DateTimeZone.UTC)
 }
 
-private case class SimplePointTime(seconds: Long, nanos: Long) extends PointTime
+private case class SimplePointTime(seconds: Long, nanos: Int) extends PointTime
