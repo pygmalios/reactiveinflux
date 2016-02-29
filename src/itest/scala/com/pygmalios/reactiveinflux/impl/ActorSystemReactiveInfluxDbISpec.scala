@@ -129,10 +129,13 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
     def withDb(action: (ActorSystemReactiveInfluxDb) => Future[Any]): Any = {
       val result = db.create().flatMap { _ =>
         action(db)
-      }.andThen {
-        case _ => db.drop()
       }
-      result.futureValue
+      try {
+        result.futureValue
+      }
+      finally {
+        db.drop().futureValue
+      }
     }
 
     def assertError(f: => Future[_], error: Class[_ <: ReactiveInfluxError], message: String): Unit =
