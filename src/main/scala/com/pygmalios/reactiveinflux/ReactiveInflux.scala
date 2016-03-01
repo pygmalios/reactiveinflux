@@ -56,8 +56,8 @@ object ReactiveInflux {
   type DbUsername = String
   type DbPassword = String
 
-  private val defaultClientName = "ReactiveInflux"
-  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
+  private[reactiveinflux] val defaultClientName = "ReactiveInflux"
+  private[reactiveinflux] def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
     ActorSystemReactiveInflux(actorSystem, config)
 
   /**
