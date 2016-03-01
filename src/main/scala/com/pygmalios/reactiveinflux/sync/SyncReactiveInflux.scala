@@ -1,5 +1,7 @@
 package com.pygmalios.reactiveinflux.sync
 
+import java.io.Closeable
+
 import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
@@ -14,7 +16,7 @@ import scala.concurrent.{Await, Future}
 /**
   * Synchronous blocking client for InfluxDB.
   */
-trait SyncReactiveInflux {
+trait SyncReactiveInflux extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None)(implicit awaitAtMost: Duration): PingResult
   def database(implicit params: ReactiveInfluxDbParams): SyncReactiveInfluxDb
   def config: ReactiveInfluxConfig
@@ -49,6 +51,7 @@ private final class WrappingSyncReactiveInflux(reactiveInflux: ReactiveInflux) e
   override def ping(waitForLeaderSec: Option[Int])(implicit awaitAtMost: Duration) = await(reactiveInflux.ping(waitForLeaderSec))
   override def database(implicit params: ReactiveInfluxDbParams) = new WrappingSyncReactiveInfluxDb(reactiveInflux.database(params))
   override def config = reactiveInflux.config
+  override def close(): Unit = reactiveInflux.close()
 }
 
 private final class WrappingSyncReactiveInfluxDb(reactiveInfluxDb: ReactiveInfluxDb) extends SyncReactiveInfluxDb {
