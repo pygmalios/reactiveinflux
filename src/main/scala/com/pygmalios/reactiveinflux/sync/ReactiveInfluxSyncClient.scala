@@ -4,7 +4,7 @@ import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
 import com.pygmalios.reactiveinflux.sync.ReactiveInfluxSyncClient._
-import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxDb}
+import com.pygmalios.reactiveinflux.{ReactiveInfluxConfig, ReactiveInfluxDbParams, ReactiveInflux, ReactiveInfluxDb}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
@@ -14,7 +14,8 @@ import scala.concurrent.{Await, Future}
   */
 trait ReactiveInfluxSyncClient {
   def ping(waitForLeaderSec: Option[Int] = None): PingResult
-  def database(name: String): ReactiveInfluxSyncDb
+  def database(implicit params: ReactiveInfluxDbParams): ReactiveInfluxSyncDb
+  def config: ReactiveInfluxConfig
 }
 
 /**
@@ -43,7 +44,8 @@ object ReactiveInfluxSyncClient {
 
 private final class WrappingReactiveInfluxSyncClient(reactiveInflux: ReactiveInflux) extends ReactiveInfluxSyncClient {
   override def ping(waitForLeaderSec: Option[Int]) = await(reactiveInflux.ping(waitForLeaderSec))
-  override def database(name: String) = new WrappingReactiveInfluxSyncDb(reactiveInflux.database(name))
+  override def database(implicit params: ReactiveInfluxDbParams) = new WrappingReactiveInfluxSyncDb(reactiveInflux.database(params))
+  override def config = reactiveInflux.config
 }
 
 private final class WrappingReactiveInfluxSyncDb(reactiveInfluxDb: ReactiveInfluxDb) extends ReactiveInfluxSyncDb {

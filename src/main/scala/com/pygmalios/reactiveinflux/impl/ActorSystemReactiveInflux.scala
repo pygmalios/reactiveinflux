@@ -25,8 +25,8 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
 
   override def ping(waitForLeaderSec: Option[Int]) = execute(new PingCommand(config.uri))
 
-  override def database(name: DbName, username: Option[DbUsername], password: Option[DbPassword]): ReactiveInfluxDb =
-    new ActorSystemReactiveInfluxDb(name, username, password, this)
+  override def database(implicit params: ReactiveInfluxDbParams): ReactiveInfluxDb =
+    new ActorSystemReactiveInfluxDb(params.dbName, params.dbUsername, params.dbPassword, this)
 
   override def execute[R <: ReactiveInfluxCommand](request: R): Future[request.TResult] = {
     val httpRequest = request.httpRequest
