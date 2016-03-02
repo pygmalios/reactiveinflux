@@ -1,5 +1,6 @@
 package com.pygmalios.reactiveinflux
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model.{HttpRequest, HttpResponse}
 import com.pygmalios.reactiveinflux.response.ReactiveInfluxJsonResultException
 
@@ -16,9 +17,9 @@ trait ReactiveInfluxCommand extends Serializable {
 
   def httpRequest: HttpRequest
 
-  def apply(httpResponse: HttpResponse): TResult = {
+  def apply(httpResponse: HttpResponse, actorSystem: ActorSystem): TResult = {
     try {
-      responseFactory(httpResponse).result
+      responseFactory(httpResponse, actorSystem).result
     }
     catch {
       case ex: ReactiveInfluxJsonResultException =>
@@ -28,7 +29,7 @@ trait ReactiveInfluxCommand extends Serializable {
     }
   }
 
-  protected def responseFactory(httpResponse: HttpResponse): ReactiveInfluxResult[TResult]
+  protected def responseFactory(httpResponse: HttpResponse, actorSystem: ActorSystem): ReactiveInfluxResult[TResult]
 }
 
 trait ReactiveInfluxResult[+T] extends Serializable {

@@ -33,7 +33,7 @@ class ActorSystemReactiveInflux(actorSystem: ActorSystem, val config: ReactiveIn
     log.debug(s"${request.getClass.getSimpleName} HTTP ${httpRequest.method.name} ${httpRequest.uri}")
     http.singleRequest(httpRequest).map { httpResponse =>
       log.debug(s"Response: $httpResponse")
-      request(httpResponse)
+      request(httpResponse, system)
     }
   }
 }

@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.testkit.{ImplicitSender, TestKit}
 import com.pygmalios.reactiveinflux.ReactiveInfluxResultError
 import com.pygmalios.reactiveinflux.command.query._
-import com.pygmalios.reactiveinflux.command.write.{PointSpec, Precision, WriteParameters}
+import com.pygmalios.reactiveinflux.command.write._
 import com.pygmalios.reactiveinflux.error.{DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import org.junit.runner.RunWith
@@ -13,6 +13,8 @@ import org.scalatest.junit.JUnitRunner
 import org.scalatest.{BeforeAndAfterAll, FlatSpecLike}
 
 import scala.concurrent.Future
+
+import com.pygmalios.reactiveinflux._
 
 @RunWith(classOf[JUnitRunner])
 class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_system) with ImplicitSender
@@ -69,6 +71,24 @@ class ActorSystemReactiveInfluxDbISpec(_system: ActorSystem) extends TestKit(_sy
   it should "write two points" in new TestScope {
     withDb { db =>
       db.write(Seq(PointSpec.point1, PointSpec.point2))
+    }
+  }
+
+  it should "write a batch of 100 points" in new TestScope {
+    val measurement = "m1"
+    val points = (1 to 100).map { i =>
+      val dateTime = PointSpec.dateTime1.plusSeconds(i)
+      Point(dateTime, measurement, Map.empty, Map("fk" -> LongFieldValue(-1)))
+    }
+
+    withDb { db =>
+      db.write(points).flatMap { _ =>
+        db.query(Query(s"SELECT * FROM $measurement"))
+          .map { queryResult =>
+            val rows = queryResult.result.single.values
+            assert(rows.size == 100)
+          }
+      }
     }
   }
 

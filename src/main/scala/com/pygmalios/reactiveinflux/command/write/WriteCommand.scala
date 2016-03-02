@@ -1,5 +1,6 @@
 package com.pygmalios.reactiveinflux.command.write
 
+import akka.actor.ActorSystem
 import akka.http.scaladsl.model._
 import akka.util.ByteString
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
@@ -18,7 +19,8 @@ class WriteCommand(val baseUri: Uri,
 
   override type TResult = Unit
   protected val uriWithPath = baseUri.withPath(path)
-  override protected def responseFactory(httpResponse: HttpResponse) = new WriteResponse(httpResponse)
+  override protected def responseFactory(httpResponse: HttpResponse, actorSystem: ActorSystem) =
+    new WriteResponse(httpResponse, actorSystem)
   override val httpRequest = {
     val lines = new WriteLines(points, prec).toString
     val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(lines))
@@ -120,4 +122,5 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
   }
 }
 
-private[reactiveinflux] class WriteResponse(httpResponse: HttpResponse) extends EmptyJsonResponse(httpResponse)
+private[reactiveinflux] class WriteResponse(httpResponse: HttpResponse, actorSystem: ActorSystem)
+  extends EmptyJsonResponse(httpResponse, actorSystem)
