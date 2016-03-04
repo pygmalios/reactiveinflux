@@ -5,7 +5,7 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
 import com.pygmalios.reactiveinflux.command.query.BaseQueryCommand
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 import com.pygmalios.reactiveinflux.itest.ITestConfig
-import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxCore}
+import com.pygmalios.reactiveinflux.{ReactiveInfluxDbParams, ReactiveInflux, ReactiveInfluxCore}
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
@@ -13,7 +13,8 @@ class ExampleApplication extends FunSuite with ScalaFutures with IntegrationPati
   test("Execute custom command") {
     val reactiveInflux = ReactiveInflux(config = Some(ITestConfig.config))
     try {
-      val db = reactiveInflux.database("ExampleApplicatixon")
+      implicit val params = ReactiveInfluxDbParams("ExampleApplicatixon")
+      val db = reactiveInflux.database
       try {
         val core = reactiveInflux.asInstanceOf[ReactiveInfluxCore]
         whenReady(core.execute(new CustomQueryCommand(core.config.uri)).failed) { ex =>

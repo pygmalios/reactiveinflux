@@ -17,7 +17,8 @@ import scala.concurrent.Future
   */
 trait ReactiveInflux extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResult]
-  def database(dbName: DbName, dbUsername: Option[DbUsername] = None, dbPassword: Option[DbPassword] = None): ReactiveInfluxDb
+  def database(implicit params: ReactiveInfluxDbParams): ReactiveInfluxDb
+  def config: ReactiveInfluxConfig
 }
 
 /**
@@ -36,13 +37,27 @@ trait ReactiveInfluxDb {
   def query(qs: Seq[Query], params: QueryParameters = QueryParameters()): Future[Seq[QueryResult]]
 }
 
+trait ReactiveInfluxDbParams {
+  def dbName: DbName
+  def dbUsername: Option[DbUsername]
+  def dbPassword: Option[DbPassword]
+}
+
+object ReactiveInfluxDbParams {
+  def apply(dbName: DbName, dbUsername: Option[DbUsername] = None, dbPassword: Option[DbPassword] = None): ReactiveInfluxDbParams =
+    SimpleReactiveInfluxDbParams(dbName, dbUsername, dbPassword)
+}
+
+private case class SimpleReactiveInfluxDbParams(dbName: DbName, dbUsername: Option[DbUsername], dbPassword: Option[DbPassword])
+  extends ReactiveInfluxDbParams
+
 object ReactiveInflux {
   type DbName = String
   type DbUsername = String
   type DbPassword = String
 
-  private val defaultClientName = "ReactiveInflux"
-  private def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
+  private[reactiveinflux] val defaultClientName = "ReactiveInflux"
+  private[reactiveinflux] def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
     ActorSystemReactiveInflux(actorSystem, config)
 
   /**
