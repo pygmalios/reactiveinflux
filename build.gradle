@@ -11,8 +11,8 @@ buildscript {
 
 apply plugin: "scala"
 apply plugin: "com.github.maiflai.scalatest"
-apply plugin: "maven"
 apply plugin: "java"
+apply plugin: "maven-publish"
 
 group = group
 version = "${influxVersion}.${version}"
@@ -68,4 +68,20 @@ dependencies {
     testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:$akkaVersion"
     testCompile "com.typesafe.akka:akka-http-testkit-experimental_$scalaVersion:$akkaHttpVersion"
     testCompile "junit:junit:4.12"
+}
+
+task sourceJar(type: Jar) {
+    from sourceSets.main.allScala
+}
+
+publishing {
+    publications {
+        mavenScala(MavenPublication) {
+            from components.java
+
+            artifact sourceJar {
+                classifier "sources"
+            }
+        }
+    }
 }
