@@ -1,20 +1,21 @@
 package com.pygmalios.reactiveinflux.command
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
-import com.pygmalios.reactiveinflux.{ReactiveInfluxCommand, ReactiveInfluxResult}
+import java.net.URI
 
-class PingCommand(baseUri: Uri) extends ReactiveInfluxCommand {
+import com.pygmalios.reactiveinflux.{ReactiveInfluxCommand, ReactiveInfluxResult}
+import play.api.libs.ws._
+
+class PingCommand(baseUri: URI) extends ReactiveInfluxCommand {
   override type TResult = PingResult
 
-  override protected def responseFactory(httpResponse: HttpResponse, actorSystem: ActorSystem): ReactiveInfluxResult[PingResult] =
-    SimplePingResult(httpResponse.getHeader(PingCommand.versionHeader).map(_.value()).getOrElse(""))
+  override protected def responseFactory(httpResponse: WSResponse): ReactiveInfluxResult[PingResult] =
+    SimplePingResult(httpResponse.header(PingCommand.versionHeader).getOrElse(""))
 
-  override val httpRequest = HttpRequest(uri = baseUri.withPath(PingCommand.path))
+  override def httpRequest(ws: WSClient) = ws.url(baseUri.toString + PingCommand.path)
 }
 
 object PingCommand {
-  val path = Uri.Path("/ping")
+  val path = "/ping"
   val versionHeader = "X-Influxdb-Version"
 }
 

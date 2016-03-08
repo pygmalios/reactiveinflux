@@ -1,15 +1,15 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model._
-import akka.util.ByteString
+import java.net.URI
+
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
 import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
-import com.pygmalios.reactiveinflux.impl.OptionalParameters
+import com.pygmalios.reactiveinflux.impl.URIUtils
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
+import play.api.libs.ws.{WSClient, WSResponse}
 
-class WriteCommand(val baseUri: Uri,
+class WriteCommand(val baseUri: URI,
                    val dbName: DbName,
                    val dbUsername: Option[DbUsername],
                    val dbPassword: Option[DbPassword],
@@ -18,50 +18,47 @@ class WriteCommand(val baseUri: Uri,
   import WriteCommand._
 
   override type TResult = Unit
-  protected val uriWithPath = baseUri.withPath(path)
-  override protected def responseFactory(httpResponse: HttpResponse, actorSystem: ActorSystem) =
-    new WriteResponse(httpResponse, actorSystem)
-  override val httpRequest = {
-    val lines = new WriteLines(points, prec).toString
-    val entity = HttpEntity.Strict(ContentTypes.`application/octet-stream`, ByteString(lines))
-    HttpRequest(
-      method  = HttpMethods.POST,
-      uri     = uriWithPath.withQuery(query),
-      entity  = entity
-    )
-  }
+  protected val uriWithPath = new URI(baseUri.toString + path)
+  override protected def responseFactory(wsResponse: WSResponse) = new WriteResponse(wsResponse)
+  override def httpRequest(ws: WSClient) =
+    ws
+      .url(new URI(uriWithPath.toString + URIUtils.queryToString(query)).toString)
+      .withHeaders("Content-Type" -> "application/octet-stream")
+      .withMethod("POST")
+      .withBody(new WriteLines(points, prec).toString)
 
   private[command] def prec: Precision = params.precision.getOrElse(Nano)
 
-  private[command] def query: Uri.Query = {
-    val qMap = OptionalParameters(
-      dbQ -> Some(dbName),
-      usernameQ -> dbUsername,
-      passwordQ -> dbPassword
-    )
+  private[command] def query: Map[String, Option[String]] = Map(
+    dbQ -> Some(dbName),
+    usernameQ -> dbUsername,
+    passwordQ -> dbPassword
+  )
 
-    Uri.Query(qMap ++ params.params)
-  }
+  override def toString = s"WriteCommand(uriWithPath=$uriWithPath, baseUri=$baseUri, dbName=$dbName, dbUsername=$dbUsername, dbPassword=$dbPassword, points=$points, params=$params)"
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[WriteCommand]
 
   override def equals(other: Any): Boolean = other match {
     case that: WriteCommand =>
       (that canEqual this) &&
-        httpRequest == that.httpRequest
+        baseUri == that.baseUri &&
+        dbName == that.dbName &&
+        dbUsername == that.dbUsername &&
+        dbPassword == that.dbPassword &&
+        points == that.points &&
+        params == that.params
     case _ => false
   }
 
   override def hashCode(): Int = {
-    val state = Seq(httpRequest)
+    val state = Seq(baseUri, dbName, dbUsername, dbPassword, points, params)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
-
-  override def toString = s"WriteCommand(uriWithPath=$uriWithPath, httpRequest=$httpRequest, baseUri=$baseUri, dbName=$dbName, dbUsername=$dbUsername, dbPassword=$dbPassword, points=$points, params=$params)"
 }
 
 object WriteCommand {
-  val path = Uri.Path("/write")
+  val path = "/write"
   val dbQ = "db"
   val usernameQ = "u"
   val passwordQ = "p"
@@ -122,5 +119,5 @@ private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precisio
   }
 }
 
-private[reactiveinflux] class WriteResponse(httpResponse: HttpResponse, actorSystem: ActorSystem)
-  extends EmptyJsonResponse(httpResponse, actorSystem)
+private[reactiveinflux] class WriteResponse(wsResponse: WSResponse)
+  extends EmptyJsonResponse(wsResponse)

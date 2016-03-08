@@ -1,16 +1,17 @@
 package com.pygmalios.reactiveinflux.impl
 
-import akka.http.scaladsl.model.Uri
+import java.net.URI
+
 import com.pygmalios.reactiveinflux.ReactiveInfluxCore
 import com.pygmalios.reactiveinflux.command.write._
+import org.junit.runner.RunWith
+import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
-import org.junit.runner.RunWith
 
 @RunWith(classOf[JUnitRunner])
-class ActorSystemReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
+class PlayWSReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
   behavior of "write of single point"
 
   it should "create WriteCommand and execute it" in new TestScope {
@@ -57,9 +58,9 @@ class ActorSystemReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
     val dbPassword = "p"
     val core = mock[ReactiveInfluxCore]
     val config = mock[DefaultReactiveInfluxConfig]
-    val uri = Uri("http://whatever/")
+    val uri = new URI("http://whatever/")
     when(config.uri).thenReturn(uri)
     when(core.config).thenReturn(config)
-    val db = new ActorSystemReactiveInfluxDb(dbName, Some(dbUsername), Some(dbPassword), core)
+    val db = new PlayWSReactiveInfluxDb(dbName, Some(dbUsername), Some(dbPassword), core)
   }
 }

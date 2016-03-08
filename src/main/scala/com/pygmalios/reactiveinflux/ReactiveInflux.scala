@@ -2,12 +2,11 @@ package com.pygmalios.reactiveinflux
 
 import java.io.Closeable
 
-import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
-import com.pygmalios.reactiveinflux.impl.ActorSystemReactiveInflux
+import com.pygmalios.reactiveinflux.impl.PlayWSReactiveInflux
 import com.typesafe.config.Config
 
 import scala.concurrent.Future
@@ -63,21 +62,14 @@ object ReactiveInflux {
   type DbPassword = String
 
   val defaultClientName = "ReactiveInflux"
-  def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
-    ActorSystemReactiveInflux(actorSystem, config)
+  def defaultClientFactory(config: ReactiveInfluxConfig): ReactiveInflux =
+    PlayWSReactiveInflux(config)
 
   /**
     * Create reactive Influx client. Normally there should be only one instance per application.
-    *
-    * @param name Provide a unique name if you plan to create more reactive Influx clients in a single JVM.
-    * @param config Provide an overriding configuration.
-    * @return Reactive Influx client.
     */
   def apply(name: String = defaultClientName,
             config: Option[Config] = None,
-            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInflux = defaultClientFactory): ReactiveInflux = {
-    val reactiveInfluxConfig = ReactiveInfluxConfig(config)
-    val actorSystem = ActorSystem(name, reactiveInfluxConfig.reactiveinflux)
-    clientFactory(actorSystem, reactiveInfluxConfig)
-  }
+            clientFactory: (ReactiveInfluxConfig) => ReactiveInflux = defaultClientFactory): ReactiveInflux =
+    clientFactory(ReactiveInfluxConfig(config))
 }

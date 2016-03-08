@@ -51,22 +51,14 @@ task itest(type: Test) {
 }
 
 dependencies {
-    def akkaVersion = "2.3.4"
-    def akkaHttpVersion = "2.0.1"
-
     compile "org.scala-lang:scala-library:$scalaVersion.6"
-    compile "com.typesafe.akka:akka-actor_$scalaVersion:$akkaVersion"
-    compile "com.typesafe.akka:akka-slf4j_$scalaVersion:$akkaVersion"
-    compile "com.typesafe.akka:akka-http-experimental_$scalaVersion:$akkaHttpVersion"
-    compile "com.typesafe.akka:akka-http-spray-json-experimental_$scalaVersion:$akkaHttpVersion"
+    compile "com.typesafe.play:play-ws_$scalaVersion:2.4.6"
     compile "ch.qos.logback:logback-classic:1.1.3"
     compile "joda-time:joda-time:2.9.2"
     compile "org.joda:joda-convert:1.8.1"
 
     testCompile "org.scalatest:scalatest_$scalaVersion:2.2.5"
     testCompile "org.mockito:mockito-all:1.10.19"
-    testCompile "com.typesafe.akka:akka-testkit_$scalaVersion:$akkaVersion"
-    testCompile "com.typesafe.akka:akka-http-testkit-experimental_$scalaVersion:$akkaHttpVersion"
     testCompile "junit:junit:4.12"
 }
 

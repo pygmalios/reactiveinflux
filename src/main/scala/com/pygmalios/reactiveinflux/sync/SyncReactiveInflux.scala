@@ -2,7 +2,6 @@ package com.pygmalios.reactiveinflux.sync
 
 import java.io.Closeable
 
-import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
@@ -43,19 +42,12 @@ trait SyncReactiveInfluxDb {
 object SyncReactiveInflux {
   def await[T](f: => Future[T])(implicit awaitAtMost: Duration): T = Await.result(f, awaitAtMost)
 
-  def apply(actorSystem: ActorSystem,
-            name: String = ReactiveInflux.defaultClientName,
+  def apply(name: String = ReactiveInflux.defaultClientName,
             config: Option[Config] = None): SyncReactiveInflux =
-    apply(ReactiveInflux.defaultClientFactory(actorSystem, ReactiveInfluxConfig(config)), name, config)
+    apply(name, config, ReactiveInflux.defaultClientFactory(ReactiveInfluxConfig(config)))
 
   def apply(name: String,
             config: Option[Config],
-            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInflux): SyncReactiveInflux =
-    apply(ReactiveInflux(name, config, clientFactory), name, config)
-
-
-  def apply(reactiveInfluxFactory: => ReactiveInflux,
-            name: String,
-            config: Option[Config]): SyncReactiveInflux =
+            reactiveInfluxFactory: => ReactiveInflux): SyncReactiveInflux =
     new WrappingSyncReactiveInflux(reactiveInfluxFactory)
 }

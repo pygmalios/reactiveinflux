@@ -1,9 +1,7 @@
 package com.pygmalios.reactiveinflux.response
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.HttpResponse
+import play.api.libs.ws.WSResponse
 
-class EmptyJsonResponse(httpResponse: HttpResponse, actorSystem: ActorSystem)
-  extends JsonResponse[Unit](httpResponse, actorSystem) {
+class EmptyJsonResponse(wsResponse: WSResponse) extends PlayWSJsonResponse[Unit](wsResponse) {
   val result = ()
 }

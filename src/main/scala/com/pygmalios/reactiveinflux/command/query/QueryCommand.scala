@@ -1,22 +1,21 @@
 package com.pygmalios.reactiveinflux.command.query
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
-import com.pygmalios.reactiveinflux.ReactiveInflux._
-import com.pygmalios.reactiveinflux.ReactiveInfluxException
-import com.pygmalios.reactiveinflux.impl.OptionalParameters
-import com.pygmalios.reactiveinflux.response.JsonResponse
-import spray.json._
+import java.net.URI
 
-class QueryCommand(baseUri: Uri, dbName: DbName, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
+import com.pygmalios.reactiveinflux.ReactiveInflux._
+import com.pygmalios.reactiveinflux.impl.OptionalParameters
+import com.pygmalios.reactiveinflux.response.PlayWSJsonResponse
+import play.api.libs.ws.{WSClient, WSResponse}
+
+class QueryCommand(baseUri: URI, dbName: DbName, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
   override type TResult = Seq[QueryResult]
-  override protected def responseFactory(httpResponse: HttpResponse, actorSystem: ActorSystem) = {
+  override protected def responseFactory(wsResponse: WSResponse) = {
     val timeFormat: TimeFormat = params.epoch.getOrElse(Rfc3339)
-    new QueryCommandResult(httpResponse, qs, timeFormat, actorSystem)
+    new QueryCommandResult(wsResponse, qs, timeFormat)
   }
-  override val httpRequest = {
+  override def httpRequest(ws: WSClient) = {
     val q = qs.map(_.influxQl).mkString(";")
-    HttpRequest(uri = qUri(q))
+    ws.url(qUri(q).toString)
   }
   override def otherParams = OptionalParameters(
     QueryParameters.dbQ -> Some(dbName),
@@ -25,14 +24,14 @@ class QueryCommand(baseUri: Uri, dbName: DbName, qs: Seq[Query], params: QueryPa
   )
 }
 
-private[reactiveinflux] class QueryCommandResult(httpResponse: HttpResponse, qs: Seq[Query], timeFormat: TimeFormat, actorSystem: ActorSystem)
-  extends JsonResponse[Seq[QueryResult]](httpResponse, actorSystem) {
-  import JsonResultProtocol._
+private[reactiveinflux] class QueryCommandResult(wsResponse: WSResponse, qs: Seq[Query], timeFormat: TimeFormat)
+  extends PlayWSJsonResponse[Seq[QueryResult]](wsResponse) {
 
+  // TODO: ...
+  /*
   override def result: Seq[QueryResult] = qs.zip(results.elements).map { case (q, jsResult) =>
     QueryResult(q, jsToResult(jsResult.convertTo[JsonResult]))
   }
-
   private def jsToResult(jsonResult: JsonResult): Result = Result(jsonResult.series.map(jsToSeries))
 
   private def jsToSeries(jsonSeries: JsonSeries): Series = Series(
@@ -47,7 +46,8 @@ private[reactiveinflux] class QueryCommandResult(httpResponse: HttpResponse, qs:
     case JsNumber(value) => BigDecimalValue(value)
     case JsBoolean(value) => BooleanValue(value)
     case other => throw new ReactiveInfluxException(s"Unsupported JSON value type! [$other]")
-  }
+  }*/
+  override def result: Seq[QueryResult] = ???
 }
 
 object QueryCommandResult {

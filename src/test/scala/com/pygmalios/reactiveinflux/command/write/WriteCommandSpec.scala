@@ -1,23 +1,26 @@
 package com.pygmalios.reactiveinflux.command.write
 
-import akka.http.scaladsl.model.{ContentTypes, HttpEntity, HttpMethods, Uri}
+import java.net.URI
+
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
 import org.junit.runner.RunWith
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
+import org.scalatest.mock.MockitoSugar
+import play.api.libs.ws.{InMemoryBody, WSClient}
 
 @RunWith(classOf[JUnitRunner])
 class WriteCommandSpec extends FlatSpec {
   behavior of "method"
 
   it should "use POST method" in new TestScope {
-    assert(cmd().httpRequest.method == HttpMethods.POST)
+    assert(cmd().httpRequest(ws).method == "POST")
   }
 
   behavior of "path"
 
   it should "have /write path" in new TestScope {
-    assert(cmd().httpRequest.uri.path == Uri.Path("/write"))
+    assert(cmd().httpRequest(ws).uri.getPath == "/write")
   }
 
   behavior of "prec"
@@ -59,23 +62,25 @@ class WriteCommandSpec extends FlatSpec {
   behavior of "entity"
 
   it should "contain binary content" in new TestScope {
-    val entity = cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity
-    assert(entity.getContentType() == ContentTypes.`application/octet-stream`)
+    val headers = cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws).headers
+    assert(headers.get("Content-Type").get == Seq("application/octet-stream"))
   }
 
   it should "contain point lines" in new TestScope {
-    cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest.entity match {
-      case HttpEntity.Strict(_, byteString) =>
-          assert(byteString.decodeString("UTF8") == "m1 fk=-1i 411046927013000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016000000")
+    cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws).body match {
+      case InMemoryBody(bytes) =>
+          val decoded = new String(bytes, "UTF8")
+          assert(decoded == "m1 fk=-1i 411046927013000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016000000")
       case _ => fail("Invalit entity!")
     }
   }
 }
 
-private class TestScope {
+private class TestScope extends MockitoSugar {
   val dbName = "test"
-  val baseUri = Uri("http://something/")
-  def cmd(baseUri: Uri = baseUri,
+  val baseUri = new URI("http://something/")
+  val ws = mock[WSClient]
+  def cmd(baseUri: URI = baseUri,
           dbName: DbName = dbName,
           points: Seq[PointNoTime] = Seq.empty,
           retentionPolicy: Option[String] = None,
@@ -92,5 +97,5 @@ private class TestScope {
       WriteParameters(retentionPolicy,precision,consistency))
 
   def assertQuery(cmd: WriteCommand, key: String, value: String) =
-    assert(cmd.query.get(key) == Some(value), cmd.httpRequest.uri)
+    assert(cmd.query.get(key) == Some(value))
 }

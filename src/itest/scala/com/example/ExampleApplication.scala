@@ -1,13 +1,14 @@
 package com.example
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.model.{HttpRequest, HttpResponse, Uri}
+import java.net.URI
+
 import com.pygmalios.reactiveinflux.command.query.BaseQueryCommand
-import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 import com.pygmalios.reactiveinflux.itest.ITestConfig
-import com.pygmalios.reactiveinflux.{ReactiveInfluxDbParams, ReactiveInflux, ReactiveInfluxCore}
+import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
+import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxCore, ReactiveInfluxDbParams}
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
+import play.api.libs.ws.{WSClient, WSResponse}
 
 class ExampleApplication extends FunSuite with ScalaFutures with IntegrationPatience {
   test("Execute custom command") {
@@ -30,12 +31,10 @@ class ExampleApplication extends FunSuite with ScalaFutures with IntegrationPati
   }
 }
 
-class CustomQueryCommand(baseUri: Uri) extends BaseQueryCommand(baseUri) {
+class CustomQueryCommand(baseUri: URI) extends BaseQueryCommand(baseUri) {
   override type TResult = Unit
-  override protected def responseFactory(httpResponse: HttpResponse, actorSystem: ActorSystem) =
-    new CustomQueryCommandResponse(httpResponse, actorSystem)
-  override val httpRequest = HttpRequest(uri = qUri("WHATEVER"))
+  override protected def responseFactory(wsResponse: WSResponse) =  new CustomQueryCommandResponse(wsResponse)
+  override def httpRequest(ws: WSClient) = ws.url(qUri("WHATEVER").toString)
 }
 
-class CustomQueryCommandResponse(httpResponse: HttpResponse, actorSystem: ActorSystem)
-  extends EmptyJsonResponse(httpResponse, actorSystem)
+class CustomQueryCommandResponse(wsResponse: WSResponse) extends EmptyJsonResponse(wsResponse)

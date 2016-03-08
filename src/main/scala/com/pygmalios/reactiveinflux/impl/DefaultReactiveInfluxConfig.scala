@@ -1,6 +1,7 @@
 package com.pygmalios.reactiveinflux.impl
 
-import akka.http.scaladsl.model.Uri
+import java.net.URI
+
 import com.pygmalios.reactiveinflux.ReactiveInfluxConfig
 import com.typesafe.config.{Config, ConfigFactory}
 
@@ -11,5 +12,5 @@ private[reactiveinflux] class DefaultReactiveInfluxConfig(config: Option[Config]
   }
 
   val reactiveinflux = rootConfig.getConfig("reactiveinflux")
-  val uri = Uri(reactiveinflux.getString("url"))
+  val uri = new URI(reactiveinflux.getString("url"))
 }
