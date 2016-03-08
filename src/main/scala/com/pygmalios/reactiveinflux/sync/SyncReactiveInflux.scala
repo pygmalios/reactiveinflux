@@ -6,8 +6,8 @@ import akka.actor.ActorSystem
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
-import com.pygmalios.reactiveinflux.sync.SyncReactiveInflux._
-import com.pygmalios.reactiveinflux.{ReactiveInfluxConfig, ReactiveInfluxDbParams, ReactiveInflux, ReactiveInfluxDb}
+import com.pygmalios.reactiveinflux.sync.impl.WrappingSyncReactiveInflux
+import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxConfig, ReactiveInfluxDbParams}
 import com.typesafe.config.Config
 
 import scala.concurrent.duration._
@@ -41,28 +41,19 @@ trait SyncReactiveInfluxDb {
 object SyncReactiveInflux {
   def await[T](f: => Future[T])(implicit awaitAtMost: Duration): T = Await.result(f, awaitAtMost)
 
-  def apply(name: String = ReactiveInflux.defaultClientName,
-            config: Option[Config] = None,
-            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInflux = ReactiveInflux.defaultClientFactory): SyncReactiveInflux =
-    new WrappingSyncReactiveInflux(ReactiveInflux(name, config, clientFactory))
-}
+  def apply(actorSystem: ActorSystem,
+            name: String = ReactiveInflux.defaultClientName,
+            config: Option[Config] = None): SyncReactiveInflux =
+    apply(ReactiveInflux.defaultClientFactory(actorSystem, ReactiveInfluxConfig(config)), name, config)
 
-private final class WrappingSyncReactiveInflux(reactiveInflux: ReactiveInflux) extends SyncReactiveInflux {
-  override def ping(waitForLeaderSec: Option[Int])(implicit awaitAtMost: Duration) = await(reactiveInflux.ping(waitForLeaderSec))
-  override def database(implicit params: ReactiveInfluxDbParams) = new WrappingSyncReactiveInfluxDb(reactiveInflux.database(params))
-  override def config = reactiveInflux.config
-  override def close(): Unit = reactiveInflux.close()
-}
+  def apply(name: String,
+            config: Option[Config],
+            clientFactory: (ActorSystem, ReactiveInfluxConfig) => ReactiveInflux): SyncReactiveInflux =
+    apply(ReactiveInflux(name, config, clientFactory), name, config)
 
-private final class WrappingSyncReactiveInfluxDb(reactiveInfluxDb: ReactiveInfluxDb) extends SyncReactiveInfluxDb {
-  override def create()(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.create())
-  override def drop(failIfNotExists: Boolean = false)(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.drop(failIfNotExists))
 
-  override def write(point: PointNoTime)(implicit awaitAtMost: Duration) = write(point, WriteParameters())
-  override def write(point: PointNoTime, params: WriteParameters)(implicit awaitAtMost: Duration) = write(Seq(point), params)
-  override def write(points: Iterable[PointNoTime], params: WriteParameters)(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.write(points, params))
-
-  override def query(q: Query)(implicit awaitAtMost: Duration) = query(q, QueryParameters())
-  override def query(q: Query, params: QueryParameters)(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.query(q, params))
-  override def query(qs: Seq[Query], params: QueryParameters)(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.query(qs, params))
+  def apply(reactiveInfluxFactory: => ReactiveInflux,
+            name: String,
+            config: Option[Config]): SyncReactiveInflux =
+    new WrappingSyncReactiveInflux(reactiveInfluxFactory)
 }

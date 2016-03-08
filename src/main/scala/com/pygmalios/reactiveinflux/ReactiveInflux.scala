@@ -44,11 +44,15 @@ trait ReactiveInfluxDbParams {
 }
 
 object ReactiveInfluxDbParams {
-  def apply(dbName: DbName, dbUsername: Option[DbUsername] = None, dbPassword: Option[DbPassword] = None): ReactiveInfluxDbParams =
+  def apply(dbName: DbName,
+            dbUsername: Option[DbUsername] = None,
+            dbPassword: Option[DbPassword] = None): ReactiveInfluxDbParams =
     SimpleReactiveInfluxDbParams(dbName, dbUsername, dbPassword)
 }
 
-private case class SimpleReactiveInfluxDbParams(dbName: DbName, dbUsername: Option[DbUsername], dbPassword: Option[DbPassword])
+private case class SimpleReactiveInfluxDbParams(dbName: DbName,
+                                                dbUsername: Option[DbUsername],
+                                                dbPassword: Option[DbPassword])
   extends ReactiveInfluxDbParams
 
 object ReactiveInflux {
@@ -56,8 +60,8 @@ object ReactiveInflux {
   type DbUsername = String
   type DbPassword = String
 
-  private[reactiveinflux] val defaultClientName = "ReactiveInflux"
-  private[reactiveinflux] def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
+  val defaultClientName = "ReactiveInflux"
+  def defaultClientFactory(actorSystem: ActorSystem, config: ReactiveInfluxConfig): ReactiveInflux =
     ActorSystemReactiveInflux(actorSystem, config)
 
   /**
