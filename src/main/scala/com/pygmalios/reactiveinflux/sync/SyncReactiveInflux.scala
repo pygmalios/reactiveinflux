@@ -36,6 +36,8 @@ trait SyncReactiveInfluxDb {
   def query(q: Query)(implicit awaitAtMost: Duration): QueryResult
   def query(q: Query, params: QueryParameters)(implicit awaitAtMost: Duration): QueryResult
   def query(qs: Seq[Query], params: QueryParameters = QueryParameters())(implicit awaitAtMost: Duration): Seq[QueryResult]
+
+  def config: ReactiveInfluxConfig
 }
 
 object SyncReactiveInflux {

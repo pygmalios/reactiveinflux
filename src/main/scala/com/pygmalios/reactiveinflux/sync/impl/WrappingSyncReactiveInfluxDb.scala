@@ -1,12 +1,12 @@
 package com.pygmalios.reactiveinflux.sync.impl
 
-import com.pygmalios.reactiveinflux.ReactiveInfluxDb
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
+import com.pygmalios.reactiveinflux.sync.SyncReactiveInflux._
 import com.pygmalios.reactiveinflux.sync.{SyncReactiveInflux, SyncReactiveInfluxDb}
+import com.pygmalios.reactiveinflux.{ReactiveInfluxConfig, ReactiveInfluxDb}
 
 import scala.concurrent.duration.Duration
-import SyncReactiveInflux._
 
 class WrappingSyncReactiveInfluxDb(reactiveInfluxDb: ReactiveInfluxDb) extends SyncReactiveInfluxDb {
   override def create()(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.create())
@@ -19,4 +19,6 @@ class WrappingSyncReactiveInfluxDb(reactiveInfluxDb: ReactiveInfluxDb) extends S
   override def query(q: Query)(implicit awaitAtMost: Duration) = query(q, QueryParameters())
   override def query(q: Query, params: QueryParameters)(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.query(q, params))
   override def query(qs: Seq[Query], params: QueryParameters)(implicit awaitAtMost: Duration) = await(reactiveInfluxDb.query(qs, params))
+
+  override def config: ReactiveInfluxConfig = reactiveInfluxDb.config
 }

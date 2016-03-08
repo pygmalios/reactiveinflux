@@ -78,6 +78,8 @@ class ActorSystemReactiveInfluxDb(dbName: DbName,
       qs      = qs,
       params  = params
     ))
+
+  override def config = core.config
 }
 
 object ActorSystemReactiveInflux {
