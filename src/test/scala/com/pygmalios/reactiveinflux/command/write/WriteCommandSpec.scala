@@ -10,8 +10,8 @@ import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
-import play.api.http.Writeable
-import play.api.libs.ws.{WSClient, WSRequest}
+import play.api.http.{ContentTypeOf, Writeable}
+import play.api.libs.ws.{WSClient, WSRequestHolder}
 
 @RunWith(classOf[JUnitRunner])
 class WriteCommandSpec extends FlatSpec {
@@ -73,7 +73,8 @@ class WriteCommandSpec extends FlatSpec {
 
   it should "contain point lines" in new TestScope {
     verify(cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws))
-      .withBody(Matchers.eq("m1 fk=-1i 411046927013000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016000000"))(any[Writeable[String]]())
+      .withBody(
+        Matchers.eq("m1 fk=-1i 411046927013000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016000000"))(any[Writeable[String]](), any[ContentTypeOf[String]]())
   }
 }
 
@@ -82,12 +83,12 @@ private class TestScope extends MockitoSugar {
   val baseUri = new URI("http://something/")
 
   val ws = mock[WSClient]
-  val wsRequest = mock[WSRequest]
+  val wsRequest = mock[WSRequestHolder]
 
   when(ws.url("http://something//write?db=test")).thenReturn(wsRequest)
   when(wsRequest.withHeaders("Content-Type" -> "application/octet-stream")).thenReturn(wsRequest)
   when(wsRequest.withMethod("POST")).thenReturn(wsRequest)
-  when(wsRequest.withBody(anyString())(any[Writeable[String]]())).thenReturn(wsRequest)
+  when(wsRequest.withBody(anyString())(any[Writeable[String]](), any[ContentTypeOf[String]]())).thenReturn(wsRequest)
 
   def cmd(baseUri: URI = baseUri,
           dbName: DbName = dbName,

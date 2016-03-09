@@ -33,8 +33,8 @@ class PlayWSJsonResponseSpec extends FlatSpec with MockitoSugar {
     assert(series.value.size == 1)
 
     val m1Serie = series.value.head.as[JsObject]
-    assert((m1Serie \ "name").get == JsString("m1"))
-    assert((m1Serie \ "columns").get == JsArray(Seq(JsString("time"), JsString("fk"))))
+    assert((m1Serie \ "name") == JsString("m1"))
+    assert((m1Serie \ "columns") == JsArray(Seq(JsString("time"), JsString("fk"))))
     assert((m1Serie \ "values").as[JsArray].value.size == 100)
 
     // Verify
@@ -78,7 +78,7 @@ class PlayWSJsonResponseSpec extends FlatSpec with MockitoSugar {
 
     // Assert
     assert(result.size == 1)
-    assert((result.head \ "error").get == JsString("hmm"))
+    assert((result.head \ "error") == JsString("hmm"))
     assert(testJsonResponse.errors.size == 1)
     assert(testJsonResponse.errors.head.message == "hmm")
 

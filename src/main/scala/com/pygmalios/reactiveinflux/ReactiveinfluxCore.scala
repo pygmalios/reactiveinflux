@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux
 
 import com.pygmalios.reactiveinflux.response.ReactiveInfluxJsonResultException
-import play.api.libs.ws.{WSClient, WSRequest, WSResponse}
+import play.api.libs.ws.{WSClient, WSRequestHolder, WSResponse}
 
 import scala.concurrent.Future
 
@@ -13,17 +13,17 @@ trait ReactiveInfluxCore {
 trait ReactiveInfluxCommand extends Serializable {
   type TResult <: Any
 
-  def httpRequest(ws: WSClient): WSRequest
+  def httpRequest(ws: WSClient): WSRequestHolder
 
-  def apply(httpRequest: WSRequest, httpResponse: WSResponse): TResult = {
+  def apply(wsRequest: WSRequestHolder, httpResponse: WSResponse): TResult = {
     try {
       responseFactory(httpResponse).result
     }
     catch {
       case ex: ReactiveInfluxJsonResultException =>
-        throw new ReactiveInfluxResultError(ex.errors, httpRequest)
+        throw new ReactiveInfluxResultError(ex.errors, wsRequest)
       case ex: Exception =>
-        throw new ReactiveInfluxException(s"Response processing failed!\n  [$httpResponse]\n  [${httpRequest.method}]\n  [${httpRequest.uri}]", ex)
+        throw new ReactiveInfluxException(s"Response processing failed!\n  [$httpResponse]\n  [${wsRequest.method}]\n  [${wsRequest.url}]", ex)
     }
   }
 

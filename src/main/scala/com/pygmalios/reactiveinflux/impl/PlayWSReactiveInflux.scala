@@ -5,14 +5,15 @@ import com.pygmalios.reactiveinflux._
 import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteCommand, WriteParameters}
 import com.pygmalios.reactiveinflux.command.{PingCommand, PingResult}
-import play.api.libs.ws.ning.NingWSClient
+import play.api.Play.current
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import play.api.libs.ws.WS
 
 import scala.concurrent.Future
 
 class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInflux with ReactiveInfluxCore
   with Logging {
-  private lazy val ws = NingWSClient()
+  private lazy val ws = WS.client
 
   override def ping(waitForLeaderSec: Option[Int]): Future[PingResult] = execute(new PingCommand(config.uri))
 
@@ -21,7 +22,7 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
 
   override def execute[R <: ReactiveInfluxCommand](command: R): Future[command.TResult] = {
     val httpRequest = command.httpRequest(ws)
-    log.debug(s"${command.getClass.getSimpleName} HTTP ${httpRequest.method} ${httpRequest.uri}")
+    log.debug(s"${command.getClass.getSimpleName} HTTP ${httpRequest.method} ${httpRequest.url}")
 
     httpRequest.execute().map { httpResponse =>
       log.debug(s"Response: $httpResponse")
@@ -29,7 +30,7 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
     }
   }
 
-  override def close(): Unit = ws.close()
+  override def close(): Unit = ???
 }
 
 class PlayWSReactiveInfluxDb(dbName: DbName,
