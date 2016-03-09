@@ -15,15 +15,15 @@ trait ReactiveInfluxCommand extends Serializable {
 
   def httpRequest(ws: WSClient): WSRequestHolder
 
-  def apply(wsRequest: WSRequestHolder, httpResponse: WSResponse): TResult = {
+  def apply(wsRequest: WSRequestHolder, wsResponse: WSResponse): TResult = {
     try {
-      responseFactory(httpResponse).result
+      responseFactory(wsResponse).result
     }
     catch {
       case ex: ReactiveInfluxJsonResultException =>
         throw new ReactiveInfluxResultError(ex.errors, wsRequest)
       case ex: Exception =>
-        throw new ReactiveInfluxException(s"Response processing failed!\n  [$httpResponse]\n  [${wsRequest.method}]\n  [${wsRequest.url}]", ex)
+        throw new ReactiveInfluxException(s"Response processing failed!\n  [$wsResponse]\n  [${wsRequest.method}]\n  [${wsRequest.url}\n  [${wsResponse.body}]]", ex)
     }
   }
 

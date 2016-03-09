@@ -10,7 +10,7 @@ import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
-import play.api.http.{ContentTypeOf, Writeable}
+import play.api.http._
 import play.api.libs.ws.{WSClient, WSRequestHolder}
 
 @RunWith(classOf[JUnitRunner])
@@ -25,7 +25,7 @@ class WriteCommandSpec extends FlatSpec {
 
   it should "have /write path" in new TestScope {
     cmd().httpRequest(ws)
-    verify(ws).url("http://something//write?db=test")
+    verify(ws).url("http://something/write?db=test")
   }
 
   behavior of "prec"
@@ -85,9 +85,9 @@ private class TestScope extends MockitoSugar {
   val ws = mock[WSClient]
   val wsRequest = mock[WSRequestHolder]
 
-  when(ws.url("http://something//write?db=test")).thenReturn(wsRequest)
-  when(wsRequest.withHeaders("Content-Type" -> "application/octet-stream")).thenReturn(wsRequest)
-  when(wsRequest.withMethod("POST")).thenReturn(wsRequest)
+  when(ws.url("http://something/write?db=test")).thenReturn(wsRequest)
+  when(wsRequest.withHeaders(HeaderNames.CONTENT_TYPE -> MimeTypes.BINARY)).thenReturn(wsRequest)
+  when(wsRequest.withMethod(HttpVerbs.POST)).thenReturn(wsRequest)
   when(wsRequest.withBody(anyString())(any[Writeable[String]](), any[ContentTypeOf[String]]())).thenReturn(wsRequest)
 
   def cmd(baseUri: URI = baseUri,

@@ -7,6 +7,7 @@ import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.impl.URIUtils
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
+import play.api.http.{HttpVerbs, MimeTypes, HeaderNames}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 class WriteCommand(val baseUri: URI,
@@ -18,15 +19,15 @@ class WriteCommand(val baseUri: URI,
   import WriteCommand._
 
   override type TResult = Unit
-  protected val uriWithPath = new URI(baseUri.toString + path)
+  protected val uriWithPath = URIUtils.appendPath(baseUri, path)
   override protected def responseFactory(wsResponse: WSResponse) = new WriteResponse(wsResponse)
   override def httpRequest(ws: WSClient) = {
     val completeQuery = query.filter(_._2.isDefined).mapValues(_.get)
-    val uri = new URI(uriWithPath.toString + URIUtils.queryToString(completeQuery)).toString
+    val uri = URIUtils.appendQuery(uriWithPath, completeQuery.toVector:_*).toString
     ws
       .url(uri)
-      .withHeaders("Content-Type" -> "application/octet-stream")
-      .withMethod("POST")
+      .withHeaders(HeaderNames.CONTENT_TYPE -> MimeTypes.BINARY)
+      .withMethod(HttpVerbs.POST)
       .withBody(new WriteLines(points, prec).toString)
   }
 

@@ -13,8 +13,11 @@ object URIUtils {
     new URI(uri.toString.stripSuffix(sep) + sep + encodedPath)
   }
 
-  def queryToString(q: Map[String, String]): String =
-    q.map { case(k, v) =>
+  def appendQuery(uri: URI, qs: (String, String)*): URI =
+    new URI(uri.toString + queryToString(qs:_*))
+
+  def queryToString(qs: (String, String)*): String =
+    qs.map { case(k, v) =>
       k + "=" + URLEncoder.encode(v, Charsets.UTF_8.name()).replaceAll(" ", "%20")
-    }.mkString(if (q.isEmpty) "" else "?", "&", "")
+    }.mkString(if (qs.isEmpty) "" else "?", "&", "")
 }

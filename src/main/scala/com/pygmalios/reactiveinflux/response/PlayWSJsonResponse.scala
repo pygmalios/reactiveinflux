@@ -14,6 +14,7 @@ abstract class PlayWSJsonResponse[+T](wsResponse: WSResponse) extends ReactiveIn
   protected def results: Seq[JsObject] = {
     wsResponse.status match {
       case Status.OK => handleOk(wsResponse)
+      case Status.NO_CONTENT => Nil
       case _ => handleNotOk(wsResponse)
     }
   }
@@ -49,6 +50,7 @@ abstract class PlayWSJsonResponse[+T](wsResponse: WSResponse) extends ReactiveIn
       }
     }
     catch {
+      case ex: ReactiveInfluxJsonResultException => throw ex
       case ex: Exception =>
         throw new ReactiveInfluxException(s"Invalid JSON response! [$wsResponse]", ex)
     }

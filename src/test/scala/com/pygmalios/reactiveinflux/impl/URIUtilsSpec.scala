@@ -17,14 +17,14 @@ class URIUtilsSpec extends FlatSpec {
   behavior of "queryToString"
 
   it should "create empty query string" in {
-    assert(URIUtils.queryToString(Map.empty) == "")
+    assert(URIUtils.queryToString() == "")
   }
 
   it should "create query string with single item" in {
-    assert(URIUtils.queryToString(Map("a" -> "b")) == "?a=b")
+    assert(URIUtils.queryToString("a" -> "b") == "?a=b")
   }
 
   it should "create query string with two items" in {
-    assert(URIUtils.queryToString(Map("a" -> "b", "c" -> "d")) == "?a=b&c=d")
+    assert(URIUtils.queryToString("a" -> "b", "c" -> "d") == "?a=b&c=d")
   }
 }

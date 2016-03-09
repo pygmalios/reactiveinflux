@@ -45,7 +45,7 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
 
   it should "fail if DB doesn't already exists" in new TestScope {
     db.drop(failIfNotExists = false).futureValue
-    assertError(db.drop(failIfNotExists = true), classOf[DatabaseNotFound], "database not found: ActorSystemReactiveInfluxDbISpec")
+    assertError(db.drop(failIfNotExists = true), classOf[DatabaseNotFound], "database not found: PlayWSReactiveInfluxDbISpec")
   }
 
   behavior of "write"
@@ -152,11 +152,11 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
       whenReady(f.failed) {
         case ex: ReactiveInfluxResultError =>
           ex.errors.find(_.getClass == error) match {
-            case Some(e) if message != Some(e.message) => fail(s"Expected error message [${message.map(s => s)}] got [${e.message}]")
+            case Some(e) if message != Some(e.message) => fail(s"Expected error message [$message] got [${e.message}]")
             case None => fail(s"Expected error not found. [$ex]")
             case _ =>
           }
-        case other => fail(s"Unexpected exception. [$other]")
+        case other => fail(s"Unexpected exception.", other)
       }
     }
   }
