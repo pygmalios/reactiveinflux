@@ -3,7 +3,7 @@ package com.pygmalios.reactiveinflux.response
 import com.pygmalios.reactiveinflux.error.ReactiveInfluxError
 import com.pygmalios.reactiveinflux.{ReactiveInfluxException, ReactiveInfluxResult}
 import play.api.http.Status
-import play.api.libs.json.{JsArray, JsObject, JsString}
+import play.api.libs.json.{JsDefined, JsArray, JsObject, JsString}
 import play.api.libs.ws.WSResponse
 
 class ReactiveInfluxJsonResultException(val errors: Set[ReactiveInfluxError]) extends ReactiveInfluxException(errors.mkString(","))
@@ -21,7 +21,7 @@ abstract class PlayWSJsonResponse[+T](wsResponse: WSResponse) extends ReactiveIn
             case jsObject: JsObject =>
               // Get "results" field
               jsObject \ resultsField match {
-                case resultsArray: JsArray =>
+                case JsDefined(resultsArray: JsArray) =>
                   // Process all result item
                   val results = resultsArray.value.map {
                       // Get result item as JSON object
@@ -43,7 +43,7 @@ abstract class PlayWSJsonResponse[+T](wsResponse: WSResponse) extends ReactiveIn
         }
         catch {
           case ex: Exception =>
-            throw new ReactiveInfluxException(s"Invalid JSON response! [$wsResponse]")
+            throw new ReactiveInfluxException(s"Invalid JSON response! [$wsResponse]", ex)
         }
 
       case _ =>
@@ -62,7 +62,7 @@ abstract class PlayWSJsonResponse[+T](wsResponse: WSResponse) extends ReactiveIn
   private def errorsFromResults(results: Seq[JsObject]): Seq[String] = {
     results.flatMap {
       _ \ errorField match {
-        case error: JsString => Some(error.value)
+        case JsDefined(error: JsString) => Some(error.value)
         case _ => None
       }
     }
