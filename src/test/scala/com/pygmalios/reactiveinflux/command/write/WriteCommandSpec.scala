@@ -4,23 +4,28 @@ import java.net.URI
 
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
 import org.junit.runner.RunWith
+import org.mockito.Matchers
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
-import play.api.libs.ws.{InMemoryBody, WSClient}
+import play.api.http.Writeable
+import play.api.libs.ws.{WSClient, WSRequest}
 
 @RunWith(classOf[JUnitRunner])
 class WriteCommandSpec extends FlatSpec {
   behavior of "method"
 
   it should "use POST method" in new TestScope {
-    assert(cmd().httpRequest(ws).method == "POST")
+    verify(cmd().httpRequest(ws)).withMethod("POST")
   }
 
   behavior of "path"
 
   it should "have /write path" in new TestScope {
-    assert(cmd().httpRequest(ws).uri.getPath == "/write")
+    cmd().httpRequest(ws)
+    verify(ws).url("http://something//write?db=test")
   }
 
   behavior of "prec"
@@ -62,24 +67,28 @@ class WriteCommandSpec extends FlatSpec {
   behavior of "entity"
 
   it should "contain binary content" in new TestScope {
-    val headers = cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws).headers
-    assert(headers.get("Content-Type").get == Seq("application/octet-stream"))
+    verify(cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws))
+      .withHeaders("Content-Type" -> "application/octet-stream")
   }
 
   it should "contain point lines" in new TestScope {
-    cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws).body match {
-      case InMemoryBody(bytes) =>
-          val decoded = new String(bytes, "UTF8")
-          assert(decoded == "m1 fk=-1i 411046927013000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016000000")
-      case _ => fail("Invalit entity!")
-    }
+    verify(cmd(points = Seq(PointSpec.point1, PointSpec.point2)).httpRequest(ws))
+      .withBody(Matchers.eq("m1 fk=-1i 411046927013000000\nm2,tk1=tv1,tk2=tv2 fk=true,fk2=1,fk3=\"abcXYZ\" 411046927016000000"))(any[Writeable[String]]())
   }
 }
 
 private class TestScope extends MockitoSugar {
   val dbName = "test"
   val baseUri = new URI("http://something/")
+
   val ws = mock[WSClient]
+  val wsRequest = mock[WSRequest]
+
+  when(ws.url("http://something//write?db=test")).thenReturn(wsRequest)
+  when(wsRequest.withHeaders("Content-Type" -> "application/octet-stream")).thenReturn(wsRequest)
+  when(wsRequest.withMethod("POST")).thenReturn(wsRequest)
+  when(wsRequest.withBody(anyString())(any[Writeable[String]]())).thenReturn(wsRequest)
+
   def cmd(baseUri: URI = baseUri,
           dbName: DbName = dbName,
           points: Seq[PointNoTime] = Seq.empty,
@@ -94,8 +103,9 @@ private class TestScope extends MockitoSugar {
       username,
       password,
       points,
-      WriteParameters(retentionPolicy,precision,consistency))
+      WriteParameters(retentionPolicy, precision, consistency))
 
-  def assertQuery(cmd: WriteCommand, key: String, value: String) =
-    assert(cmd.query.get(key) == Some(value))
+  def assertQuery(cmd: WriteCommand, key: String, value: String) = {
+    assert(cmd.query.get(key).flatten == Some(value), s"${cmd.query}, $key, $value")
+  }
 }

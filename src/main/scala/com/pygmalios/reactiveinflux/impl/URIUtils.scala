@@ -1,8 +1,8 @@
 package com.pygmalios.reactiveinflux.impl
 
 object URIUtils {
-  def queryToString(q: Map[String, Option[String]]): String =
-    q.filter(_._2.isDefined).map { case(k, v) =>
-      k + "=" + v.get.toString
+  def queryToString(q: Map[String, String]): String =
+    q.map { case(k, v) =>
+      k + "=" + v.toString
     }.mkString("?", "&", "")
 }

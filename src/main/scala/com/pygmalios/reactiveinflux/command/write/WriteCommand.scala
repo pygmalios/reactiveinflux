@@ -20,20 +20,25 @@ class WriteCommand(val baseUri: URI,
   override type TResult = Unit
   protected val uriWithPath = new URI(baseUri.toString + path)
   override protected def responseFactory(wsResponse: WSResponse) = new WriteResponse(wsResponse)
-  override def httpRequest(ws: WSClient) =
+  override def httpRequest(ws: WSClient) = {
+    val completeQuery = query.filter(_._2.isDefined).mapValues(_.get)
+    val uri = new URI(uriWithPath.toString + URIUtils.queryToString(completeQuery)).toString
     ws
-      .url(new URI(uriWithPath.toString + URIUtils.queryToString(query)).toString)
+      .url(uri)
       .withHeaders("Content-Type" -> "application/octet-stream")
       .withMethod("POST")
       .withBody(new WriteLines(points, prec).toString)
+  }
 
   private[command] def prec: Precision = params.precision.getOrElse(Nano)
 
-  private[command] def query: Map[String, Option[String]] = Map(
-    dbQ -> Some(dbName),
-    usernameQ -> dbUsername,
-    passwordQ -> dbPassword
-  )
+  private[command] def query: Map[String, Option[String]] = {
+    Map(
+      dbQ -> Some(dbName),
+      usernameQ -> dbUsername,
+      passwordQ -> dbPassword
+    ) ++ params.params.mapValues(Some(_))
+  }
 
   override def toString = s"WriteCommand(uriWithPath=$uriWithPath, baseUri=$baseUri, dbName=$dbName, dbUsername=$dbUsername, dbPassword=$dbPassword, points=$points, params=$params)"
 

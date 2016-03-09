@@ -3,13 +3,13 @@ package com.pygmalios.reactiveinflux.response
 import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.error.ReactiveInfluxError
 import org.junit.runner.RunWith
+import org.mockito.Mockito._
 import org.scalatest.FlatSpec
 import org.scalatest.junit.JUnitRunner
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
-import play.api.libs.json.{JsString, JsArray, Json, JsObject}
+import play.api.libs.json.{JsArray, JsObject, JsString, Json}
 import play.api.libs.ws.WSResponse
-import org.mockito.Mockito._
 
 import scala.collection.mutable.ListBuffer
 
