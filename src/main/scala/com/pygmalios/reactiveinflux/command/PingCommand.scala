@@ -2,6 +2,7 @@ package com.pygmalios.reactiveinflux.command
 
 import java.net.URI
 
+import com.pygmalios.reactiveinflux.impl.URIUtils
 import com.pygmalios.reactiveinflux.{ReactiveInfluxCommand, ReactiveInfluxResult}
 import play.api.libs.ws._
 
@@ -11,7 +12,8 @@ class PingCommand(baseUri: URI) extends ReactiveInfluxCommand {
   override protected def responseFactory(httpResponse: WSResponse): ReactiveInfluxResult[PingResult] =
     SimplePingResult(httpResponse.header(PingCommand.versionHeader).getOrElse(""))
 
-  override def httpRequest(ws: WSClient) = ws.url(baseUri.toString + PingCommand.path)
+  override def httpRequest(ws: WSClient) =
+    ws.url(URIUtils.appendPath(baseUri, PingCommand.path).toString)
 }
 
 object PingCommand {
