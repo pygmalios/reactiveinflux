@@ -3,8 +3,10 @@ package com.pygmalios.reactiveinflux.command.query
 import java.net.URI
 
 import com.pygmalios.reactiveinflux.ReactiveInflux._
+import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
 import com.pygmalios.reactiveinflux.response.PlayWSJsonResponse
+import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 
 class QueryCommand(baseUri: URI, dbName: DbName, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
@@ -26,12 +28,13 @@ class QueryCommand(baseUri: URI, dbName: DbName, qs: Seq[Query], params: QueryPa
 
 private[reactiveinflux] class QueryCommandResult(wsResponse: WSResponse, qs: Seq[Query], timeFormat: TimeFormat)
   extends PlayWSJsonResponse[Seq[QueryResult]](wsResponse) {
+  import JsonResultFormat._
 
-  // TODO: ...
-  /*
-  override def result: Seq[QueryResult] = qs.zip(results.elements).map { case (q, jsResult) =>
-    QueryResult(q, jsToResult(jsResult.convertTo[JsonResult]))
+  override def result: Seq[QueryResult] = qs.zip(results).map {
+    case (q, jsResult) =>
+      QueryResult(q, jsToResult(jsResult.as[JsonResult]))
   }
+
   private def jsToResult(jsonResult: JsonResult): Result = Result(jsonResult.series.map(jsToSeries))
 
   private def jsToSeries(jsonSeries: JsonSeries): Series = Series(
@@ -46,8 +49,7 @@ private[reactiveinflux] class QueryCommandResult(wsResponse: WSResponse, qs: Seq
     case JsNumber(value) => BigDecimalValue(value)
     case JsBoolean(value) => BooleanValue(value)
     case other => throw new ReactiveInfluxException(s"Unsupported JSON value type! [$other]")
-  }*/
-  override def result: Seq[QueryResult] = ???
+  }
 }
 
 object QueryCommandResult {
