@@ -10,7 +10,7 @@ class JsonResultFormatSpec extends FlatSpec {
   import JsonResultFormatSpec._
   import JsonResultFormat._
 
-  behavior of "protocol"
+  behavior of "format"
 
   it should "parse result with one series" in {
     // Execute

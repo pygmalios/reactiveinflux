@@ -41,7 +41,7 @@ abstract class PlayWSJsonResponse[+T](wsResponse: WSResponse) extends ReactiveIn
               // Get and process errors from results (if any)
               processErrors(errorsFromResults(results))
 
-              results
+              results.filter(_.fields.nonEmpty)
             case _ =>
               throw new ReactiveInfluxException("No results JSON field!")
           }
