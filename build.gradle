@@ -82,10 +82,13 @@ publishing {
 }
 
 uploadArchives {
+    def mavenRepoURL = (version.endsWith("-SNAPSHOT")) ?
+            "$System.env.MAVEN_REPO_SNAPSHOT_URL" : "$System.env.MAVEN_REPO_RELEASE_URL"
+
     repositories {
         mavenDeployer {
             configuration = configurations.deployerJars
-            repository(url: "dav:$System.env.MAVEN_REPO_URL") {
+            repository(url: "dav:$mavenRepoURL") {
                 authentication(userName: "$System.env.MAVEN_REPO_USERNAME", password: "$System.env.MAVEN_REPO_PASSWORD")
             }
         }
