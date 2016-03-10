@@ -85,7 +85,7 @@ uploadArchives {
     repositories {
         mavenDeployer {
             configuration = configurations.deployerJars
-            repository(url: "$System.env.MAVEN_REPO_URL") {
+            repository(url: "dav:$System.env.MAVEN_REPO_URL") {
                 authentication(userName: "$System.env.MAVEN_REPO_USERNAME", password: "$System.env.MAVEN_REPO_PASSWORD")
             }
         }
