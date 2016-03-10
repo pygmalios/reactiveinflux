@@ -58,10 +58,10 @@ class PlayWSReactiveInfluxDb(dbName: DbName,
   override def query(q: Query): Future[QueryResult] = query(q, QueryParameters())
   override def query(q: Query, params: QueryParameters): Future[QueryResult] = query(Seq(q), params).map { results =>
     if (results.isEmpty)
-      throw new ReactiveInfluxException("No results returned!")
+      throw new ReactiveInfluxException(s"No results returned! [$q]")
 
     if (results.size > 1)
-      throw new ReactiveInfluxException(s"Too many results returned! [${results.size}]")
+      throw new ReactiveInfluxException(s"Too many results returned! [${results.size}, $q]")
 
     results.head
   }
