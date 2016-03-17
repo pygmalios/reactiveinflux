@@ -13,10 +13,6 @@ package object uri {
     }
 
     def withQuery(uriQueryString: URIQueryString): URI = new URI(uri.toString + uriQueryString.toString)
-
-    def withAuthority(username: String, password: String): URI = {
-      new URI(uri.getScheme, s"$username:$password", uri.getPath, uri.getQuery, uri.getFragment)
-    }
   }
 
   class URIPath(parts: Seq[String]) {
@@ -29,11 +25,11 @@ package object uri {
     override def toString = parts.mkString("/")
   }
 
-  object URIPath {
-    def apply(path: String) = new URIPath(path.split("/"))
+  implicit object URIPath {
+    implicit def apply(path: String): URIPath = new URIPath(path.split("/"))
   }
 
-  class URIQueryString(val items: Map[String, Option[String]]) {
+  implicit class URIQueryString(val items: Map[String, Option[String]]) {
     def ++(queryString: URIQueryString): URIQueryString = new URIQueryString(items ++ queryString.items)
 
     override def toString: String =
