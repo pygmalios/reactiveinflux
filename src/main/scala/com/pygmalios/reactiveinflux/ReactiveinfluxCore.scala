@@ -13,8 +13,14 @@ trait ReactiveInfluxCore {
 trait ReactiveInfluxCommand extends Serializable {
   type TResult <: Any
 
+  /**
+    * Build HTTP request.
+    */
   def httpRequest(ws: WSClient): WSRequestHolder
 
+  /**
+    * Create result from HTTP response.
+    */
   def apply(wsRequest: WSRequestHolder, wsResponse: WSResponse): TResult = {
     try {
       responseFactory(wsResponse).result

@@ -1,6 +1,6 @@
 package com.pygmalios.reactiveinflux.impl
 
-import java.net.{URLEncoder, URI}
+import java.net.{URI, URLEncoder}
 
 import com.google.common.base.Charsets
 import play.utils.UriEncoding

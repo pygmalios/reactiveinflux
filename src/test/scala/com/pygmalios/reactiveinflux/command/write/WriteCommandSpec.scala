@@ -3,6 +3,7 @@ package com.pygmalios.reactiveinflux.command.write
 import java.net.URI
 
 import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import com.pygmalios.reactiveinflux.command.BaseCommand
 import org.junit.runner.RunWith
 import org.mockito.Matchers
 import org.mockito.Matchers._
@@ -49,11 +50,11 @@ class WriteCommandSpec extends FlatSpec {
   }
 
   it should "have username query" in new TestScope {
-    assertQuery(cmd(username = Some("a")), WriteCommand.usernameQ, "a")
+    assertQuery(cmd(username = Some("a")), BaseCommand.usernameQ, "a")
   }
 
   it should "have password query" in new TestScope {
-    assertQuery(cmd(password = Some("a")), WriteCommand.passwordQ, "a")
+    assertQuery(cmd(password = Some("a")), BaseCommand.passwordQ, "a")
   }
 
   it should "have precision query" in new TestScope {

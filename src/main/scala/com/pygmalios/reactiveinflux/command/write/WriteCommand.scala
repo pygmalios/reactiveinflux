@@ -7,7 +7,7 @@ import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.impl.URIUtils
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
-import play.api.http.{HttpVerbs, MimeTypes, HeaderNames}
+import play.api.http.{HeaderNames, HttpVerbs, MimeTypes}
 import play.api.libs.ws.{WSClient, WSResponse}
 
 class WriteCommand(val baseUri: URI,
@@ -35,9 +35,10 @@ class WriteCommand(val baseUri: URI,
 
   private[command] def query: Map[String, Option[String]] = {
     Map(
-      dbQ -> Some(dbName),
-      usernameQ -> dbUsername,
-      passwordQ -> dbPassword
+      dbQ -> Some(dbName)
+//      TODO:
+//      AuhtorizedCommand.usernameQ -> dbUsername,
+//      AuhtorizedCommand.passwordQ -> dbPassword
     ) ++ params.params.mapValues(Some(_))
   }
 
@@ -66,8 +67,6 @@ class WriteCommand(val baseUri: URI,
 object WriteCommand {
   val path = "/write"
   val dbQ = "db"
-  val usernameQ = "u"
-  val passwordQ = "p"
 }
 
 private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precision: Precision) {
