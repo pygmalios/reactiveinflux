@@ -18,7 +18,7 @@ class ExampleApplication extends FunSuite with ScalaFutures with IntegrationPati
       val db = reactiveInflux.database
       try {
         val core = reactiveInflux.asInstanceOf[ReactiveInfluxCore]
-        whenReady(core.execute(new CustomQueryCommand(core.config.uri)).failed) { ex =>
+        whenReady(core.execute(new CustomQueryCommand(core.config.url)).failed) { ex =>
         }
       }
       finally {

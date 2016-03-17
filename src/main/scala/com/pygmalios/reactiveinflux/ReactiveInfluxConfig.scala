@@ -7,7 +7,10 @@ import com.typesafe.config.Config
 
 trait ReactiveInfluxConfig extends Serializable {
   def reactiveinflux: Config
-  def uri: URI
+  def url: URI
+  def db: Option[String]
+  def username: Option[String]
+  def password: Option[String]
 }
 
 object ReactiveInfluxConfig {

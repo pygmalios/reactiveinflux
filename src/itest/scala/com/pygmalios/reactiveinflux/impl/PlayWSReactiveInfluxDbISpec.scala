@@ -132,7 +132,11 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
 
   private class TestScope {
     val client = new PlayWSReactiveInflux(ITestConfig.reactiveInfluxConfig)
-    val db = new PlayWSReactiveInfluxDb("PlayWSReactiveInfluxDbISpec", None, None, client)
+    val db = new PlayWSReactiveInfluxDb(
+      dbName      = "PlayWSReactiveInfluxDbISpec",
+      dbUsername  = ITestConfig.reactiveInfluxConfig.username,
+      dbPassword  = ITestConfig.reactiveInfluxConfig.password,
+      core        = client)
 
     def withDb(action: (PlayWSReactiveInfluxDb) => Future[Any]): Any = {
       val result = db.create().flatMap { _ =>

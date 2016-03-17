@@ -59,7 +59,7 @@ class PlayWSReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
     val core = mock[ReactiveInfluxCore]
     val config = mock[DefaultReactiveInfluxConfig]
     val uri = new URI("http://whatever/")
-    when(config.uri).thenReturn(uri)
+    when(config.url).thenReturn(uri)
     when(core.config).thenReturn(config)
     val db = new PlayWSReactiveInfluxDb(dbName, Some(dbUsername), Some(dbPassword), core)
   }

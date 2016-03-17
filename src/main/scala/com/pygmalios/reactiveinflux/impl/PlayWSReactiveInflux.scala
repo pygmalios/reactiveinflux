@@ -15,7 +15,7 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
   with Logging {
   private lazy val ws = new NingWSClient(new AsyncHttpClientConfig.Builder().build())
 
-  override def ping(waitForLeaderSec: Option[Int]): Future[PingResult] = execute(new PingCommand(config.uri))
+  override def ping(waitForLeaderSec: Option[Int]): Future[PingResult] = execute(new PingCommand(config.url))
 
   override def database(implicit params: ReactiveInfluxDbParams): ReactiveInfluxDb =
     new PlayWSReactiveInfluxDb(params.dbName, params.dbUsername, params.dbPassword, this)
@@ -39,15 +39,15 @@ class PlayWSReactiveInfluxDb(dbName: DbName,
                              core: ReactiveInfluxCore) extends ReactiveInfluxDb {
 
   override def create(): Future[Unit] =
-    core.execute(new CreateDatabaseCommand(core.config.uri, dbName))
+    core.execute(new CreateDatabaseCommand(core.config.url, dbName))
   override def drop(failIfNotExists: Boolean): Future[Unit] =
-    core.execute(new DropDatabaseCommand(core.config.uri, dbName, failIfNotExists))
+    core.execute(new DropDatabaseCommand(core.config.url, dbName, failIfNotExists))
 
   override def write(point: PointNoTime): Future[Unit] = write(point, WriteParameters())
   override def write(point: PointNoTime, params: WriteParameters): Future[Unit] = write(Seq(point), params)
   override def write(points: Iterable[PointNoTime], params: WriteParameters): Future[Unit] =
     core.execute(new WriteCommand(
-      baseUri     = core.config.uri,
+      baseUri     = core.config.url,
       dbName      = dbName,
       dbUsername  = dbUsername,
       dbPassword  = dbPassword,
@@ -67,7 +67,7 @@ class PlayWSReactiveInfluxDb(dbName: DbName,
   }
   override def query(qs: Seq[Query], params: QueryParameters): Future[Seq[QueryResult]] =
     core.execute(new QueryCommand(
-      baseUri = core.config.uri,
+      baseUri = core.config.url,
       dbName  = dbName,
       qs      = qs,
       params  = params
