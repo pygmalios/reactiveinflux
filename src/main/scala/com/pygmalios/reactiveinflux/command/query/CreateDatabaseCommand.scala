@@ -4,7 +4,6 @@ import java.net.URI
 
 import com.pygmalios.reactiveinflux.ReactiveInflux.DbName
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
-import com.pygmalios.reactiveinflux.uri.URIQueryString
 import play.api.libs.ws.{WSClient, WSResponse}
 
 class CreateDatabaseCommand(baseUri: URI, dbName: DbName) extends BaseQueryCommand(baseUri) {
