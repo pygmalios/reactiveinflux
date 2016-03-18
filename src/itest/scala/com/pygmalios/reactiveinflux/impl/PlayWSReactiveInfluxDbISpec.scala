@@ -152,7 +152,7 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
         result.futureValue
       }
       finally {
-        //db.drop().futureValue
+        db.drop().futureValue
       }
     }
 
