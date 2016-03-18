@@ -62,11 +62,17 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
     }
   }
 
-  it should "write a batch of 100 points" in new TestScope {
+  it should "write a batch of 1000 points" in new TestScope {
     val measurement = "m1"
-    val points = (1 to 100).map { i =>
+    val points = (1 to 1000).map { i =>
       val dateTime = PointSpec.dateTime1.plusSeconds(i)
-      Point(dateTime, measurement, Map.empty, Map("fk" -> LongFieldValue(-1)))
+      Point(dateTime,
+        measurement,
+        Map(
+          "tk1" -> (i % 7).toString,
+          "tk2" -> (i % 23).toString,
+          "tk3" -> (i % 47).toString),
+        Map("fk" -> LongFieldValue(i)))
     }
 
     withDb { db =>
@@ -74,7 +80,7 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
         db.query(Query(s"SELECT * FROM $measurement"))
           .map { queryResult =>
             val rows = queryResult.result.single.values
-            assert(rows.size == 100)
+            assert(rows.size == 1000)
           }
       }
     }
@@ -146,7 +152,7 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
         result.futureValue
       }
       finally {
-        db.drop().futureValue
+        //db.drop().futureValue
       }
     }
 

@@ -7,8 +7,8 @@ import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteCommand, WriteParameters}
 import com.pygmalios.reactiveinflux.command.{PingCommand, PingResult}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.ws.{WSRequestHolder, WSAuthScheme}
-import play.api.libs.ws.ning.NingWSClient
+import play.api.libs.ws.{WSAuthScheme, WSRequestHolder}
+import play.api.libs.ws.ning.{NingWSClient, NingWSResponse}
 
 import scala.concurrent.Future
 
@@ -23,12 +23,17 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
 
   override def execute[R <: ReactiveInfluxCommand](command: R): Future[command.TResult] = {
     val httpRequest = authHttpRequest(command)
-    log.debug(s"${command.getClass.getSimpleName} HTTP ${httpRequest.method} ${httpRequest.url}")
+    log.info(s"${command.getClass.getSimpleName} ${command.logInfo} HTTP ${httpRequest.method} ${httpRequest.url}")
 
-    httpRequest.execute().map { httpResponse =>
-      log.debug(s"Response: $httpResponse")
-      command(httpRequest, httpResponse)
-    }
+    httpRequest.execute().map {
+      case r: NingWSResponse =>
+        val headers = r.allHeaders.map {
+          case (k, v) => s"$k=${v.mkString(",")}"
+        }
+        log.info(s"Response: ${r.status} Length=${r.body.size} ${headers.mkString(";")}")
+        r
+      case other => other
+    }.map(command(httpRequest, _))
   }
 
   override def close(): Unit = ws.close()

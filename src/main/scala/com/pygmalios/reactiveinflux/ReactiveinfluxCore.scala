@@ -33,6 +33,8 @@ trait ReactiveInfluxCommand extends Serializable {
     }
   }
 
+  def logInfo: String = ""
+
   protected def responseFactory(httpResponse: WSResponse): ReactiveInfluxResult[TResult]
 }
 

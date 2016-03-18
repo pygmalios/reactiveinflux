@@ -40,14 +40,15 @@ private[reactiveinflux] class QueryCommandResult(wsResponse: WSResponse, qs: Seq
   private def jsToSeries(jsonSeries: JsonSeries): Series = Series(
     name        = jsonSeries.name,
     columns     = jsonSeries.columns,
-    values      = jsonSeries.values.map(jsRow => jsRow.map(jsToValue)),
+    values      = jsonSeries.values.map(jsRow => jsRow.flatMap(jsToValue)),
     timeFormat  = timeFormat
   )
 
-  private def jsToValue(jsValue: JsValue): Value = jsValue match {
-    case JsString(value) => StringValue(value)
-    case JsNumber(value) => BigDecimalValue(value)
-    case JsBoolean(value) => BooleanValue(value)
+  private def jsToValue(jsValue: JsValue): Option[Value] = jsValue match {
+    case JsString(value) => Some(StringValue(value))
+    case JsNumber(value) => Some(BigDecimalValue(value))
+    case JsBoolean(value) => Some(BooleanValue(value))
+    case JsNull => None
     case other => throw new ReactiveInfluxException(s"Unsupported JSON value type! [$other]")
   }
 }

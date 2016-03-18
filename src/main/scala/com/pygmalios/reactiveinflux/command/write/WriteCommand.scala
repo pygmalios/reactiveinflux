@@ -7,8 +7,9 @@ import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.impl.URIUtils
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
+import org.slf4j.LoggerFactory
 import play.api.http.{HeaderNames, HttpVerbs, MimeTypes}
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.{WSClient, WSRequestHolder, WSResponse}
 
 class WriteCommand(val baseUri: URI,
                    val dbName: DbName,
@@ -21,14 +22,21 @@ class WriteCommand(val baseUri: URI,
   override type TResult = Unit
   protected val uriWithPath = URIUtils.appendPath(baseUri, path)
   override protected def responseFactory(wsResponse: WSResponse) = new WriteResponse(wsResponse)
-  override def httpRequest(ws: WSClient) = {
+  override def httpRequest(ws: WSClient): WSRequestHolder = {
     val completeQuery = query.filter(_._2.isDefined).mapValues(_.get)
     val uri = URIUtils.appendQuery(uriWithPath, completeQuery.toVector:_*).toString
-    ws
+    val result = ws
       .url(uri)
       .withHeaders(HeaderNames.CONTENT_TYPE -> MimeTypes.BINARY)
       .withMethod(HttpVerbs.POST)
       .withBody(new WriteLines(points, prec).toString)
+
+    result
+  }
+
+  override def logInfo = {
+    val p = Vector(params.retentionPolicy, params.consistency, params.precision).flatten.mkString(",")
+    s"Points=${points.size} Parameters=$p"
   }
 
   private[command] def prec: Precision = params.precision.getOrElse(Nano)
@@ -36,9 +44,6 @@ class WriteCommand(val baseUri: URI,
   private[command] def query: Map[String, Option[String]] = {
     Map(
       dbQ -> Some(dbName)
-//      TODO:
-//      AuhtorizedCommand.usernameQ -> dbUsername,
-//      AuhtorizedCommand.passwordQ -> dbPassword
     ) ++ params.params.mapValues(Some(_))
   }
 
@@ -67,6 +72,8 @@ class WriteCommand(val baseUri: URI,
 object WriteCommand {
   val path = "/write"
   val dbQ = "db"
+
+  private val log = LoggerFactory.getLogger(classOf[WriteCommand])
 }
 
 private[reactiveinflux] class WriteLines(points: Iterable[PointNoTime], precision: Precision) {
