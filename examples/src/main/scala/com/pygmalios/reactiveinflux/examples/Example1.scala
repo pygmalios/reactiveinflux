@@ -1,21 +1,18 @@
 package com.pygmalios.reactiveinflux.examples
 
-import com.pygmalios.reactiveinflux.ReactiveInflux
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import java.net.URI
+
+import com.pygmalios.reactiveinflux._
 
 /**
   * Example usage of ReactiveInflux.
   */
 object Example1 extends App {
-  implicit val dbName = ReactiveInfluxDbName("example1")
-
-  val reactiveInflux = ReactiveInflux()
-  try {
-    val db = reactiveInflux.database
+  withInfluxDb(new URI("http://myinflux:6543/"), "example1") { db =>
+    // Create the "example1" database
     db.create()
+
+    // Drop the "example1" database
     db.drop()
-  }
-  finally {
-    reactiveInflux.close()
   }
 }

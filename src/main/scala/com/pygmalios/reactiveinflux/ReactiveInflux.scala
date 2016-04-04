@@ -2,7 +2,6 @@ package com.pygmalios.reactiveinflux
 
 import java.io.Closeable
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
@@ -40,17 +39,20 @@ trait ReactiveInfluxDb {
 
 object ReactiveInflux {
   /**
-    * Database name.
+    * Create reactive Influx client. Normally there should be only one instance per application.
     */
-  case class ReactiveInfluxDbName(value: String)
-
   def apply(config: ReactiveInfluxConfig): ReactiveInflux =
     PlayWSReactiveInflux(config)
 
   /**
-    * Create reactive Influx client. Normally there should be only one instance per application.
+    * Create reactive Influx client from Typesafe config.
     */
   def apply(config: Option[Config] = None,
             clientFactory: (ReactiveInfluxConfig) => ReactiveInflux = apply): ReactiveInflux =
     clientFactory(ReactiveInfluxConfig(config))
 }
+
+/**
+  * Typed database name.
+  */
+case class ReactiveInfluxDbName(value: String)

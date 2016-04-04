@@ -2,10 +2,9 @@ package com.pygmalios.reactiveinflux.command.query
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInflux._
-import com.pygmalios.reactiveinflux.ReactiveInfluxException
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
 import com.pygmalios.reactiveinflux.response.PlayWSJsonResponse
+import com.pygmalios.reactiveinflux.{ReactiveInfluxDbName, ReactiveInfluxException}
 import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 

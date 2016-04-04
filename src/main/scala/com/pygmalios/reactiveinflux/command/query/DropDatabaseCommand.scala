@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.command.query
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.error.{DatabaseNotFound, ReactiveInfluxError}
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 import play.api.libs.ws.{WSClient, WSResponse}

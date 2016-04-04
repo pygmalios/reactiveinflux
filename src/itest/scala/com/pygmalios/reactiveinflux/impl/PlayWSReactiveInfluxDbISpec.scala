@@ -1,6 +1,6 @@
 package com.pygmalios.reactiveinflux.impl
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write._
 import com.pygmalios.reactiveinflux.error.{DatabaseNotFound, ReactiveInfluxError}

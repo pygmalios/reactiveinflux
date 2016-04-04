@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.sync
 
 import java.io.Closeable
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}

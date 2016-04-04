@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux.sync.impl
 
 import com.pygmalios.reactiveinflux.ReactiveInflux
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.sync.SyncReactiveInflux
 import com.pygmalios.reactiveinflux.sync.SyncReactiveInflux._
 

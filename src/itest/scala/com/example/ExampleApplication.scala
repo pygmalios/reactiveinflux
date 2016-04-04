@@ -2,7 +2,7 @@ package com.example
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.query.BaseQueryCommand
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse

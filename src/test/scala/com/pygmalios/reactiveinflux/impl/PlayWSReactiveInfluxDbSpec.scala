@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.impl
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.ReactiveInfluxCore
 import com.pygmalios.reactiveinflux.command.write._
 import org.junit.runner.RunWith
