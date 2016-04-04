@@ -2,7 +2,8 @@ package com.pygmalios
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.command.write.{BigDecimalFieldValue, FieldValue}
+import com.pygmalios.reactiveinflux.command.query.Query
+import com.pygmalios.reactiveinflux.command.write.{BigDecimalFieldValue, BooleanFieldValue, FieldValue, StringFieldValue}
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
 package object reactiveinflux {
@@ -12,12 +13,19 @@ package object reactiveinflux {
     (field._1, field._2)
   implicit def tagToEscapedStringWithEquals(tag: (String, String)): (EscapedStringWithEquals, EscapedStringWithEquals) =
     (tag._1, tag._2)
+  implicit def stringFieldToStringFieldValue(field: (String, String)): (EscapedStringWithEquals,StringFieldValue) =
+    (new EscapedStringWithEquals(field._1), StringFieldValue(field._2))
+  implicit def booleanFieldToBooleanFieldValue(field: (String, Boolean)): (EscapedStringWithEquals,BooleanFieldValue) =
+    (new EscapedStringWithEquals(field._1), BooleanFieldValue(field._2))
   implicit def bigDecimalFieldToBigDecimalFieldValue(field: (String, BigDecimal)): (EscapedStringWithEquals,BigDecimalFieldValue) =
     (new EscapedStringWithEquals(field._1), BigDecimalFieldValue(field._2))
   implicit def intFieldToBigDecimalFieldValue(field: (String, Int)): (EscapedStringWithEquals,BigDecimalFieldValue) =
     (new EscapedStringWithEquals(field._1), BigDecimalFieldValue(BigDecimal(field._2)))
+  implicit def doubleFieldToBigDecimalFieldValue(field: (String, Double)): (EscapedStringWithEquals,BigDecimalFieldValue) =
+    (new EscapedStringWithEquals(field._1), BigDecimalFieldValue(BigDecimal(field._2)))
   implicit def stringToReactiveInfluxDbName(dbName: String): ReactiveInfluxDbName = ReactiveInfluxDbName(dbName)
   implicit def uriToReactiveInfluxConfig(url: URI): ReactiveInfluxConfig = ReactiveInfluxConfig(url)
+  implicit def stringToQuery(query: String) = Query(query)
 
   def withInfluxDb[T](config: ReactiveInfluxConfig, dbName: ReactiveInfluxDbName)(action: ReactiveInfluxDb => T): T = {
     val reactiveInflux = ReactiveInflux(config)
