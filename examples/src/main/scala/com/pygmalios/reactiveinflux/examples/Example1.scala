@@ -5,32 +5,47 @@ import java.net.URI
 import com.pygmalios.reactiveinflux._
 import com.pygmalios.reactiveinflux.command.write.Point
 import org.joda.time.DateTime
+
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration._
 
 /**
-  * The simplest possible usage of ReactiveInflux. No configuration file needed.
+  * Simple asynchronous example of ReactiveInflux using and chaining Scala futures together.
   */
 object Example1 extends App {
-  withInfluxDb(new URI("http://myinflux:6543/"), "example1") { db =>
-    // Create the "example1" database
-    db.create().map { _ =>
-      // Write a single point to "measurement1"
+  // Use Influx at the provided URL and database "example1"
+  val result = withInfluxDb(new URI("http://myinflux:6543/"), "example1") { db =>
+
+    // Asynchronously create the "example1" database ...
+    db.create().flatMap { _ =>
+
+      // ... and then asynchronously write a single point to "measurement1" ...
       val point = Point(
         time        = DateTime.now(),
         measurement = "measurement1",
         tags        = Map("t1" -> "A", "t2" -> "B"),
-        fields      = Map("f1" -> 10.3, "f2" -> "x", "f3" -> -1, "f4" -> true)
+        fields      = Map(
+          "f1" -> 10.3, // BigDecimal field
+          "f2" -> "x",  // String field
+          "f3" -> -1,   // Long field
+          "f4" -> true) // Boolean field
       )
-      db.write(point).map { _ =>
-        // Read the written point
-        db.query("SELECT * FROM measurement1").flatMap { result =>
-          // Print it to the console
-          println(result.result.single.single.items)
+      db.write(point).flatMap { _ =>
 
-          // Drop the "example1" database
+        // ... and then asynchronously read the written point ...
+        db.query("SELECT * FROM measurement1").flatMap { queryResult =>
+
+          // Print the single point to the console
+          println(queryResult.row)
+
+          // ... and then asynchronously drop the "example1" database.
           db.drop()
         }
       }
     }
   }
+
+  // Wait at most 30 seconds for everything to complete.
+  Await.result(result, 30.seconds)
 }

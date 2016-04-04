@@ -80,7 +80,7 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
       db.write(points).flatMap { _ =>
         db.query(Query(s"SELECT * FROM $measurement"))
           .map { queryResult =>
-            val rows = queryResult.result.single.values
+            val rows = queryResult.result.singleSeries.rows
             assert(rows.size == 1000)
           }
       }
@@ -125,10 +125,10 @@ class PlayWSReactiveInfluxDbISpec extends FlatSpec with ScalaFutures with Integr
 
     def testEpoch(epoch: Option[Epoch], writeParameters: WriteParameters): Future[Unit] = {
       db.query(Query("SELECT * FROM " + PointSpec.point1.measurement), QueryParameters(epoch = epoch)).map { queryResult =>
-        val series = queryResult.result.single
+        val series = queryResult.result.singleSeries
         assert(series.name == PointSpec.point1.measurement.unescaped)
 
-        val row = series.single
+        val row = series.singleRow
 
         val expextedTime = writeParameters.precision.map(_.round(PointSpec.point1.time)).getOrElse(PointSpec.point1.time)
         assert(row.time == expextedTime, epoch)

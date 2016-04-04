@@ -8,6 +8,8 @@ import org.joda.time.Instant
 trait QueryResult extends Serializable {
   def q: Query
   def result: Result
+  def rows: Seq[Row] = result.singleSeries.rows
+  def row: Row = result.singleSeries.singleRow
 }
 
 object QueryResult {
@@ -16,7 +18,7 @@ object QueryResult {
 
 trait Result extends Serializable {
   def series: Seq[Series]
-  def single: Series = {
+  def singleSeries: Series = {
     if (series.isEmpty)
       throw new ReactiveInfluxException("No series!")
 
@@ -35,18 +37,18 @@ object Result {
 trait Series extends Serializable {
   def name: SeriesName
   def columns: Seq[ColumnName]
-  def values: Seq[Row]
-  def single: Row = {
-    if (values.isEmpty)
+  def rows: Seq[Row]
+  def singleRow: Row = {
+    if (rows.isEmpty)
       throw new ReactiveInfluxException("No values!")
 
-    if (values.size > 1)
-      throw new ReactiveInfluxException(s"More values! [${values.size}]")
+    if (rows.size > 1)
+      throw new ReactiveInfluxException(s"More values! [${rows.size}]")
 
-    values.head
+    rows.head
   }
-  def isEmpty: Boolean = values.isEmpty
-  def apply(row: Row, columnName: ColumnName): Value = row.items(columns.indexOf(columnName))
+  def isEmpty: Boolean = rows.isEmpty
+  def apply(row: Row, columnName: ColumnName): Value = row.values(columns.indexOf(columnName))
 }
 
 object Series {
@@ -63,7 +65,7 @@ object Series {
 
 trait Row {
   def time: PointTime
-  def items: Seq[Value]
+  def values: Seq[Value]
 }
 
 object Row {
@@ -89,5 +91,5 @@ private[reactiveinflux] object Rfc3339 extends TimeFormat {
 
 private[reactiveinflux] case class SimpleQueryResult(q: Query, result: Result) extends QueryResult
 private[reactiveinflux] case class SimpleResult(series: Seq[Series]) extends Result
-private[reactiveinflux] case class SimpleSeries(name: SeriesName, columns: Seq[ColumnName], values: Seq[Row]) extends Series
-private[reactiveinflux] case class SimpleRow(time: PointTime, items: Seq[Value]) extends Row
+private[reactiveinflux] case class SimpleSeries(name: SeriesName, columns: Seq[ColumnName], rows: Seq[Row]) extends Series
+private[reactiveinflux] case class SimpleRow(time: PointTime, values: Seq[Value]) extends Row
