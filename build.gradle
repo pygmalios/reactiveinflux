@@ -59,9 +59,10 @@ dependencies {
     compile "joda-time:joda-time:2.9.2"
     compile "org.joda:joda-convert:1.8.1"
 
-    testCompile "org.scalatest:scalatest_$scalaVersion:2.2.5"
+    testCompile "org.scalatest:scalatest_$scalaVersion:2.2.6"
     testCompile "org.mockito:mockito-all:1.10.19"
     testCompile "junit:junit:4.12"
+    testCompile "org.pegdown:pegdown:1.6.0"
 
     deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
 }
@@ -145,23 +146,23 @@ artifacts {
 //    ]
 //}
 
-signing {
-    sign configurations.archives
-}
+//signing {
+//    sign configurations.archives
+//}
 
-publishing {
-    publications {
-        signatures (MavenPublication) {
-            // give signature files to rtifact method
-            getSignatureFiles().each {signature ->
-                artifact (signature.archive) {
-                    classifier = signature.classifier
-                    extension  = signature.extension
-                }
-            }
-        }
-    }
-}
+//publishing {
+//    publications {
+//        signatures (MavenPublication) {
+//            // give signature files to rtifact method
+//            getSignatureFiles().each {signature ->
+//                artifact (signature.archive) {
+//                    classifier = signature.classifier
+//                    extension  = signature.extension
+//                }
+//            }
+//        }
+//    }
+//}
 
 uploadArchives {
     def mavenRepoURL = (version.endsWith("-SNAPSHOT")) ?
