@@ -2,6 +2,7 @@ package com.pygmalios.reactiveinflux.impl
 
 import java.net.URI
 
+import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.ReactiveInfluxCore
 import com.pygmalios.reactiveinflux.command.write._
 import org.junit.runner.RunWith
@@ -22,8 +23,6 @@ class PlayWSReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
     verify(core).execute(new WriteCommand(
       baseUri     = uri,
       dbName      = dbName,
-      dbUsername  = Some(dbUsername),
-      dbPassword  = Some(dbPassword),
       points      = Seq(PointSpec.point1),
       params      = WriteParameters()
     ))
@@ -35,8 +34,6 @@ class PlayWSReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
     val writeCommand = new WriteCommand(
       baseUri     = uri,
       dbName      = dbName,
-      dbUsername  = Some(dbUsername),
-      dbPassword  = Some(dbPassword),
       points      = Seq(PointSpec.point1, PointSpec.point2),
       params      = WriteParameters(
         retentionPolicy = Some("x"),
@@ -53,14 +50,12 @@ class PlayWSReactiveInfluxDbSpec extends FlatSpec with MockitoSugar {
   }
 
   private class TestScope {
-    val dbName = "db"
-    val dbUsername = "u"
-    val dbPassword = "p"
+    val dbName = ReactiveInfluxDbName("db")
     val core = mock[ReactiveInfluxCore]
     val config = mock[DefaultReactiveInfluxConfig]
     val uri = new URI("http://whatever/")
     when(config.url).thenReturn(uri)
     when(core.config).thenReturn(config)
-    val db = new PlayWSReactiveInfluxDb(dbName, Some(dbUsername), Some(dbPassword), core)
+    val db = new PlayWSReactiveInfluxDb(dbName, core)
   }
 }

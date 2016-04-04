@@ -7,8 +7,8 @@ import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteCommand, WriteParameters}
 import com.pygmalios.reactiveinflux.command.{PingCommand, PingResult}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.ws.{WSAuthScheme, WSRequestHolder}
 import play.api.libs.ws.ning.{NingWSClient, NingWSResponse}
+import play.api.libs.ws.{WSAuthScheme, WSRequestHolder}
 
 import scala.concurrent.Future
 
@@ -18,8 +18,8 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
 
   override def ping(waitForLeaderSec: Option[Int]): Future[PingResult] = execute(new PingCommand(config.url))
 
-  override def database(implicit params: ReactiveInfluxDbParams): ReactiveInfluxDb =
-    new PlayWSReactiveInfluxDb(params.dbName, params.dbUsername, params.dbPassword, this)
+  override def database(implicit dbName: ReactiveInfluxDbName): ReactiveInfluxDb =
+    new PlayWSReactiveInfluxDb(dbName, this)
 
   override def execute[R <: ReactiveInfluxCommand](command: R): Future[command.TResult] = {
     val httpRequest = authHttpRequest(command)
@@ -49,9 +49,7 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
   }
 }
 
-class PlayWSReactiveInfluxDb(dbName: DbName,
-                             dbUsername: Option[DbUsername],
-                             dbPassword: Option[DbPassword],
+class PlayWSReactiveInfluxDb(dbName: ReactiveInfluxDbName,
                              core: ReactiveInfluxCore) extends ReactiveInfluxDb {
 
   override def create(): Future[Unit] =
@@ -65,8 +63,6 @@ class PlayWSReactiveInfluxDb(dbName: DbName,
     core.execute(new WriteCommand(
       baseUri     = core.config.url,
       dbName      = dbName,
-      dbUsername  = dbUsername,
-      dbPassword  = dbPassword,
       points      = points,
       params      = params
     ))

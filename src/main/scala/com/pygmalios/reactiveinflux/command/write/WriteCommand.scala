@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.command.write
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
 import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
 import com.pygmalios.reactiveinflux.impl.URIUtils
@@ -12,9 +12,7 @@ import play.api.http.{HeaderNames, HttpVerbs, MimeTypes}
 import play.api.libs.ws.{WSClient, WSRequestHolder, WSResponse}
 
 class WriteCommand(val baseUri: URI,
-                   val dbName: DbName,
-                   val dbUsername: Option[DbUsername],
-                   val dbPassword: Option[DbPassword],
+                   val dbName: ReactiveInfluxDbName,
                    val points: Iterable[PointNoTime],
                    val params: WriteParameters) extends ReactiveInfluxCommand {
   import WriteCommand._
@@ -43,11 +41,11 @@ class WriteCommand(val baseUri: URI,
 
   private[command] def query: Map[String, Option[String]] = {
     Map(
-      dbQ -> Some(dbName)
+      dbQ -> Some(dbName.value)
     ) ++ params.params.mapValues(Some(_))
   }
 
-  override def toString = s"WriteCommand(uriWithPath=$uriWithPath, baseUri=$baseUri, dbName=$dbName, dbUsername=$dbUsername, dbPassword=$dbPassword, points=$points, params=$params)"
+  override def toString = s"WriteCommand(uriWithPath=$uriWithPath, baseUri=$baseUri, dbName=${dbName.value}, points=$points, params=$params)"
 
   def canEqual(other: Any): Boolean = other.isInstanceOf[WriteCommand]
 
@@ -56,15 +54,13 @@ class WriteCommand(val baseUri: URI,
       (that canEqual this) &&
         baseUri == that.baseUri &&
         dbName == that.dbName &&
-        dbUsername == that.dbUsername &&
-        dbPassword == that.dbPassword &&
         points == that.points &&
         params == that.params
     case _ => false
   }
 
   override def hashCode(): Int = {
-    val state = Seq(baseUri, dbName, dbUsername, dbPassword, points, params)
+    val state = Seq(baseUri, dbName, points, params)
     state.map(_.hashCode()).foldLeft(0)((a, b) => 31 * a + b)
   }
 }

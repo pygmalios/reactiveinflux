@@ -8,7 +8,6 @@ import com.typesafe.config.Config
 trait ReactiveInfluxConfig extends Serializable {
   def reactiveinflux: Config
   def url: URI
-  def db: Option[String]
   def username: Option[String]
   def password: Option[String]
 }

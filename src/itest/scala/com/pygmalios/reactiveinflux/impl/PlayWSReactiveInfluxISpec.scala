@@ -11,7 +11,7 @@ class PlayWSReactiveInfluxISpec extends FlatSpec with ScalaFutures {
   behavior of "ping"
 
   it should "send ping request to InfluxDB" in new TestScope {
-    assert(reactiveInflux.ping().futureValue.influxDbVersion.startsWith("0.10"))
+    assert(reactiveInflux.ping().futureValue.influxDbVersion.startsWith("0.11"))
   }
 }
 

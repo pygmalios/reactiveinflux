@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux.command.write
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
 import org.junit.runner.RunWith
 import org.mockito.Matchers
 import org.mockito.Matchers._
@@ -41,7 +41,7 @@ class WriteCommandSpec extends FlatSpec {
   behavior of "query"
 
   it should "have db query" in new TestScope {
-    assertQuery(cmd(), WriteCommand.dbQ, dbName)
+    assertQuery(cmd(), WriteCommand.dbQ, dbName.value)
   }
 
   it should "have retentionPolicy query" in new TestScope {
@@ -71,7 +71,7 @@ class WriteCommandSpec extends FlatSpec {
 }
 
 private class TestScope extends MockitoSugar {
-  val dbName = "test"
+  val dbName = ReactiveInfluxDbName("test")
   val baseUri = new URI("http://something/")
 
   val ws = mock[WSClient]
@@ -83,18 +83,14 @@ private class TestScope extends MockitoSugar {
   when(wsRequest.withBody(anyString())(any[Writeable[String]](), any[ContentTypeOf[String]]())).thenReturn(wsRequest)
 
   def cmd(baseUri: URI = baseUri,
-          dbName: DbName = dbName,
+          dbName: ReactiveInfluxDbName = dbName,
           points: Seq[PointNoTime] = Seq.empty,
           retentionPolicy: Option[String] = None,
-          username: Option[DbUsername] = None,
-          password: Option[DbPassword] = None,
           precision: Option[Precision] = None,
           consistency: Option[Consistency] = None) =
     new WriteCommand(
       baseUri,
       dbName,
-      username,
-      password,
       points,
       WriteParameters(retentionPolicy, precision, consistency))
 

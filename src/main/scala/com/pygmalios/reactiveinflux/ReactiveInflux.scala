@@ -2,7 +2,7 @@ package com.pygmalios.reactiveinflux
 
 import java.io.Closeable
 
-import com.pygmalios.reactiveinflux.ReactiveInflux.{DbName, DbPassword, DbUsername}
+import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
@@ -16,7 +16,7 @@ import scala.concurrent.Future
   */
 trait ReactiveInflux extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None): Future[PingResult]
-  def database(implicit params: ReactiveInfluxDbParams): ReactiveInfluxDb
+  def database(implicit dbName: ReactiveInfluxDbName): ReactiveInfluxDb
   def config: ReactiveInfluxConfig
 }
 
@@ -38,38 +38,19 @@ trait ReactiveInfluxDb {
   def config: ReactiveInfluxConfig
 }
 
-trait ReactiveInfluxDbParams {
-  def dbName: DbName
-  def dbUsername: Option[DbUsername]
-  def dbPassword: Option[DbPassword]
-}
-
-object ReactiveInfluxDbParams {
-  def apply(dbName: DbName,
-            dbUsername: Option[DbUsername] = None,
-            dbPassword: Option[DbPassword] = None): ReactiveInfluxDbParams =
-    SimpleReactiveInfluxDbParams(dbName, dbUsername, dbPassword)
-}
-
-private case class SimpleReactiveInfluxDbParams(dbName: DbName,
-                                                dbUsername: Option[DbUsername],
-                                                dbPassword: Option[DbPassword])
-  extends ReactiveInfluxDbParams
-
 object ReactiveInflux {
-  type DbName = String
-  type DbUsername = String
-  type DbPassword = String
+  /**
+    * Database name.
+    */
+  case class ReactiveInfluxDbName(value: String)
 
-  val defaultClientName = "ReactiveInflux"
-  def defaultClientFactory(config: ReactiveInfluxConfig): ReactiveInflux =
+  def apply(config: ReactiveInfluxConfig): ReactiveInflux =
     PlayWSReactiveInflux(config)
 
   /**
     * Create reactive Influx client. Normally there should be only one instance per application.
     */
-  def apply(name: String = defaultClientName,
-            config: Option[Config] = None,
-            clientFactory: (ReactiveInfluxConfig) => ReactiveInflux = defaultClientFactory): ReactiveInflux =
+  def apply(config: Option[Config] = None,
+            clientFactory: (ReactiveInfluxConfig) => ReactiveInflux = apply): ReactiveInflux =
     clientFactory(ReactiveInfluxConfig(config))
 }

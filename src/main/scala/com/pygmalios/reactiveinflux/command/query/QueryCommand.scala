@@ -9,7 +9,7 @@ import com.pygmalios.reactiveinflux.response.PlayWSJsonResponse
 import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 
-class QueryCommand(baseUri: URI, dbName: DbName, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
+class QueryCommand(baseUri: URI, dbName: ReactiveInfluxDbName, qs: Seq[Query], params: QueryParameters) extends BaseQueryCommand(baseUri) {
   override type TResult = Seq[QueryResult]
   override protected def responseFactory(wsResponse: WSResponse) = {
     val timeFormat: TimeFormat = params.epoch.getOrElse(Rfc3339)
@@ -20,7 +20,7 @@ class QueryCommand(baseUri: URI, dbName: DbName, qs: Seq[Query], params: QueryPa
     ws.url(qUri(q).toString)
   }
   override def otherParams = OptionalParameters(
-    QueryParameters.dbQ -> Some(dbName),
+    QueryParameters.dbQ -> Some(dbName.value),
     QueryParameters.epochQ -> params.epoch.map(_.q),
     QueryParameters.chunkSizeQ -> params.chunkSize.map(_.toString)
   )

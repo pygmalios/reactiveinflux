@@ -1,12 +1,13 @@
 package com.pygmalios.reactiveinflux.examples
 
-import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxDbParams}
+import com.pygmalios.reactiveinflux.ReactiveInflux
+import com.pygmalios.reactiveinflux.ReactiveInflux.ReactiveInfluxDbName
 
 /**
   * Example usage of ReactiveInflux.
   */
 object Example1 extends App {
-  implicit val params = ReactiveInfluxDbParams(dbName = "example1")
+  implicit val dbName = ReactiveInfluxDbName("example1")
 
   val reactiveInflux = ReactiveInflux()
   try {
