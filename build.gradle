@@ -15,6 +15,7 @@ apply plugin: "maven-publish"
 apply plugin: "signing"
 
 group = group
+archivesBaseName = name
 version = "${influxVersion}.${reactiveInfluxVersion}"
 
 targetCompatibility = "1.7"
@@ -69,12 +70,12 @@ dependencies {
 
 task sourceJar(type: Jar) {
     classifier = "sources"
-    from sourceSets.main.allScala
+    from sourceSets.main.allSource
 }
 
-task javadocJar (type: Jar, dependsOn: javadoc) {
+task javadocJar (type: Jar) {
     classifier = "javadoc"
-    from javadoc.destinationDir
+    from javadoc
 }
 
 publishing {
@@ -126,6 +127,10 @@ artifacts {
     archives javadocJar
 }
 
+//signing {
+//    sign configurations.archives
+//}
+
 //task signJars (type : Sign, dependsOn: [jar, javadocJar, sourceJar]) {
 //    sign configurations.archives
 //}
@@ -144,10 +149,6 @@ artifacts {
 //            [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
 //            [archive: signedJar,     classifier: null,      extension: 'jar.asc']
 //    ]
-//}
-
-//signing {
-//    sign configurations.archives
 //}
 
 //publishing {
@@ -173,6 +174,54 @@ uploadArchives {
             configuration = configurations.deployerJars
             repository(url: "dav:$mavenRepoURL") {
                 authentication(userName: "$System.env.MAVEN_REPO_USERNAME", password: "$System.env.MAVEN_REPO_PASSWORD")
+            }
+        }
+    }
+}
+
+task uploadToSonatype(type: Upload) {
+    configuration = configurations.archives
+    uploadDescriptor = true
+
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: ossrhUsername, password: ossrhPassword)
+            }
+
+            pom.project {
+                name "ReactiveInflux"
+                packaging "jar"
+
+                description "Non-blocking, reactive InfluxDB driver for Scala and Java."
+                url "https://github.com/pygmalios/reactiveinflux"
+
+                scm {
+                    connection "scm:git:https://github.com/pygmalios/reactiveinflux.git"
+                    developerConnection "scm:git:https://github.com/pygmalios/reactiveinflux.git"
+                    url "https://github.com/pygmalios/reactiveinflux"
+                }
+
+                licenses {
+                    license {
+                        name "The Apache License, Version 2.0"
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id "radoburansky"
+                        name "Rado Buransky"
+                        email "rado@buransky.com"
+                    }
+                }
             }
         }
     }
