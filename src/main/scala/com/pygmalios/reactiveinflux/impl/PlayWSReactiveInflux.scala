@@ -2,9 +2,9 @@ package com.pygmalios.reactiveinflux.impl
 
 import com.ning.http.client.AsyncHttpClientConfig
 import com.pygmalios.reactiveinflux._
+import com.pygmalios.reactiveinflux.command.PingCommand
 import com.pygmalios.reactiveinflux.command.query._
 import com.pygmalios.reactiveinflux.command.write.{WriteCommand, WriteParameters}
-import com.pygmalios.reactiveinflux.command.{PingCommand, PingResult}
 import play.api.libs.ws.ning.{NingWSClient, NingWSResponse}
 import play.api.libs.ws.{WSAuthScheme, WSRequestHolder}
 

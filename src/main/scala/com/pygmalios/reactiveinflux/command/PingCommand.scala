@@ -3,7 +3,7 @@ package com.pygmalios.reactiveinflux.command
 import java.net.URI
 
 import com.pygmalios.reactiveinflux.impl.URIUtils
-import com.pygmalios.reactiveinflux.{ReactiveInfluxCommand, ReactiveInfluxResult}
+import com.pygmalios.reactiveinflux.{PingResult, ReactiveInfluxCommand, ReactiveInfluxResult}
 import play.api.libs.ws._
 
 class PingCommand(baseUri: URI) extends ReactiveInfluxCommand {
@@ -19,10 +19,6 @@ class PingCommand(baseUri: URI) extends ReactiveInfluxCommand {
 object PingCommand {
   val path = "/ping"
   val versionHeader = "X-Influxdb-Version"
-}
-
-trait PingResult extends Serializable {
-  def influxDbVersion: String
 }
 
 private[reactiveinflux] case class SimplePingResult(influxDbVersion: String) extends PingResult with ReactiveInfluxResult[PingResult] {

@@ -20,29 +20,29 @@ object SyncExample extends App {
   // Use Influx at the provided URL and database "example1"
   syncInfluxDb(new URI("http://localhost:8086/"), "example1") { db =>
 
-    // Asynchronously create the "example1" database ...
+    // Synchronously create the "example1" database
     db.create()
 
-    // ... and then asynchronously write a single point to "measurement1" ...
+    // Synchronously write a single point to "measurement1"
     val point = Point(
       time = DateTime.now(),
       measurement = "measurement1",
       tags = Map("t1" -> "A", "t2" -> "B"),
       fields = Map(
         "f1" -> 10.3, // BigDecimal field
-        "f2" -> "x", // String field
-        "f3" -> -1, // Long field
+        "f2" -> "x",  // String field
+        "f3" -> -1,   // Long field
         "f4" -> true) // Boolean field
     )
     db.write(point)
 
-    // ... and then asynchronously read the written point ...
+    // Synchronously read the written point
     val queryResult = db.query("SELECT * FROM measurement1")
 
     // Print the single point to the console
     println(queryResult.row.mkString)
 
-    // ... and then asynchronously drop the "example1" database.
+    // Synchronously drop the "example1" database.
     db.drop()
   }
 }

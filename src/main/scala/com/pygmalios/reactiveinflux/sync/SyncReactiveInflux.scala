@@ -2,12 +2,10 @@ package com.pygmalios.reactiveinflux.sync
 
 import java.io.Closeable
 
-import com.pygmalios.reactiveinflux.{PointNoTime, Query, QueryResult, ReactiveInflux, ReactiveInfluxConfig, ReactiveInfluxDbName}
-import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.QueryParameters
 import com.pygmalios.reactiveinflux.command.write.WriteParameters
 import com.pygmalios.reactiveinflux.sync.impl.WrappingSyncReactiveInflux
-import com.typesafe.config.Config
+import com.pygmalios.reactiveinflux.{PingResult, PointNoTime, Query, QueryResult, ReactiveInflux, ReactiveInfluxConfig, ReactiveInfluxDbName}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
