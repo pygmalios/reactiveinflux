@@ -3,8 +3,8 @@ package com.pygmalios.reactiveinflux
 import java.io.Closeable
 
 import com.pygmalios.reactiveinflux.command.PingResult
-import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
-import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
+import com.pygmalios.reactiveinflux.command.query.QueryParameters
+import com.pygmalios.reactiveinflux.command.write.WriteParameters
 import com.pygmalios.reactiveinflux.impl.PlayWSReactiveInflux
 import com.typesafe.config.Config
 

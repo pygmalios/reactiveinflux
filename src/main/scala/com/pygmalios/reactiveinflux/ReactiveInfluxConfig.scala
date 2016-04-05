@@ -34,7 +34,7 @@ object ReactiveInfluxConfig {
   def apply(config: Option[Config]): ReactiveInfluxConfig = new DefaultReactiveInfluxConfig(config)
   def apply(url: URI,
             username: Option[String] = None,
-            password: Option[String] = None): ReactiveInfluxConfig = ReactiveInfluxConfig(url, username, password)
+            password: Option[String] = None): ReactiveInfluxConfig = SimpleReactiveInfluxConfig(url, username, password)
 }
 
 private case class SimpleReactiveInfluxConfig(url: URI,

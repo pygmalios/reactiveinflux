@@ -4,7 +4,7 @@ import java.net.URI
 
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
 import com.pygmalios.reactiveinflux.response.PlayWSJsonResponse
-import com.pygmalios.reactiveinflux.{ReactiveInfluxDbName, ReactiveInfluxException}
+import com.pygmalios.reactiveinflux.{BigDecimalValue, BooleanValue, Query, QueryResult, ReactiveInfluxDbName, ReactiveInfluxException, Result, Rfc3339, Series, StringValue, TimeFormat, Value}
 import play.api.libs.json._
 import play.api.libs.ws.{WSClient, WSResponse}
 

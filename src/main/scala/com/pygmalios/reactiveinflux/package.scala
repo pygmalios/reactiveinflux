@@ -2,12 +2,11 @@ package com.pygmalios
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.command.query.Query
-import com.pygmalios.reactiveinflux.command.write.{BigDecimalFieldValue, BooleanFieldValue, FieldValue, StringFieldValue}
+import com.pygmalios.reactiveinflux.Query
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 package object reactiveinflux {
   implicit def stringToEscapedString(value: String): EscapedString = new EscapedString(value)
@@ -34,7 +33,8 @@ package object reactiveinflux {
     val reactiveInflux = ReactiveInflux(config)
     action(reactiveInflux.database(dbName))
       .andThen {
-        case _ => reactiveInflux.close()
+        case _ =>
+          reactiveInflux.close()
       }
   }
 }

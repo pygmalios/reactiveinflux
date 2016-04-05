@@ -1,10 +1,10 @@
 package com.pygmalios.reactiveinflux.sync.impl
 
-import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters}
-import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
+import com.pygmalios.reactiveinflux.command.query.QueryParameters
+import com.pygmalios.reactiveinflux.command.write.WriteParameters
 import com.pygmalios.reactiveinflux.sync.SyncReactiveInflux._
 import com.pygmalios.reactiveinflux.sync.{SyncReactiveInflux, SyncReactiveInfluxDb}
-import com.pygmalios.reactiveinflux.{ReactiveInfluxConfig, ReactiveInfluxDb}
+import com.pygmalios.reactiveinflux.{PointNoTime, Query, ReactiveInfluxConfig, ReactiveInfluxDb}
 
 import scala.concurrent.duration.Duration
 

@@ -1,15 +1,14 @@
 package com.pygmalios.reactiveinflux.impl
 
 import com.ning.http.client.AsyncHttpClientConfig
-import com.pygmalios.reactiveinflux.ReactiveInflux._
 import com.pygmalios.reactiveinflux._
 import com.pygmalios.reactiveinflux.command.query._
-import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteCommand, WriteParameters}
+import com.pygmalios.reactiveinflux.command.write.{WriteCommand, WriteParameters}
 import com.pygmalios.reactiveinflux.command.{PingCommand, PingResult}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.ws.ning.{NingWSClient, NingWSResponse}
 import play.api.libs.ws.{WSAuthScheme, WSRequestHolder}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInflux with ReactiveInfluxCore
@@ -30,7 +29,7 @@ class PlayWSReactiveInflux(val config: ReactiveInfluxConfig) extends ReactiveInf
         val headers = r.allHeaders.map {
           case (k, v) => s"$k=${v.mkString(",")}"
         }
-        log.info(s"Response: ${r.status} Length=${r.body.size} ${headers.mkString(";")}")
+        log.info(s"Response: ${r.status} Length=${r.body.length} ${headers.mkString(";")}")
         r
       case other => other
     }.map(command(httpRequest, _))

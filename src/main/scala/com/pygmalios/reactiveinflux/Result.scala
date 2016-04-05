@@ -1,7 +1,6 @@
-package com.pygmalios.reactiveinflux.command.query
+package com.pygmalios.reactiveinflux
 
-import com.pygmalios.reactiveinflux.ReactiveInfluxException
-import com.pygmalios.reactiveinflux.command.query.Series.{ColumnName, SeriesName}
+import com.pygmalios.reactiveinflux.Series.{ColumnName, SeriesName}
 import com.pygmalios.reactiveinflux.command.write.PointTime
 import org.joda.time.Instant
 
@@ -66,6 +65,7 @@ object Series {
 trait Row {
   def time: PointTime
   def values: Seq[Value]
+  def mkString: String
 }
 
 object Row {
@@ -73,10 +73,18 @@ object Row {
     SimpleRow(timeFormat(items(timeColumnIndex)), items)
 }
 
-sealed trait Value extends Serializable
-case class StringValue(value: String) extends Value
-case class BigDecimalValue(value: BigDecimal) extends Value
-case class BooleanValue(value: Boolean) extends Value
+sealed trait Value extends Serializable {
+  def mkString: String
+}
+case class StringValue(value: String) extends Value {
+  override def mkString: String = "\"" + value + "\""
+}
+case class BigDecimalValue(value: BigDecimal) extends Value {
+  override def mkString: String = value.toString()
+}
+case class BooleanValue(value: Boolean) extends Value {
+  override def mkString: String = value.toString
+}
 
 trait TimeFormat {
   def apply(value: Value): PointTime
@@ -92,4 +100,9 @@ private[reactiveinflux] object Rfc3339 extends TimeFormat {
 private[reactiveinflux] case class SimpleQueryResult(q: Query, result: Result) extends QueryResult
 private[reactiveinflux] case class SimpleResult(series: Seq[Series]) extends Result
 private[reactiveinflux] case class SimpleSeries(name: SeriesName, columns: Seq[ColumnName], rows: Seq[Row]) extends Series
-private[reactiveinflux] case class SimpleRow(time: PointTime, values: Seq[Value]) extends Row
+private[reactiveinflux] case class SimpleRow(time: PointTime, values: Seq[Value]) extends Row {
+  override def mkString: String = {
+    val timeS = PointTime.pointTimeToDateTime(time)
+    values.map(_.mkString).mkString(timeS + " ", ", ", "")
+  }
+}

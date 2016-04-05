@@ -2,9 +2,8 @@ package com.pygmalios.reactiveinflux.command.write
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
-import com.pygmalios.reactiveinflux.ReactiveInfluxCommand
-import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, TagKey, TagValue}
+import com.pygmalios.reactiveinflux.Point.{FieldKey, TagKey, TagValue}
+import com.pygmalios.reactiveinflux._
 import com.pygmalios.reactiveinflux.impl.URIUtils
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
 import org.slf4j.LoggerFactory

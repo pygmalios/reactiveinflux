@@ -1,6 +1,7 @@
-package com.pygmalios.reactiveinflux.command.write
+package com.pygmalios.reactiveinflux
 
-import com.pygmalios.reactiveinflux.command.write.Point.{FieldKey, Measurement, TagKey, TagValue}
+import com.pygmalios.reactiveinflux.Point.{FieldKey, Measurement, TagKey, TagValue}
+import com.pygmalios.reactiveinflux.command.write.PointTime
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
 /**

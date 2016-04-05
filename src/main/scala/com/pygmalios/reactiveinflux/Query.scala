@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.command.query
+package com.pygmalios.reactiveinflux
 
 /**
   * Query in InfluxQL.
