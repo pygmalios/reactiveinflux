@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 import scala.concurrent.duration._
 
 /**
-  * Example of blocking, synchronous usage of ReactiveInflux.
+  * Example of blocking, synchronous usage of SyncReactiveInflux.
   *
   * It assumes that you have InfluxDB running locally on port 8086. How to install InfluxDB:
   * https://docs.influxdata.com/influxdb/v0.11/introduction/installation/

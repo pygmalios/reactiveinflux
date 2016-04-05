@@ -6,7 +6,7 @@ import com.pygmalios.reactiveinflux.impl.DefaultReactiveInfluxConfig
 import com.typesafe.config.Config
 
 /**
-  * ReactiveInflux configuration.
+  * SyncReactiveInflux configuration.
   */
 trait ReactiveInfluxConfig extends Serializable {
   /**

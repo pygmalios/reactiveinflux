@@ -10,7 +10,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 /**
-  * Example of asynchronous usage of ReactiveInflux.
+  * Example of asynchronous usage of SyncReactiveInflux.
   *
   * It assumes that you have InfluxDB running locally on port 8086. How to install InfluxDB:
   * https://docs.influxdata.com/influxdb/v0.11/introduction/installation/
