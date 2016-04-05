@@ -1,7 +1,7 @@
 package com.pygmalios.reactiveinflux;
 
-/**
- * Created by rado on 5.4.2016.
- */
-public interface JavaQuery {
+import java.io.Serializable;
+
+public interface JavaQuery extends Serializable {
+    String getInfluxQl();
 }
