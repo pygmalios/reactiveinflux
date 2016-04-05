@@ -7,65 +7,67 @@ buildscript {
     }
 }
 
-apply plugin: "scala"
-apply plugin: "com.github.maiflai.scalatest"
-apply plugin: "java"
-apply plugin: "maven"
-apply plugin: "maven-publish"
-apply plugin: "signing"
+allprojects {
+    apply plugin: "scala"
+    apply plugin: "com.github.maiflai.scalatest"
+    apply plugin: "java"
+    apply plugin: "maven"
+    apply plugin: "maven-publish"
+    apply plugin: "signing"
 
-group = group
-archivesBaseName = name
-version = "${influxVersion}.${reactiveInfluxVersion}"
+    group = group
+    archivesBaseName = name
+    version = "${influxVersion}.${reactiveInfluxVersion}"
 
-targetCompatibility = "1.7"
+    targetCompatibility = "1.7"
 
-repositories {
-    mavenCentral()
-    maven { url "http://dl.bintray.com/typesafe/maven-releases/" }
-}
-
-configurations {
-    itestCompile.extendsFrom testCompile
-    itestRuntime.extendsFrom testRuntime
-    deployerJars
-}
-
-sourceSets {
-    itest {
-        compileClasspath += main.output + test.output
-        runtimeClasspath += main.output + test.output
-
-        scala.srcDir file("src/itest/scala")
+    repositories {
+        mavenCentral()
+        maven { url "http://dl.bintray.com/typesafe/maven-releases/" }
     }
 
-    test {
-        resources.srcDir file("src/itest/resources")
+    configurations {
+        itestCompile.extendsFrom testCompile
+        itestRuntime.extendsFrom testRuntime
+        deployerJars
     }
-}
 
-task itest(type: Test) {
-    testClassesDir = sourceSets.itest.output.classesDir
-    classpath = sourceSets.itest.runtimeClasspath
+    sourceSets {
+        itest {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
 
-    testLogging {
-        events "passed", "skipped", "failed"
+            scala.srcDir file("src/itest/scala")
+        }
+
+        test {
+            resources.srcDir file("src/itest/resources")
+        }
     }
-}
 
-dependencies {
-    compile "org.scala-lang:scala-library:$scalaVersion.6"
-    compile "com.typesafe.play:play-ws_$scalaVersion:2.3.10"
-    compile "ch.qos.logback:logback-classic:1.1.3"
-    compile "joda-time:joda-time:2.9.2"
-    compile "org.joda:joda-convert:1.8.1"
+    task itest(type: Test) {
+        testClassesDir = sourceSets.itest.output.classesDir
+        classpath = sourceSets.itest.runtimeClasspath
 
-    testCompile "org.scalatest:scalatest_$scalaVersion:2.2.6"
-    testCompile "org.mockito:mockito-all:1.10.19"
-    testCompile "junit:junit:4.12"
-    testCompile "org.pegdown:pegdown:1.6.0"
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
 
-    deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+    dependencies {
+        compile "org.scala-lang:scala-library:$scalaVersion.6"
+        compile "com.typesafe.play:play-ws_$scalaVersion:2.3.10"
+        compile "ch.qos.logback:logback-classic:1.1.3"
+        compile "joda-time:joda-time:2.9.2"
+        compile "org.joda:joda-convert:1.8.1"
+
+        testCompile "org.scalatest:scalatest_$scalaVersion:2.2.6"
+        testCompile "org.mockito:mockito-all:1.10.19"
+        testCompile "junit:junit:4.12"
+        testCompile "org.pegdown:pegdown:1.6.0"
+
+        deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
+    }
 }
 
 project(":examples") {
