@@ -7,7 +7,7 @@ import org.joda.time.{DateTime, DateTimeZone, Instant}
 /**
   * Epoch time with nanosecond precision.
   */
-trait PointTime {
+trait PointTime extends Serializable {
   /**
     * The number of seconds from the epoch of 1970-01-01T00:00:00Z.
     */
