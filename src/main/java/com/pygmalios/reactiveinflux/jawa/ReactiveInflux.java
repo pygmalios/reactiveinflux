@@ -1,13 +1,14 @@
-package com.pygmalios.reactiveinflux.jova;
+package com.pygmalios.reactiveinflux.jawa;
+
+import play.libs.F;
 
 import java.io.Closeable;
-import java.util.concurrent.Future;
 
 /**
  * Reactive client for InfluxDB.
  */
 public interface ReactiveInflux extends Closeable {
-    Future<PingResult> ping();
+    F.Promise<PingResult> ping();
     ReactiveInfluxDb database(String dbName);
     ReactiveInfluxConfig getConfig();
 }

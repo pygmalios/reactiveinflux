@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.jova;
+package com.pygmalios.reactiveinflux.jawa;
 
 import com.typesafe.config.Config;
 
