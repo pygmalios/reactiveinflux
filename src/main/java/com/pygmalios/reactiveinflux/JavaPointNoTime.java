@@ -1,4 +1,10 @@
 package com.pygmalios.reactiveinflux;
 
-public interface JavaPointNoTime {
+import java.io.Serializable;
+import java.util.Map;
+
+public interface JavaPointNoTime extends Serializable {
+    String getMeasurement();
+    Map<String, String> getTags();
+    Map<String, Object> getFields();
 }
