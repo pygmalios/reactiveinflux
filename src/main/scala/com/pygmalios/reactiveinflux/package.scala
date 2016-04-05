@@ -4,6 +4,7 @@ import java.net.URI
 
 import com.pygmalios.reactiveinflux.Query
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
+import com.pygmalios.reactiveinflux.sync.{SyncReactiveInflux, SyncReactiveInfluxDb}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -36,5 +37,15 @@ package object reactiveinflux {
         case _ =>
           reactiveInflux.close()
       }
+  }
+
+  def syncInfluxDb[T](config: ReactiveInfluxConfig, dbName: ReactiveInfluxDbName)(action: SyncReactiveInfluxDb => T): T = {
+    val syncReactiveInflux = SyncReactiveInflux(config)
+    try {
+      action(syncReactiveInflux.database(dbName))
+    }
+    finally {
+      syncReactiveInflux.close()
+    }
   }
 }

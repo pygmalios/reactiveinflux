@@ -42,10 +42,8 @@ trait SyncReactiveInfluxDb {
 object SyncReactiveInflux {
   def await[T](f: => Future[T])(implicit awaitAtMost: Duration): T = Await.result(f, awaitAtMost)
 
-  def apply(config: Option[Config] = None): SyncReactiveInflux =
-    apply(config, ReactiveInflux.apply(ReactiveInfluxConfig(config)))
+  def apply(config: ReactiveInfluxConfig): SyncReactiveInflux = apply(ReactiveInflux.apply(config))
 
-  def apply(config: Option[Config],
-            reactiveInfluxFactory: => ReactiveInflux): SyncReactiveInflux =
+  def apply(reactiveInfluxFactory: => ReactiveInflux): SyncReactiveInflux =
     new WrappingSyncReactiveInflux(reactiveInfluxFactory)
 }

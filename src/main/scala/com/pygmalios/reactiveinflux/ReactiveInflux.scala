@@ -41,8 +41,7 @@ object ReactiveInflux {
   /**
     * Create reactive Influx client. Normally there should be only one instance per application.
     */
-  def apply(config: ReactiveInfluxConfig): ReactiveInflux =
-    PlayWSReactiveInflux(config)
+  def apply(config: ReactiveInfluxConfig): ReactiveInflux = PlayWSReactiveInflux(config)
 
   /**
     * Create reactive Influx client from Typesafe config.
