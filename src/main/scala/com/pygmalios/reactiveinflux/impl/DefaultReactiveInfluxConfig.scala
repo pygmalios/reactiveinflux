@@ -15,7 +15,6 @@ private[reactiveinflux] class DefaultReactiveInfluxConfig(config: Option[Config]
 
   override lazy val reactiveinflux = rootConfig.getConfig("reactiveinflux")
   override lazy val url = new URI(reactiveinflux.getString("url"))
-  override lazy val db = withFallback(Try(reactiveinflux.getString("db")))
   override lazy val username = withFallback(Try(reactiveinflux.getString("username")))
   override lazy val password = withFallback(Try(reactiveinflux.getString("password")))
 

@@ -2,10 +2,11 @@ package com.example
 
 import java.net.URI
 
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.query.BaseQueryCommand
 import com.pygmalios.reactiveinflux.itest.ITestConfig
 import com.pygmalios.reactiveinflux.response.EmptyJsonResponse
-import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxCore, ReactiveInfluxDbParams}
+import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxCore}
 import org.scalatest.FunSuite
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import play.api.libs.ws.{WSClient, WSResponse}
@@ -14,7 +15,7 @@ class ExampleApplication extends FunSuite with ScalaFutures with IntegrationPati
   test("Execute custom command") {
     val reactiveInflux = ReactiveInflux(config = Some(ITestConfig.config))
     try {
-      implicit val params = ReactiveInfluxDbParams("ExampleApplicatixon")
+      implicit val dbName = ReactiveInfluxDbName("ExampleApplicatixon")
       val db = reactiveInflux.database
       try {
         val core = reactiveInflux.asInstanceOf[ReactiveInfluxCore]

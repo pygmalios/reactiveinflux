@@ -2,11 +2,12 @@ package com.pygmalios.reactiveinflux.sync
 
 import java.io.Closeable
 
+import com.pygmalios.reactiveinflux.ReactiveInfluxDbName
 import com.pygmalios.reactiveinflux.command.PingResult
 import com.pygmalios.reactiveinflux.command.query.{Query, QueryParameters, QueryResult}
 import com.pygmalios.reactiveinflux.command.write.{PointNoTime, WriteParameters}
 import com.pygmalios.reactiveinflux.sync.impl.WrappingSyncReactiveInflux
-import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxConfig, ReactiveInfluxDbParams}
+import com.pygmalios.reactiveinflux.{ReactiveInflux, ReactiveInfluxConfig}
 import com.typesafe.config.Config
 
 import scala.concurrent.duration._
@@ -17,7 +18,7 @@ import scala.concurrent.{Await, Future}
   */
 trait SyncReactiveInflux extends Closeable {
   def ping(waitForLeaderSec: Option[Int] = None)(implicit awaitAtMost: Duration): PingResult
-  def database(implicit params: ReactiveInfluxDbParams): SyncReactiveInfluxDb
+  def database(implicit dbName: ReactiveInfluxDbName): SyncReactiveInfluxDb
   def config: ReactiveInfluxConfig
 }
 
@@ -42,12 +43,10 @@ trait SyncReactiveInfluxDb {
 object SyncReactiveInflux {
   def await[T](f: => Future[T])(implicit awaitAtMost: Duration): T = Await.result(f, awaitAtMost)
 
-  def apply(name: String = ReactiveInflux.defaultClientName,
-            config: Option[Config] = None): SyncReactiveInflux =
-    apply(name, config, ReactiveInflux.defaultClientFactory(ReactiveInfluxConfig(config)))
+  def apply(config: Option[Config] = None): SyncReactiveInflux =
+    apply(config, ReactiveInflux.apply(ReactiveInfluxConfig(config)))
 
-  def apply(name: String,
-            config: Option[Config],
+  def apply(config: Option[Config],
             reactiveInfluxFactory: => ReactiveInflux): SyncReactiveInflux =
     new WrappingSyncReactiveInflux(reactiveInfluxFactory)
 }

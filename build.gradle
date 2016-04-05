@@ -68,6 +68,12 @@ dependencies {
     deployerJars "org.apache.maven.wagon:wagon-webdav:1.0-beta-2"
 }
 
+project(":examples") {
+    dependencies {
+        compile rootProject
+    }
+}
+
 task sourceJar(type: Jar) {
     classifier = "sources"
     from sourceSets.main.allSource
