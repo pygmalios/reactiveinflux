@@ -6,6 +6,9 @@ import com.pygmalios.reactiveinflux.command.query.Query
 import com.pygmalios.reactiveinflux.command.write.{BigDecimalFieldValue, BooleanFieldValue, FieldValue, StringFieldValue}
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
 package object reactiveinflux {
   implicit def stringToEscapedString(value: String): EscapedString = new EscapedString(value)
   implicit def stringToEscapedStringWithEquals(value: String): EscapedStringWithEquals = new EscapedStringWithEquals(value)
@@ -27,13 +30,11 @@ package object reactiveinflux {
   implicit def uriToReactiveInfluxConfig(url: URI): ReactiveInfluxConfig = ReactiveInfluxConfig(url)
   implicit def stringToQuery(query: String) = Query(query)
 
-  def withInfluxDb[T](config: ReactiveInfluxConfig, dbName: ReactiveInfluxDbName)(action: ReactiveInfluxDb => T): T = {
+  def withInfluxDb[T](config: ReactiveInfluxConfig, dbName: ReactiveInfluxDbName)(action: ReactiveInfluxDb => Future[T]): Future[T] = {
     val reactiveInflux = ReactiveInflux(config)
-    try {
-      action(reactiveInflux.database(dbName))
-    }
-    finally {
-      reactiveInflux.close()
-    }
+    action(reactiveInflux.database(dbName))
+      .andThen {
+        case _ => reactiveInflux.close()
+      }
   }
 }
