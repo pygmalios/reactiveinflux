@@ -48,6 +48,12 @@ public class JavaSyncExample {
             );
             db.write(point);
 
+            // Synchronously read the written point
+            QueryResult queryResult = db.query("SELECT * FROM measurement1");
+
+            // Print the single point to the console
+            System.out.println(queryResult.getRow().mkString());
+
             // Synchronously drop the "example1" database
             db.drop();
         }

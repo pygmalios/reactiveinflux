@@ -13,10 +13,11 @@ public interface SyncReactiveInfluxDb {
     void write(PointNoTime point, WriteParameters params);
     void write(Iterable<PointNoTime> points, WriteParameters params);
 
+    QueryResult query(String q);
     QueryResult query(Query q);
     QueryResult query(Query q, QueryParameters params);
-    QueryResult query(List<Query> qs);
-    QueryResult query(List<Query> qs, QueryParameters params);
+    List<QueryResult> query(List<Query> qs);
+    List<QueryResult> query(List<Query> qs, QueryParameters params);
 
     ReactiveInfluxConfig getConfig();
 }

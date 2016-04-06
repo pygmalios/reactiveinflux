@@ -14,15 +14,28 @@ class JavaSyncReactiveInfluxDb(val underlying: sc.sync.SyncReactiveInfluxDb)
                               (implicit awaitAtMost: Duration) extends SyncReactiveInfluxDb {
   override def create(): Unit = underlying.create()
   override def drop(): Unit = underlying.drop()
-  override def write(point: PointNoTime): Unit = underlying.write(toScala(point))
-  override def write(points: Iterable[PointNoTime]): Unit = underlying.write(points.toIterable.map(toScala))
-  override def write(point: PointNoTime, params: WriteParameters): Unit = underlying.write(toScala(point), toScala(params))
-  override def write(points: Iterable[PointNoTime], params: WriteParameters): Unit = underlying.write(points.toIterable.map(toScala), toScala(params))
-  override def query(q: Query): QueryResult = ???
-  override def query(q: Query, params: QueryParameters): QueryResult = ???
-  override def query(qs: util.List[Query]): QueryResult = ???
-  override def query(qs: util.List[Query], params: QueryParameters): QueryResult = ???
-  override def getConfig: ReactiveInfluxConfig = ???
+
+  override def write(point: PointNoTime): Unit =
+    underlying.write(toScala(point))
+  override def write(points: Iterable[PointNoTime]): Unit =
+    underlying.write(points.toIterable.map(toScala))
+  override def write(point: PointNoTime, params: WriteParameters): Unit =
+    underlying.write(toScala(point), toScala(params))
+  override def write(points: Iterable[PointNoTime], params: WriteParameters): Unit =
+    underlying.write(points.toIterable.map(toScala), toScala(params))
+
+  override def query(q: String): QueryResult =
+    query(new JavaQuery(q))
+  override def query(q: Query): QueryResult =
+    new JavaQueryResult(underlying.query(toScala(q)))
+  override def query(q: Query, params: QueryParameters): QueryResult =
+    new JavaQueryResult(underlying.query(toScala(q), toScala(params)))
+  override def query(qs: util.List[Query]): util.List[QueryResult] =
+    underlying.query(qs.map(toScala)).map(new JavaQueryResult(_))
+  override def query(qs: util.List[Query], params: QueryParameters): util.List[QueryResult] =
+    underlying.query(qs.map(toScala), toScala(params)).map(new JavaQueryResult(_))
+
+  override def getConfig: ReactiveInfluxConfig = new JavaReactiveInfluxConfig(underlying.config)
 
   override def toString: String = underlying.toString
   override def hashCode(): Int = underlying.hashCode()

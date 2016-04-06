@@ -85,4 +85,20 @@ object Conversions {
       consistency = Option(writeParameters.getConsistency).map(Consistency.apply)
     )
   }
+
+  def toJava(value: sc.Value): Object = value match {
+    case StringValue(v) => v: java.lang.String
+    case BigDecimalValue(v) => v.bigDecimal: java.math.BigDecimal
+    case BooleanValue(v) => v: java.lang.Boolean
+  }
+
+  def toScala(query: Query): sc.Query = query match {
+    case javaQuery: JavaQuery => javaQuery.underlying
+    case _ => ??? // TODO:
+  }
+
+  def toScala(queryParameters: QueryParameters): sc.command.query.QueryParameters = queryParameters match {
+    case javaQueryParameters: JavaQueryParameters => javaQueryParameters.underlying
+    case _ => ??? // TODO:
+  }
 }
