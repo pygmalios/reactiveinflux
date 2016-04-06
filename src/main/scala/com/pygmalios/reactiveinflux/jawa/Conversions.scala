@@ -3,15 +3,16 @@ package com.pygmalios.reactiveinflux.jawa
 import java.util
 
 import com.pygmalios.reactiveinflux.Point.{FieldKey, TagKey, TagValue}
+import com.pygmalios.reactiveinflux._
+import com.pygmalios.reactiveinflux.command.write.{Consistency, Precision}
+import com.pygmalios.reactiveinflux.impl.EscapedStringWithEquals
 import com.pygmalios.reactiveinflux.jawa.sync.{JavaSyncReactiveInflux, JavaSyncReactiveInfluxDb, SyncReactiveInflux, SyncReactiveInfluxDb}
 import com.pygmalios.{reactiveinflux => sc}
-import com.pygmalios.reactiveinflux._
-import com.pygmalios.reactiveinflux.impl.EscapedStringWithEquals
 
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.Duration
-import scala.collection.JavaConversions._
 
 object Conversions {
   def toScala(reactiveInfluxConfig: ReactiveInfluxConfig): sc.ReactiveInfluxConfig = {
@@ -75,5 +76,13 @@ object Conversions {
   def toScala(pointNoTime: PointNoTime): sc.PointNoTime = pointNoTime match {
     case javaPoint: JavaPoint => javaPoint.underlying
     case _ => ??? // TODO:
+  }
+
+  def toScala(writeParameters: WriteParameters): sc.command.write.WriteParameters = {
+    sc.command.write.WriteParameters(
+      retentionPolicy = Option(writeParameters.getRetentionPolicy),
+      precision = Option(writeParameters.getPrecision).map(Precision.apply),
+      consistency = Option(writeParameters.getConsistency).map(Consistency.apply)
+    )
   }
 }

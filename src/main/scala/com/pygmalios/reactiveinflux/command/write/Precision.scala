@@ -41,4 +41,13 @@ object Precision {
     case MinuteEpoch => Minute
     case HourEpoch => Hour
   }
+
+  def apply(p: String): Precision = p match {
+    case Nano.q => Nano
+    case Micro.q => Micro
+    case Milli.q => Milli
+    case Second.q => Second
+    case Minute.q => Minute
+    case Hour.q => Hour
+  }
 }
