@@ -9,7 +9,20 @@ which is a rich asynchronous HTTP client built on top of [Async Http Client](htt
 
 ## Get it from Maven Central repository
 
-[Maven Central repository](http://mvnrepository.com/artifact/com.pygmalios)
+**Maven:**
+```xml
+<dependency>
+  <groupId>com.pygmalios</groupId>
+  <artifactId>reactiveinflux_2.10</artifactId>
+  <version>0.10.0.4</version>
+</dependency>
+```
+
+**SBT:**
+
+```
+libraryDependencies += "com.pygmalios" % "reactiveinflux" %% "0.10.0.4"
+```
 
 ## Compatibility
 
@@ -192,10 +205,12 @@ public class JavaSyncExample {
 }
 ```
 
-## Apache Spark support
-
-**TODO**
-
 ## Versioning explained
 
-**TODO**
+Version number (0.10.0.4) of reactiveinflux consists of two parts:
+
+2. InfluxDB major and minor versions. (0.10)
+3. Reactiveinflux major and minor versions. (0.4)
+
+Additionally Scala 2.11 and 2.10 versions are supported by adding "_2.11" or "_2.10" suffix to
+the artifact name.
