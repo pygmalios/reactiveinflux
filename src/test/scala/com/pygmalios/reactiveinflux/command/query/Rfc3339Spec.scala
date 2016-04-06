@@ -1,7 +1,6 @@
 package com.pygmalios.reactiveinflux.command.query
 
-import com.pygmalios.reactiveinflux.{Rfc3339, StringValue}
-import com.pygmalios.reactiveinflux.command.write.PointTime
+import com.pygmalios.reactiveinflux.{PointTime, Rfc3339, StringValue}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.junit.runner.RunWith
 import org.scalatest.FlatSpec

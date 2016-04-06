@@ -1,5 +1,6 @@
 package com.pygmalios.reactiveinflux.command.write
 
+import com.pygmalios.reactiveinflux.PointTime
 import com.pygmalios.reactiveinflux.command.query._
 
 sealed abstract class Precision(val q: String) extends Serializable {

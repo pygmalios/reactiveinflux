@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.command.write
+package com.pygmalios.reactiveinflux
 
 import java.util.Date
 

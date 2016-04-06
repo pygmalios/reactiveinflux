@@ -1,5 +1,6 @@
 package com.pygmalios.reactiveinflux.command.write
 
+import com.pygmalios.reactiveinflux.PointTime
 import org.scalatest.FlatSpec
 
 class PointTimeSpec extends FlatSpec {

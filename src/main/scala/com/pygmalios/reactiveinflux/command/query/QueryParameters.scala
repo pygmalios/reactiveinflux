@@ -1,7 +1,6 @@
 package com.pygmalios.reactiveinflux.command.query
 
-import com.pygmalios.reactiveinflux.{BigDecimalValue, ReactiveInfluxException, TimeFormat, Value}
-import com.pygmalios.reactiveinflux.command.write.PointTime
+import com.pygmalios.reactiveinflux.{BigDecimalValue, PointTime, ReactiveInfluxException, TimeFormat, Value}
 import com.pygmalios.reactiveinflux.impl.OptionalParameters
 
 trait QueryParameters extends OptionalParameters {

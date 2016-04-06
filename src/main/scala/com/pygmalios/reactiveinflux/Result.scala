@@ -1,7 +1,6 @@
 package com.pygmalios.reactiveinflux
 
 import com.pygmalios.reactiveinflux.Series.{ColumnName, SeriesName}
-import com.pygmalios.reactiveinflux.command.write.PointTime
 import org.joda.time.Instant
 
 trait QueryResult extends Serializable {

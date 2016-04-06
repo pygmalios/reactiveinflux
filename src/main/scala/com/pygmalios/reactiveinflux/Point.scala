@@ -1,11 +1,10 @@
 package com.pygmalios.reactiveinflux
 
 import com.pygmalios.reactiveinflux.Point.{FieldKey, Measurement, TagKey, TagValue}
-import com.pygmalios.reactiveinflux.command.write.PointTime
 import com.pygmalios.reactiveinflux.impl.{EscapedString, EscapedStringWithEquals}
 
 /**
-  * Common attributes of every point.
+  * Common attributes of every point without a timestamp which will be assigned by Influx server.
   */
 trait PointNoTime extends Serializable {
   def measurement: Measurement

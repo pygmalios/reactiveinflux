@@ -1,4 +1,4 @@
-package com.pygmalios.reactiveinflux.jawa.wrapper.sync
+package com.pygmalios.reactiveinflux.jawa.sync
 
 import java.lang.Iterable
 import java.util
@@ -8,12 +8,13 @@ import com.pygmalios.reactiveinflux.jawa.sync._
 import com.pygmalios.{reactiveinflux => sc}
 
 import scala.concurrent.duration.Duration
+import com.pygmalios.reactiveinflux.jawa.Conversions._
 
-private[jawa] class JavaSyncReactiveInfluxDb(underlying: sc.sync.SyncReactiveInfluxDb)
-                                            (implicit awaitAtMost: Duration) extends SyncReactiveInfluxDb {
+class JavaSyncReactiveInfluxDb(val underlying: sc.sync.SyncReactiveInfluxDb)
+                              (implicit awaitAtMost: Duration) extends SyncReactiveInfluxDb {
   override def create(): Unit = underlying.create()
   override def drop(): Unit = underlying.drop()
-  override def write(point: PointNoTime): Unit = ???
+  override def write(point: PointNoTime): Unit = underlying.write(toScala(point))
   override def write(points: Iterable[PointNoTime]): Unit = ???
   override def write(point: PointNoTime, params: WriteParameters): Unit = ???
   override def write(points: Iterable[PointNoTime], params: WriteParameters): Unit = ???

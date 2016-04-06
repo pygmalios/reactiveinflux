@@ -1,12 +1,19 @@
-package com.pygmalios.reactiveinflux.jawa.wrapper
+package com.pygmalios.reactiveinflux.jawa
 
 import java.net.URI
 
-import com.pygmalios.reactiveinflux.jawa.ReactiveInfluxConfig
-import com.typesafe.config.Config
 import com.pygmalios.{reactiveinflux => sc}
+import com.typesafe.config.Config
 
-private[jawa] class JavaReactiveInfluxConfig(underlying: sc.ReactiveInfluxConfig) extends ReactiveInfluxConfig {
+class JavaReactiveInfluxConfig(val underlying: sc.ReactiveInfluxConfig) extends ReactiveInfluxConfig {
+  def this(url: URI, username: String, password: String) {
+    this(sc.ReactiveInfluxConfig(url, Option(username), Option(password)))
+  }
+
+  def this(url: URI) {
+    this(url, null, null)
+  }
+
   override def getUrl: URI = underlying.url
   override def getUsername: String = underlying.username.orNull
   override def getPassword: String = underlying.password.orNull
