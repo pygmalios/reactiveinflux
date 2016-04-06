@@ -20,7 +20,7 @@ which is a rich asynchronous HTTP client built on top of [Async Http Client](htt
 
 **SBT:**
 
-```
+```scala
 libraryDependencies += "com.pygmalios" % "reactiveinflux" %% "0.10.0.4"
 ```
 
