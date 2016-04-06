@@ -1,4 +1,4 @@
-# reactiveinflux 0.4
+# reactiveinflux 0.5-SNAPSHOT
 Non-blocking [InfluxDB](https://influxdata.com/time-series-platform/influxdb/) driver for
 [Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) (blocking only).
 
