@@ -1,14 +1,21 @@
 # reactiveinflux 0.4
 Non-blocking [InfluxDB](https://influxdata.com/time-series-platform/influxdb/) driver for
-[Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) (blocking only).
+[Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) (blocking only)
+with [support for Apache Spark](https://github.com/pygmalios/reactiveinflux-spark).
 
 Immutability, testability and extensibility are key features of ReactiveInflux. It internally uses
 [Play Framework WS API](https://www.playframework.com/documentation/2.3.x/ScalaWS)
 which is a rich asynchronous HTTP client built on top of [Async Http Client](https://github.com/AsyncHttpClient/async-http-client).
 
 ## Get it from Maven Central repository
-**TODO:**
-[http://mvnrepository.com/artifact/com.pygmalios](http://mvnrepository.com/artifact/com.pygmalios)
+
+[Maven Central repository](http://mvnrepository.com/artifact/com.pygmalios)
+
+## Compatibility
+
+- InfluxDB 0.11, 0.10 and 0.9 (maybe even older too)
+- Scala 2.11 and 2.10
+- Java 7 and above
 
 ## Scala example
 
