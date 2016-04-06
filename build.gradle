@@ -135,9 +135,9 @@ artifacts {
     archives javadocJar
 }
 
-//signing {
-//    sign configurations.archives
-//}
+signing {
+    sign configurations.archives
+}
 
 //task signJars (type : Sign, dependsOn: [jar, javadocJar, sourceJar]) {
 //    sign configurations.archives
