@@ -93,7 +93,7 @@ publishing {
             pom.withXml {
                 asNode().children().last() + {
                     resolveStrategy = Closure.DELEGATE_FIRST
-                    name "ReactiveInflux"
+                    name "reactiveinflux"
                     description "Non-blocking, reactive InfluxDB driver for Scala and Java."
                     url "https://github.com/pygmalios/reactiveinflux"
                     scm {
@@ -204,7 +204,7 @@ task uploadToSonatype(type: Upload) {
             }
 
             pom.project {
-                name "ReactiveInflux"
+                name "reactiveinflux"
                 packaging "jar"
 
                 description "Non-blocking, reactive InfluxDB driver for Scala and Java."
