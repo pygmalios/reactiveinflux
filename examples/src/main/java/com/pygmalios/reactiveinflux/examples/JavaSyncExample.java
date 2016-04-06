@@ -1,6 +1,7 @@
 package com.pygmalios.reactiveinflux.examples;
 
 import com.pygmalios.reactiveinflux.jawa.*;
+import com.pygmalios.reactiveinflux.jawa.sync.JavaSyncReactiveInflux;
 import com.pygmalios.reactiveinflux.jawa.sync.SyncReactiveInflux;
 import com.pygmalios.reactiveinflux.jawa.sync.SyncReactiveInfluxDb;
 import org.joda.time.DateTime;
@@ -10,9 +11,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
-
-import static com.pygmalios.reactiveinflux.jawa.sync.SyncReactiveInfluxFactory.createSyncReactiveInflux;
 
 public class JavaSyncExample {
     private static final long awaitAtMostMillis = 30000;
@@ -20,7 +18,7 @@ public class JavaSyncExample {
     public static void main(String[] args) throws IOException, URISyntaxException {
         // Use Influx at the provided URL
         ReactiveInfluxConfig config = new JavaReactiveInfluxConfig(new URI("http://localhost:8086/"));
-        try (SyncReactiveInflux reactiveInflux = createSyncReactiveInflux(config, awaitAtMostMillis)) {
+        try (SyncReactiveInflux reactiveInflux = new JavaSyncReactiveInflux(config, awaitAtMostMillis)) {
             // Use database "example1"
             SyncReactiveInfluxDb db = reactiveInflux.database("example1");
 
