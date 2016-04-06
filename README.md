@@ -1,11 +1,10 @@
 # reactiveinflux 0.4
-Non-blocking, reactive [InfluxDB](https://influxdata.com/time-series-platform/influxdb/) driver for
-[Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) based on
-[Akka](http://akka.io/).
+Non-blocking [InfluxDB](https://influxdata.com/time-series-platform/influxdb/) driver for
+[Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) (blocking only).
 
 Immutability, testability and extensibility are key features of ReactiveInflux. It internally uses
 [Play Framework WS API](https://www.playframework.com/documentation/2.3.x/ScalaWS)
-which is a rich asynchronous HTTP client built on top of Akka actor system.
+which is a rich asynchronous HTTP client built on top of [Async Http Client](https://github.com/AsyncHttpClient/async-http-client).
 
 ## Get it from Maven Central repository
 **TODO:**
