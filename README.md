@@ -1,14 +1,34 @@
-# reactiveinflux 0.5-SNAPSHOT
+# reactiveinflux 0.4
 Non-blocking [InfluxDB](https://influxdata.com/time-series-platform/influxdb/) driver for
-[Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) (blocking only).
+[Scala](http://www.scala-lang.org/) and [Java](https://en.wikipedia.org/wiki/Java_(programming_language)) (blocking only)
+with [support for Apache Spark](https://github.com/pygmalios/reactiveinflux-spark).
 
 Immutability, testability and extensibility are key features of ReactiveInflux. It internally uses
 [Play Framework WS API](https://www.playframework.com/documentation/2.3.x/ScalaWS)
 which is a rich asynchronous HTTP client built on top of [Async Http Client](https://github.com/AsyncHttpClient/async-http-client).
 
 ## Get it from Maven Central repository
-**TODO:**
-[http://mvnrepository.com/artifact/com.pygmalios](http://mvnrepository.com/artifact/com.pygmalios)
+
+**Maven:**
+```xml
+<dependency>
+  <groupId>com.pygmalios</groupId>
+  <artifactId>reactiveinflux_2.10</artifactId>
+  <version>0.10.0.4</version>
+</dependency>
+```
+
+**SBT:**
+
+```scala
+libraryDependencies += "com.pygmalios" % "reactiveinflux" %% "0.10.0.4"
+```
+
+## Compatibility
+
+- InfluxDB 0.11, 0.10 and 0.9 (maybe even older too)
+- Scala 2.11 and 2.10
+- Java 7 and above
 
 ## Scala example
 
@@ -185,10 +205,12 @@ public class JavaSyncExample {
 }
 ```
 
-## Apache Spark support
-
-**TODO**
-
 ## Versioning explained
 
-**TODO**
+Version number (0.10.0.4) of reactiveinflux consists of two parts:
+
+2. InfluxDB major and minor versions. (0.10)
+3. Reactiveinflux major and minor versions. (0.4)
+
+Additionally Scala 2.11 and 2.10 versions are supported by adding "_2.11" or "_2.10" suffix to
+the artifact name.
