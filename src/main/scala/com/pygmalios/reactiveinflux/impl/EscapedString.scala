@@ -8,10 +8,10 @@ class EscapedStringWithEquals(unescaped: String) extends BaseEscapedString(unesc
 abstract class BaseEscapedString(val unescaped: String) extends Serializable {
   def escaped: String = unescaped.replace(" ", "\\ ").replace(",", "\\,")
 
-  def canEqual(other: Any): Boolean = other.isInstanceOf[EscapedString]
+  def canEqual(other: Any): Boolean = other.isInstanceOf[BaseEscapedString]
 
   override def equals(other: Any): Boolean = other match {
-    case that: EscapedString =>
+    case that: BaseEscapedString =>
       (that canEqual this) &&
         unescaped == that.unescaped
     case _ => false
