@@ -139,43 +139,9 @@ signing {
     sign configurations.archives
 }
 
-//task signJars (type : Sign, dependsOn: [jar, javadocJar, sourceJar]) {
-//    sign configurations.archives
-//}
-//
-//// call signJar task before publish task
-//task preparePublish(dependsOn: signJar)
-//
-//// extract signature file and give them proper name
-//def getSignatureFiles = {
-//    def allFiles = project.tasks.signJars.signatureFiles.collect { it }
-//    def signedSources = allFiles.find { it.name.contains('-sources') }
-//    def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
-//    def signedJar = (allFiles - [signedSources, signedJavadoc])[0]
-//    return [
-//            [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
-//            [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
-//            [archive: signedJar,     classifier: null,      extension: 'jar.asc']
-//    ]
-//}
-
-//publishing {
-//    publications {
-//        signatures (MavenPublication) {
-//            // give signature files to rtifact method
-//            getSignatureFiles().each {signature ->
-//                artifact (signature.archive) {
-//                    classifier = signature.classifier
-//                    extension  = signature.extension
-//                }
-//            }
-//        }
-//    }
-//}
-
 uploadArchives {
     def mavenRepoURL = (version.endsWith("-SNAPSHOT")) ?
-            "$System.env.MAVEN_REPO_SNAPSHOT_URL" : "$System.env.MAVEN_REPO_RELEASE_URL"
+        "$System.env.MAVEN_REPO_SNAPSHOT_URL" : "$System.env.MAVEN_REPO_RELEASE_URL"
 
     repositories {
         mavenDeployer {
@@ -195,12 +161,15 @@ task uploadToSonatype(type: Upload) {
         mavenDeployer {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
+            def ossrhUsername = binding.variables.get("ossrhUsername")
+            def ossrhPassword = binding.variables.get("ossrhPassword")
+
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: "$ossrhUsername" ?: "", password: ossrhPassword)
             }
 
             snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                authentication(userName: ossrhUsername, password: ossrhPassword)
+                authentication(userName: "$ossrhUsername", password: ossrhPassword)
             }
 
             pom.project {
