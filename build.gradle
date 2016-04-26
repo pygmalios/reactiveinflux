@@ -86,6 +86,16 @@ task javadocJar (type: Jar) {
     from javadoc
 }
 
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+}
+
+signing {
+    sign configurations.archives
+}
+
 publishing {
     publications {
         mavenScala(MavenPublication) {
@@ -129,16 +139,6 @@ publishing {
     }
 }
 
-artifacts {
-    archives jar
-    archives sourceJar
-    archives javadocJar
-}
-
-signing {
-    sign configurations.archives
-}
-
 uploadArchives {
     def mavenRepoURL = (version.endsWith("-SNAPSHOT")) ?
         "$System.env.MAVEN_REPO_SNAPSHOT_URL" : "$System.env.MAVEN_REPO_RELEASE_URL"
@@ -162,7 +162,7 @@ task uploadToSonatype(type: Upload) {
             beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
             def ossrhUsername = binding.variables.get("ossrhUsername")
-            def ossrhPassword = binding.variables.get("ossrhPassword")
+            def ossrhPassword = binding.variables.get("ossrhUsername")
 
             repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
                 authentication(userName: "$ossrhUsername" ?: "", password: ossrhPassword)
