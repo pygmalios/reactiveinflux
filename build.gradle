@@ -203,3 +203,20 @@ task uploadToSonatype(type: Upload) {
         }
     }
 }
+
+task copyPomToLibs(type: Copy) {
+    from('build/poms') {
+        rename 'pom-default.xml', 'pom.xml'
+        rename 'pom-default.xml.asc', 'pom.xml.asc'
+    }
+    into 'build/libs'
+}
+
+task zipForSonatype(type: Zip) {
+    from 'build/libs'
+    into('')
+}
+
+zipForSonatype.dependsOn clean
+zipForSonatype.dependsOn uploadToSonatype
+zipForSonatype.dependsOn copyPomToLibs
