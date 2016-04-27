@@ -217,6 +217,4 @@ task zipForSonatype(type: Zip) {
     into('')
 }
 
-zipForSonatype.dependsOn clean
-zipForSonatype.dependsOn uploadToSonatype
 zipForSonatype.dependsOn copyPomToLibs
